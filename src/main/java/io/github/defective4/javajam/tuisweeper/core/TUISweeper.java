@@ -37,6 +37,11 @@ public class TUISweeper {
                 case Character: {
                     if (absY >= 0 && absX >= 0 && absX < board.getSizeX() && absY < board.getSizeY())
                         switch (keyStroke.getCharacter()) {
+                            case 'f': {
+                                flag(absX, absY);
+                                updateBoard();
+                                break;
+                            }
                             case ' ': {
                                 reveal(absX, absY);
                                 updateBoard();
@@ -76,20 +81,64 @@ public class TUISweeper {
         });
     }
 
-    public void reveal(int x, int y) {
+    public void flag(int x, int y) {
         byte current = board.getFieldAt(x, y);
-        if (current == 0) {
+        byte c;
+        switch (current) {
+            case 0: {
+                c = 12;
+                break;
+            }
+            case 11: {
+                c = 13;
+                break;
+            }
+            case 12: {
+                c = 0;
+                break;
+            }
+            case 13: {
+                c = 11;
+                break;
+            }
+            default: {
+                c = -1;
+                break;
+            }
+        }
+        if (c > -1) board.setFieldAt(x, y, c);
+    }
+
+    public void reveal(int x, int y) {
+        reveal(x, y, false);
+    }
+
+    public void reveal(int x, int y, boolean revealFlags) {
+        byte current = board.getFieldAt(x, y);
+        if (current == 0 || (revealFlags && current == 12)) {
             int bombs = board.countBombs(x, y);
             if (bombs == 0) {
                 board.setFieldAt(x, y, 10);
                 for (int i = x - 1; i <= x + 1; i++)
                     for (int j = y - 1; j <= y + 1; j++) {
                         if (i >= 0 && j >= 0 && i < board.getSizeX() && j < board.getSizeY()) {
-                            reveal(i, j);
+                            byte c = board.getFieldAt(i, j);
+                            if (c == 0 || c == 12) reveal(i, j, true);
                         }
                     }
             } else {
                 board.setFieldAt(x, y, bombs);
+            }
+        } else if (current > 0 && current < 10) {
+            int flags = board.countFlags(x, y);
+            if (flags == current) {
+                for (int i = x - 1; i <= x + 1; i++)
+                    for (int j = y - 1; j <= y + 1; j++) {
+                        if (i >= 0 && j >= 0 && i < board.getSizeX() && j < board.getSizeY()) {
+                            byte c = board.getFieldAt(i, j);
+                            if (c == 0 || c == 11) reveal(i, j, true);
+                        }
+                    }
             }
         }
     }

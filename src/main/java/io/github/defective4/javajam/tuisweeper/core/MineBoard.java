@@ -9,8 +9,10 @@ public class MineBoard {
     private static final Map<Integer, Character> CHAR_MAP = new HashMap<>();
 
     static {
-        CHAR_MAP.put(10, '-');
-        CHAR_MAP.put(11, 'x');
+        CHAR_MAP.put(10, '-'); // - Revealed field
+        CHAR_MAP.put(11, ' '); // - Bomb field
+        CHAR_MAP.put(12, 'F'); // - Flagged safe field
+        CHAR_MAP.put(13, 'F'); // - Flagged bomb field
     }
 
     private final Random rand = new Random();
@@ -53,12 +55,24 @@ public class MineBoard {
     }
 
     public int countBombs(int x, int y) {
+        return countFields(x, y, 11, 13);
+    }
+
+    public int countFlags(int x, int y) {
+        return countFields(x, y, 12, 13);
+    }
+
+    public int countFields(int x, int y, int... types) {
         int bombs = 0;
         for (int i = x - 1; i <= x + 1; i++)
             for (int j = y - 1; j <= y + 1; j++) {
                 if (i >= 0 && j >= 0 && i < getSizeX() && j < getSizeY()) {
                     byte field = getFieldAt(i, j);
-                    if (field == 11) bombs++;
+                    for (int type : types)
+                        if (type == field) {
+                            bombs++;
+                            break;
+                        }
                 }
             }
         return bombs;
