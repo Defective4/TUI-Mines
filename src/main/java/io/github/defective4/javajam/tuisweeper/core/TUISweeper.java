@@ -6,11 +6,13 @@ import com.googlecode.lanterna.gui2.TextBox;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.screen.Screen;
+import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -29,6 +31,9 @@ public class TUISweeper {
 
     private long startTime = -1;
     private long endTime = -1;
+    private boolean placed = false;
+
+    private final Preferences prefs = new Preferences();
 
     public String getCurrentPlayingTime() {
         long diff = startTime == -1 ? 0 : endTime == -1 ? System.currentTimeMillis() - startTime : endTime - startTime;
@@ -38,6 +43,7 @@ public class TUISweeper {
     public TUISweeper(Screen screen) {
         this.screen = screen;
         gui = new MultiWindowTextGUI(screen);
+        gui.setTheme(prefs.getTheme().toTUITheme());
         mainWindow.setComponent(boardBox);
 
         boardBox.setInputFilter((interactable, keyStroke) -> {
@@ -145,6 +151,22 @@ public class TUISweeper {
     public void reveal(int x, int y, boolean revealFlags) {
         startTimer();
         byte current = board.getFieldAt(x, y);
+        if (!placed) {
+            placed = true;
+            if (current == 11) {
+                int i, j;
+                byte c;
+                Random rand = board.getRand();
+                do {
+                    i = rand.nextInt(board.getSizeX());
+                    j = rand.nextInt(board.getSizeY());
+                    c = board.getFieldAt(i, j);
+                } while (c != 0);
+                board.setFieldAt(i, j, 11);
+                board.setFieldAt(x, y, 0);
+                current = 0;
+            }
+        }
         if (current == 0 || (revealFlags && current == 12)) {
             int bombs = board.countBombs(x, y);
             if (bombs == 0) {
@@ -180,7 +202,7 @@ public class TUISweeper {
     }
 
     public void start() {
-        board.initialize(18, 18, 10);
+        board.initialize(10, 10, 10);
         resetVariables();
         updateBoard();
         boardBox.setCaretPosition(MineBoard.Y_OFFSET, board.getXOffset());
@@ -197,6 +219,7 @@ public class TUISweeper {
     private void resetVariables() {
         startTime = -1;
         endTime = -1;
+        placed = false;
     }
 
     private void updateBoard() {

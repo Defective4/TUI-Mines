@@ -26,6 +26,10 @@ public class MineBoard {
         initialize(1, 1, 0);
     }
 
+    public Random getRand() {
+        return rand;
+    }
+
     public char getFieldCharAt(int x, int y) {
         int field = getFieldAt(x, y);
         if (field > 0 && field < 10) return Integer.toString(field).charAt(0);
