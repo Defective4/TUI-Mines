@@ -6,6 +6,17 @@ import com.googlecode.lanterna.graphics.Theme;
 
 public class Preferences {
 
+    private final UserTheme theme = new UserTheme(TextColor.ANSI.WHITE_BRIGHT,
+                                                  TextColor.ANSI.BLACK,
+                                                  TextColor.ANSI.WHITE_BRIGHT,
+                                                  TextColor.ANSI.BLACK,
+                                                  TextColor.ANSI.BLACK,
+                                                  TextColor.ANSI.WHITE_BRIGHT);
+
+    public UserTheme getTheme() {
+        return theme;
+    }
+
     public static class UserTheme {
 
         private TextColor.ANSI baseForeground, baseBackground, editableForeground, editableBackground, selectedForeground, selectedBackground;
@@ -77,16 +88,5 @@ public class Preferences {
                                          selectedBackground,
                                          TextColor.ANSI.BLACK);
         }
-    }
-
-    private final UserTheme theme = new UserTheme(TextColor.ANSI.WHITE_BRIGHT,
-                                                  TextColor.ANSI.BLACK,
-                                                  TextColor.ANSI.WHITE_BRIGHT,
-                                                  TextColor.ANSI.BLACK,
-                                                  TextColor.ANSI.BLACK,
-                                                  TextColor.ANSI.WHITE_BRIGHT);
-
-    public UserTheme getTheme() {
-        return theme;
     }
 }

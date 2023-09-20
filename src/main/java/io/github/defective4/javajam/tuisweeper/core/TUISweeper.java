@@ -28,17 +28,10 @@ public class TUISweeper {
     private final MineBoard board = new MineBoard();
 
     private final Timer boardUpdater = new Timer(true);
-
+    private final Preferences prefs = new Preferences();
     private long startTime = -1;
     private long endTime = -1;
     private boolean placed = false;
-
-    private final Preferences prefs = new Preferences();
-
-    public String getCurrentPlayingTime() {
-        long diff = startTime == -1 ? 0 : endTime == -1 ? System.currentTimeMillis() - startTime : endTime - startTime;
-        return new SimpleDateFormat("mm:ss").format(new Date(diff));
-    }
 
     public TUISweeper(Screen screen) {
         this.screen = screen;
@@ -109,6 +102,11 @@ public class TUISweeper {
                 updateBoard();
             }
         }, 250, 250);
+    }
+
+    public String getCurrentPlayingTime() {
+        long diff = startTime == -1 ? 0 : endTime == -1 ? System.currentTimeMillis() - startTime : endTime - startTime;
+        return new SimpleDateFormat("mm:ss").format(new Date(diff));
     }
 
     public void flag(int x, int y) {
