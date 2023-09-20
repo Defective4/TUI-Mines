@@ -102,18 +102,21 @@ public class TUISweeper {
             public void run() {
                 updateBoard();
             }
-        }, 500, 500);
+        }, 250, 250);
     }
 
     public void flag(int x, int y) {
+        int[] fields = board.countAllFields(11, 12);
         byte current = board.getFieldAt(x, y);
-        byte c;
+        byte c = -1;
         switch (current) {
             case 0: {
+                if (fields[0] - fields[1] <= 0) break;
                 c = 12;
                 break;
             }
             case 11: {
+                if (fields[0] - fields[1] <= 0) break;
                 c = 13;
                 break;
             }
@@ -126,7 +129,6 @@ public class TUISweeper {
                 break;
             }
             default: {
-                c = -1;
                 break;
             }
         }
@@ -212,7 +214,9 @@ public class TUISweeper {
             for (int j = 0; j < board.getSizeX() + offsetX; j++) {
                 builder.append(j < offsetX ?
                                        ' ' :
-                                       i == 0 ? j == cx ? 'v' : ' ' : i == 1 ? CHARS[(j - offsetX) % CHARS.length] : '=');
+                                       i == 0 ?
+                                               j == cx ? 'v' : ' ' :
+                                               i == 1 ? CHARS[(j - offsetX) % CHARS.length] : '=');
             }
             if (i == 1) builder.append("    Timer   Bombs   Cleared");
             else if (i == 2) {
