@@ -1,10 +1,7 @@
 package io.github.defective4.javajam.tuisweeper.core;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
-import com.googlecode.lanterna.gui2.TextBox;
-import com.googlecode.lanterna.gui2.Window;
-import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.screen.Screen;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
@@ -66,6 +63,84 @@ public class TUISweeper {
                             default:
                                 break;
                         }
+
+                    switch (keyStroke.getCharacter()) {
+                        case 'n': {
+                            Window win = new SimpleWindow("New game");
+                            Panel panel = new Panel(new LinearLayout());
+                            Panel ctl = new Panel(new LinearLayout(Direction.HORIZONTAL));
+
+                            panel.addComponent(new Label("Are you sure you want to start a new game?\n" + "Your current session will get discarded.\n "));
+
+                            ctl.addComponent(new Button("No", win::close));
+                            ctl.addComponent(new Button("Yes", () -> {
+                                win.close();
+                                start();
+                            }));
+
+                            panel.addComponent(ctl);
+
+                            win.setComponent(panel);
+                            gui.addWindow(win);
+                            break;
+                        }
+                        case 'c': {
+                            Window win = new SimpleWindow("Customization");
+                            Panel panel = new Panel(new GridLayout(2));
+                            Panel ctl = new Panel(new LinearLayout());
+                            Label text = new Label("");
+
+                            Button game = new Button("Game") {
+                                @Override
+                                protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
+                                    text.setText(" |  Adjust game's difficulty   \n" + " | \n" + " |");
+                                }
+                            };
+                            Button theme = new Button("Theme") {
+                                @Override
+                                protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
+                                    text.setText(" | \n" + " |  Customize game's appearance\n" + " |");
+                                }
+                            };
+                            Button done = new Button("Done", win::close) {
+                                @Override
+                                protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
+                                    text.setText(" | \n" + " | \n" + " |  Close this menu            ");
+                                }
+                            };
+
+                            ctl.addComponent(game);
+                            ctl.addComponent(theme);
+                            ctl.addComponent(done);
+
+                            panel.addComponent(ctl);
+                            panel.addComponent(text);
+                            win.setComponent(panel);
+                            gui.addWindow(win);
+                            break;
+                        }
+                        case 'q': {
+                            Window win = new SimpleWindow("Quiting the game");
+                            Panel panel = new Panel(new LinearLayout());
+                            Panel ctl = new Panel(new LinearLayout(Direction.HORIZONTAL));
+
+                            Button no = new Button("No", win::close);
+                            Button yes = new Button("Yes", () -> System.exit(0));
+
+                            ctl.addComponent(no);
+                            ctl.addComponent(yes);
+
+                            panel.addComponent(new Label("Are you sure you want to discard\n" + "current game and close the application?\n "));
+                            panel.addComponent(ctl);
+
+                            win.setComponent(panel);
+                            gui.addWindow(win);
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+
                     break;
                 }
                 case ArrowLeft: {
@@ -275,6 +350,12 @@ public class TUISweeper {
 
             builder.append("\n");
         }
+
+        builder.append("\n\n\n")
+               .append("    n - New Game\n")
+               .append("    c - Customize\n")
+               .append("    l - Leaderboards\n")
+               .append("    q - Quit");
 
         boardBox.setText(builder.toString());
     }

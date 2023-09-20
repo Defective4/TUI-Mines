@@ -11,6 +11,8 @@ public class SimpleWindow extends BasicWindow {
         super(title);
         List<Hint> list = new ArrayList<>(Arrays.asList(hints));
         list.add(Hint.NO_POST_RENDERING);
+        list.add(Hint.MODAL);
+        list.add(Hint.CENTERED);
         setHints(list);
     }
 
