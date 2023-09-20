@@ -6,6 +6,9 @@ import java.util.Random;
 
 public class MineBoard {
 
+    public static final int X_OFFSET = 2;
+    public static final int Y_OFFSET = 3;
+
     private static final Map<Integer, Character> CHAR_MAP = new HashMap<>();
 
     static {
@@ -27,6 +30,14 @@ public class MineBoard {
         int field = getFieldAt(x, y);
         if (field > 0 && field < 10) return Integer.toString(field).charAt(0);
         return CHAR_MAP.getOrDefault(field, ' ');
+    }
+
+    public int getMaxSizeLen() {
+        return Integer.toString(getSizeY() + 1).length();
+    }
+
+    public int getXOffset() {
+        return X_OFFSET + getMaxSizeLen();
     }
 
     public void setFieldAt(int x, int y, int field) {
@@ -60,6 +71,18 @@ public class MineBoard {
 
     public int countFlags(int x, int y) {
         return countFields(x, y, 12, 13);
+    }
+
+    public int[] countAllFields(int... types) {
+        int[] ar = new int[types.length];
+
+        for (byte[] x : matrix)
+            for (byte y : x)
+                for (int i = 0; i < types.length; i++) {
+                    if (types[i] == y) ar[i]++;
+                }
+
+        return ar;
     }
 
     public int countFields(int x, int y, int... types) {
