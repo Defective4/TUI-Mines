@@ -7,6 +7,7 @@ import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.ColorChooserButton;
 import io.github.defective4.javajam.tuisweeper.core.ui.NumberBox;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
+import io.github.defective4.javajam.tuisweeper.core.ui.ThemePreset;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -176,8 +177,30 @@ public class TUISweeper {
                                 ColorChooserButton sbColor = new ColorChooserButton(gui, ut.getSelectedBackground());
 
 
-                                panel2.addComponent(new Label("Base color"));
-                                panel2.addComponent(new Label("Base background"));
+                                ComboBox<ThemePreset> presets = new ComboBox<ThemePreset>(ThemePreset.values()) {
+                                    @Override
+                                    protected synchronized void afterLeaveFocus(FocusChangeDirection direction, Interactable nextInFocus) {
+                                        setSelectedIndex(0);
+                                    }
+                                };
+                                presets.addListener((i, i1, b) -> {
+                                    ThemePreset preset = presets.getItem(i);
+                                    if (preset != ThemePreset.NONE) {
+                                        bfColor.setColor(preset.getBf());
+                                        bbColor.setColor(preset.getBb());
+                                        efColor.setColor(preset.getEf());
+                                        ebColor.setColor(preset.getEb());
+                                        sfColor.setColor(preset.getSf());
+                                        sbColor.setColor(preset.getSb());
+                                    }
+                                });
+
+                                panel2.addComponent(new Label("Choose a preset"));
+                                panel2.addComponent(new EmptySpace());
+                                panel2.addComponent(presets);
+                                panel2.addComponent(new EmptySpace());
+                                panel2.addComponent(new Label("\nBase color"));
+                                panel2.addComponent(new Label("\nBase background"));
                                 panel2.addComponent(bfColor);
                                 panel2.addComponent(bbColor);
                                 panel2.addComponent(new Label("\nField color"));
