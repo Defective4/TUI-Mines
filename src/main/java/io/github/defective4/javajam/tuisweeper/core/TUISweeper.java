@@ -379,6 +379,10 @@ public class TUISweeper {
         updateBoard(caret.getColumn(), caret.getRow());
     }
 
+    private void showLeaderboards() {
+
+    }
+
     private void updateBoard(int cx, int cy) {
         StringBuilder builder = new StringBuilder();
 
@@ -404,7 +408,21 @@ public class TUISweeper {
                     percent = gameOver == 2 ? 100 : 0;
                 } else {
                     int[] fields = board.countAllFields(11, 12, 0, 13);
-                    if (fields[0] == 0 && fields[1] == 0 && fields[2] == 0) gameOver = 2;
+                    if (fields[0] == 0 && fields[1] == 0 && fields[2] == 0) {
+                        gameOver = 2;
+                        endTime = System.currentTimeMillis();
+                        Window win = new SimpleWindow("Game won");
+                        Panel panel = new Panel(new LinearLayout());
+                        Panel ctl = new Panel(new LinearLayout(Direction.HORIZONTAL));
+
+                        ctl.addComponent(new Button("Close", win::close));
+                        ctl.addComponent(new Button("Leaderboards", this::showLeaderboards));
+
+                        panel.addComponent(new Label("You won!\n" + "Your time is " + getCurrentPlayingTime() + "\n "));
+                        panel.addComponent(ctl);
+                        win.setComponent(panel);
+                        gui.addWindow(win);
+                    }
                     percent = (double) (fields[2] + fields[0]) / (board.getSizeX() * board.getSizeY());
                     percent = 100 - (percent * 100);
                     bombs = Integer.toString(fields[0] - fields[1]);
