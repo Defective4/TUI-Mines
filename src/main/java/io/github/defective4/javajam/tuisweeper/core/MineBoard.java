@@ -16,11 +16,13 @@ public class MineBoard {
         CHAR_MAP.put(11, ' '); // - Bomb field
         CHAR_MAP.put(12, 'F'); // - Flagged safe field
         CHAR_MAP.put(13, 'F'); // - Flagged bomb field
+        CHAR_MAP.put(20, 'x'); // - Active mine
+        CHAR_MAP.put(21, 'P'); // - "False" flag
     }
 
     private final Random rand = new Random();
     private byte[][] matrix = new byte[0][0];
-    private int sizeX, sizeY;
+    private int sizeX, sizeY, bombs;
 
     public MineBoard() {
         initialize(1, 1, 0);
@@ -28,6 +30,15 @@ public class MineBoard {
 
     public Random getRand() {
         return rand;
+    }
+
+    public void revealMines() {
+        for (int x = 0; x < sizeX; x++)
+            for (int y = 0; y < sizeY; y++) {
+                byte field = getFieldAt(x, y);
+                if (field == 11) setFieldAt(x, y, 20);
+                else if (field == 12) setFieldAt(x, y, 21);
+            }
     }
 
     public char getFieldCharAt(int x, int y) {
@@ -52,10 +63,15 @@ public class MineBoard {
         return matrix[x][y];
     }
 
+    public int getBombs() {
+        return bombs;
+    }
+
     public void initialize(int sizeX, int sizeY, int bombs) {
         matrix = new byte[sizeX][sizeY];
         this.sizeX = sizeX;
         this.sizeY = sizeY;
+        this.bombs = bombs;
 
         for (int x = 0; x < bombs; x++) {
             byte current;

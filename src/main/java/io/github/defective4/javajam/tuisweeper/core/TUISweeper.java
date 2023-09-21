@@ -4,6 +4,7 @@ import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.screen.Screen;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
+import io.github.defective4.javajam.tuisweeper.core.ui.NumberBox;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
 
 import java.text.DecimalFormat;
@@ -30,6 +31,8 @@ public class TUISweeper {
     private long endTime = -1;
     private boolean placed = false;
 
+    private byte gameOver = 0;
+
     public TUISweeper(Screen screen) {
         this.screen = screen;
         gui = new MultiWindowTextGUI(screen);
@@ -48,7 +51,7 @@ public class TUISweeper {
 
             switch (keyStroke.getKeyType()) {
                 case Character: {
-                    if (absY >= 0 && absX >= 0 && absX < board.getSizeX() && absY < board.getSizeY())
+                    if (gameOver == 0 && absY >= 0 && absX >= 0 && absX < board.getSizeX() && absY < board.getSizeY())
                         switch (keyStroke.getCharacter()) {
                             case 'f': {
                                 flag(absX, absY);
@@ -90,7 +93,71 @@ public class TUISweeper {
                             Panel ctl = new Panel(new LinearLayout());
                             Label text = new Label("");
 
-                            Button game = new Button("Game") {
+                            Button game = new Button("Game", () -> {
+                                Panel panel2 = new Panel(new GridLayout(2));
+                                Panel left = new Panel(new LinearLayout());
+                                Panel right = new Panel(new LinearLayout());
+                                Panel ctl2 = new Panel(new LinearLayout(Direction.HORIZONTAL));
+
+                                Difficulty[] diffs = Difficulty.values();
+                                RadioBoxList<Difficulty> radio = new RadioBoxList<>();
+                                for (Difficulty dif : diffs)
+                                    radio.addItem(dif);
+
+                                NumberBox wBox = new NumberBox(board.getSizeX());
+                                NumberBox hBox = new NumberBox(board.getSizeY());
+                                NumberBox bBox = new NumberBox(board.getBombs());
+
+                                TextBox.TextChangeListener listener = (s, b) -> {
+                                    if (b && radio.getCheckedItem() != Difficulty.CUSTOM)
+                                        radio.setCheckedItem(Difficulty.CUSTOM);
+                                };
+
+                                wBox.setTextChangeListener(listener);
+                                hBox.setTextChangeListener(listener);
+                                bBox.setTextChangeListener(listener);
+
+                                radio.addListener((i, i1) -> {
+                                    Difficulty sel = radio.getItemAt(i);
+                                    if (sel != Difficulty.CUSTOM) {
+                                        wBox.setValue(sel.getWidth());
+                                        hBox.setValue(sel.getHeight());
+                                        bBox.setValue(sel.getBombs());
+                                    } else if (radio.isFocused()) wBox.takeFocus();
+                                });
+                                radio.setCheckedItem(prefs.getDifficulty());
+
+                                left.addComponent(radio);
+                                right.addComponent(new Label("Width"));
+                                right.addComponent(wBox);
+                                right.addComponent(new Label("\nHeight"));
+                                right.addComponent(hBox);
+                                right.addComponent(new Label("\nBombs"));
+                                right.addComponent(bBox);
+                                ctl2.addComponent(new Button("Cancel", () -> win.setComponent(panel)));
+                                ctl2.addComponent(new Button("Confirm", () -> {
+                                    prefs.setDifficulty(radio.getCheckedItem());
+                                    prefs.setWidth(wBox.getValue());
+                                    prefs.setHeight(hBox.getValue());
+                                    prefs.setBombs(bBox.getValue());
+                                    Panel panel3 = new Panel(new LinearLayout());
+                                    Panel ctl3 = new Panel(new LinearLayout(Direction.HORIZONTAL));
+
+                                    ctl3.addComponent(new Button("No", win::close));
+                                    ctl3.addComponent(new Button("Yes", () -> {
+                                        start();
+                                        win.close();
+                                    }));
+                                    panel3.addComponent(new Label(
+                                            "The changes will take effect after starting a new game.\n" + "Do you want to start a new gamew now?\n "));
+                                    panel3.addComponent(ctl3);
+                                    win.setComponent(panel3);
+                                }));
+                                panel2.addComponent(left);
+                                panel2.addComponent(right);
+                                panel2.addComponent(ctl2);
+                                win.setComponent(panel2);
+                            }) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     text.setText(" |  Adjust game's difficulty   \n" + " | \n" + " |");
@@ -177,6 +244,15 @@ public class TUISweeper {
                 updateBoard();
             }
         }, 250, 250);
+    }
+
+    public static String capitalize(Enum<?> en) {
+        String name = en.name();
+        StringBuilder builder = new StringBuilder();
+        for (String split : name.split("_")) {
+            builder.append(split.substring(0, 1).toUpperCase()).append(split.substring(1).toLowerCase());
+        }
+        return builder.toString();
     }
 
     public String getCurrentPlayingTime() {
@@ -266,7 +342,9 @@ public class TUISweeper {
                     }
             }
         } else if (current == 11) {
-            // TODO
+            board.revealMines();
+            gameOver = 1;
+            endTime = System.currentTimeMillis();
         }
     }
 
@@ -275,7 +353,7 @@ public class TUISweeper {
     }
 
     public void start() {
-        board.initialize(10, 10, 10);
+        board.initialize(prefs.getWidth(), prefs.getHeight(), prefs.getBombs());
         resetVariables();
         updateBoard();
         boardBox.setCaretPosition(MineBoard.Y_OFFSET, board.getXOffset());
@@ -293,6 +371,7 @@ public class TUISweeper {
         startTime = -1;
         endTime = -1;
         placed = false;
+        gameOver = 0;
     }
 
     private void updateBoard() {
@@ -318,9 +397,17 @@ public class TUISweeper {
             else if (i == 2) {
                 String time = getCurrentPlayingTime();
 
-                int[] fields = board.countAllFields(11, 12, 0);
-                String bombs = Integer.toString(fields[0] - fields[1]);
-                double percent = (double) (fields[2] + fields[0]) / (board.getSizeX() * board.getSizeY());
+                String bombs;
+                double percent;
+                if (gameOver > 0) {
+                    bombs = "0";
+                    percent = gameOver == 2 ? 100 : 0;
+                } else {
+                    int[] fields = board.countAllFields(11, 12, 0);
+                    percent = (double) (fields[2] + fields[0]) / (board.getSizeX() * board.getSizeY());
+                    percent = 100 - (percent * 100);
+                    bombs = Integer.toString(fields[0] - fields[1]);
+                }
 
                 StringBuilder space = new StringBuilder();
                 for (int x = 0; x < 8 - bombs.length(); x++)
@@ -331,7 +418,7 @@ public class TUISweeper {
                        .append("   ")
                        .append(bombs)
                        .append(space)
-                       .append(doubleFormat.format(100 - (percent * 100)))
+                       .append(doubleFormat.format(percent))
                        .append('%');
             }
             builder.append("\n");
