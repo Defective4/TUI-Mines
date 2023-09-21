@@ -4,6 +4,7 @@ import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.screen.Screen;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
+import io.github.defective4.javajam.tuisweeper.core.ui.ColorChooserButton;
 import io.github.defective4.javajam.tuisweeper.core.ui.NumberBox;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
 
@@ -163,7 +164,47 @@ public class TUISweeper {
                                     text.setText(" |  Adjust game's difficulty   \n" + " | \n" + " |");
                                 }
                             };
-                            Button theme = new Button("Theme") {
+                            Button theme = new Button("Theme", () -> {
+                                Panel panel2 = new Panel(new GridLayout(2));
+
+                                Preferences.UserTheme ut = prefs.getTheme();
+                                ColorChooserButton bfColor = new ColorChooserButton(gui, ut.getBaseForeground());
+                                ColorChooserButton bbColor = new ColorChooserButton(gui, ut.getBaseBackground());
+                                ColorChooserButton efColor = new ColorChooserButton(gui, ut.getEditableForeground());
+                                ColorChooserButton ebColor = new ColorChooserButton(gui, ut.getEditableBackground());
+                                ColorChooserButton sfColor = new ColorChooserButton(gui, ut.getSelectedForeground());
+                                ColorChooserButton sbColor = new ColorChooserButton(gui, ut.getSelectedBackground());
+
+
+                                panel2.addComponent(new Label("Base color"));
+                                panel2.addComponent(new Label("Base background"));
+                                panel2.addComponent(bfColor);
+                                panel2.addComponent(bbColor);
+                                panel2.addComponent(new Label("\nField color"));
+                                panel2.addComponent(new Label("\nField background"));
+                                panel2.addComponent(efColor);
+                                panel2.addComponent(ebColor);
+                                panel2.addComponent(new Label("\nSelected color    "));
+                                panel2.addComponent(new Label("\nSelected background"));
+                                panel2.addComponent(sfColor);
+                                panel2.addComponent(sbColor);
+                                panel2.addComponent(new Label("\n "));
+                                panel2.addComponent(new Label("\n "));
+                                panel2.addComponent(new Button("Cancel", () -> win.setComponent(panel)));
+                                panel2.addComponent(new Button("Apply", () -> {
+                                    ut.setBaseBackground(bbColor.getColor());
+                                    ut.setBaseForeground(bfColor.getColor());
+                                    ut.setSelectedBackground(sbColor.getColor());
+                                    ut.setSelectedForeground(sfColor.getColor());
+                                    ut.setEditableBackground(ebColor.getColor());
+                                    ut.setEditableForeground(efColor.getColor());
+                                    gui.setTheme(ut.toTUITheme());
+                                    win.setComponent(panel);
+                                }));
+
+
+                                win.setComponent(panel2);
+                            }) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     text.setText(" | \n" + " |  Customize game's appearance\n" + " |");
@@ -247,12 +288,10 @@ public class TUISweeper {
     }
 
     public static String capitalize(Enum<?> en) {
-        String name = en.name();
-        StringBuilder builder = new StringBuilder();
-        for (String split : name.split("_")) {
-            builder.append(split.substring(0, 1).toUpperCase()).append(split.substring(1).toLowerCase());
-        }
-        return builder.toString();
+        String[] split = en.name().split("_");
+        for (int x = 0; x < split.length; x++)
+            split[x] = split[x].substring(0, 1).toUpperCase() + split[x].substring(1).toLowerCase();
+        return String.join(" ", split);
     }
 
     public String getCurrentPlayingTime() {
