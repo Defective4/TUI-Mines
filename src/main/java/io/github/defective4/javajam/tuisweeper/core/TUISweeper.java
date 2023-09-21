@@ -403,7 +403,8 @@ public class TUISweeper {
                     bombs = "0";
                     percent = gameOver == 2 ? 100 : 0;
                 } else {
-                    int[] fields = board.countAllFields(11, 12, 0);
+                    int[] fields = board.countAllFields(11, 12, 0, 13);
+                    if (fields[0] == 0 && fields[1] == 0 && fields[2] == 0) gameOver = 2;
                     percent = (double) (fields[2] + fields[0]) / (board.getSizeX() * board.getSizeY());
                     percent = 100 - (percent * 100);
                     bombs = Integer.toString(fields[0] - fields[1]);
@@ -438,7 +439,9 @@ public class TUISweeper {
             builder.append("\n");
         }
 
-        builder.append("\n\n\n")
+        builder.append("\n    ")
+               .append(gameOver == 0 ? "" : gameOver == 2 ? "You won!" : "GAME OVER")
+               .append("\n\n")
                .append("    n - New Game\n")
                .append("    c - Customize\n")
                .append("    l - Leaderboards\n")
