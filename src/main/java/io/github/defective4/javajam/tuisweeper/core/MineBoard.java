@@ -71,6 +71,7 @@ public class MineBoard {
         matrix = new byte[sizeX][sizeY];
         this.sizeX = sizeX;
         this.sizeY = sizeY;
+        bombs = Math.min(bombs, sizeX * sizeY);
         this.bombs = bombs;
 
         for (int x = 0; x < bombs; x++) {

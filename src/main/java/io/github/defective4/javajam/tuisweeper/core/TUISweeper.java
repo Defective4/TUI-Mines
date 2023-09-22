@@ -115,6 +115,9 @@ public class TUISweeper {
                                 NumberBox hBox = new NumberBox(board.getSizeY());
                                 NumberBox bBox = new NumberBox(board.getBombs());
 
+                                wBox.setMin(2);
+                                hBox.setMin(2);
+
                                 TextBox.TextChangeListener listener = (s, b) -> {
                                     if (b && radio.getCheckedItem() != Difficulty.CUSTOM)
                                         radio.setCheckedItem(Difficulty.CUSTOM);
@@ -385,15 +388,28 @@ public class TUISweeper {
             if (current == 11) {
                 int i, j;
                 byte c;
+                int maxTries = 100;
                 Random rand = board.getRand();
                 do {
                     i = rand.nextInt(board.getSizeX());
                     j = rand.nextInt(board.getSizeY());
                     c = board.getFieldAt(i, j);
-                } while (c != 0);
-                board.setFieldAt(i, j, 11);
-                board.setFieldAt(x, y, 0);
-                current = 0;
+                    maxTries--;
+                } while (c != 0 && maxTries > 0);
+                if (c != 0) {
+                    for (int l = 0; l < board.getSizeX(); l++)
+                        for (int m = 0; m < board.getSizeY(); m++) {
+                            if (board.getFieldAt(l, m) == 0) {
+                                c = 0;
+                                break;
+                            }
+                        }
+                }
+                if (c == 0) {
+                    board.setFieldAt(i, j, 11);
+                    board.setFieldAt(x, y, 0);
+                    current = 0;
+                }
             }
         }
         if (current == 0 || (revealFlags && current == 12)) {
