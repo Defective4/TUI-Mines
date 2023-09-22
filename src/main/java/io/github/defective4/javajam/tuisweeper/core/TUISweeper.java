@@ -504,12 +504,15 @@ public class TUISweeper {
         endTime = -1;
         placed = false;
         gameOver = 0;
+        localDifficulty = prefs.getDifficulty();
     }
 
     private void updateBoard() {
         TerminalPosition caret = boardBox.getCaretPosition();
         updateBoard(caret.getColumn(), caret.getRow());
     }
+
+    private Difficulty localDifficulty = Difficulty.EASY;
 
     private void updateBoard(int cx, int cy) {
         StringBuilder builder = new StringBuilder();
@@ -592,6 +595,10 @@ public class TUISweeper {
 
         builder.append("\n    ")
                .append(gameOver == 0 ? "" : gameOver == 2 ? "You won!" : "GAME OVER")
+               .append("\n")
+               .append("    ")
+               .append(localDifficulty)
+               .append(" mode")
                .append("\n\n")
                .append("    n - New Game\n")
                .append("    m - Game Menu\n")
