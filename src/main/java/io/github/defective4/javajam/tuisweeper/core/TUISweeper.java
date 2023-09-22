@@ -74,10 +74,6 @@ public class TUISweeper {
                         }
 
                     switch (keyStroke.getCharacter()) {
-                        case 'l': {
-                            displayLeaderboards();
-                            break;
-                        }
                         case 'n': {
                             Window win = new SimpleWindow("New game");
                             Panel panel = new Panel(new LinearLayout());
@@ -97,11 +93,12 @@ public class TUISweeper {
                             gui.addWindow(win);
                             break;
                         }
-                        case 'c': {
-                            Window win = new SimpleWindow("Customization");
+                        case 'm': {
+                            Window win = new SimpleWindow("Game Menu");
                             Panel panel = new Panel(new GridLayout(2));
                             Panel ctl = new Panel(new LinearLayout());
                             Label text = new Label("");
+                            text.setPreferredSize(new TerminalSize(32, 4));
 
                             Button game = new Button("Game", () -> {
                                 Panel panel2 = new Panel(new GridLayout(2));
@@ -171,7 +168,7 @@ public class TUISweeper {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" |  Adjust game's difficulty   \n" + " | \n" + " |");
+                                    text.setText(" |  Adjust game's difficulty\n" + " | \n" + " | \n" + " |");
                                 }
                             };
                             Button theme = new Button("Theme", () -> {
@@ -241,19 +238,28 @@ public class TUISweeper {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " |  Customize game's appearance\n" + " |");
+                                    text.setText(" | \n" + " |  Customize game's appearance\n" + " | \n" + " |");
                                 }
                             };
+                            Button leaderboards = new Button("Leaderboards", this::displayLeaderboards) {
+                                @Override
+                                protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
+                                    super.afterEnterFocus(direction, previouslyInFocus);
+                                    text.setText(" | \n" + " | \n" + " |  Show top times by difficulty\n" + " |");
+                                }
+                            };
+
                             Button done = new Button("Done", win::close) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " | \n" + " |  Close this menu            ");
+                                    text.setText(" | \n" + " | \n" + " | \n" + " |  Close this menu");
                                 }
                             };
 
                             ctl.addComponent(game);
                             ctl.addComponent(theme);
+                            ctl.addComponent(leaderboards);
                             ctl.addComponent(done);
 
                             panel.addComponent(ctl);
@@ -571,8 +577,7 @@ public class TUISweeper {
                .append(gameOver == 0 ? "" : gameOver == 2 ? "You won!" : "GAME OVER")
                .append("\n\n")
                .append("    n - New Game\n")
-               .append("    c - Customize\n")
-               .append("    l - Leaderboards\n")
+               .append("    m - Game Menu\n")
                .append("    q - Quit");
 
         boardBox.setText(builder.toString());
