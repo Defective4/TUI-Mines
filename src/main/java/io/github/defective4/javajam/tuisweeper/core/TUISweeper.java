@@ -59,10 +59,6 @@ public class TUISweeper {
                 case Character: {
                     if (gameOver == 0 && absY >= 0 && absX >= 0 && absX < board.getSizeX() && absY < board.getSizeY())
                         switch (keyStroke.getCharacter()) {
-                            case 'l': {
-                                displayLeaderboards();
-                                break;
-                            }
                             case 'f': {
                                 flag(absX, absY);
                                 updateBoard();
@@ -78,6 +74,10 @@ public class TUISweeper {
                         }
 
                     switch (keyStroke.getCharacter()) {
+                        case 'l': {
+                            displayLeaderboards();
+                            break;
+                        }
                         case 'n': {
                             Window win = new SimpleWindow("New game");
                             Panel panel = new Panel(new LinearLayout());
@@ -425,7 +425,6 @@ public class TUISweeper {
     public void displayLeaderboards() {
         Window win = new SimpleWindow("Leaderboards");
         Panel panel = new Panel(new LinearLayout());
-//        panel.setPreferredSize(new TerminalSize(35, 17));
 
         Table<String> table = new Table<>("#", "Time", "Date (yy-mm-dd hh:mm)");
         table.setPreferredSize(new TerminalSize(35, 11));
@@ -514,6 +513,10 @@ public class TUISweeper {
                     if (fields[0] == 0 && fields[1] == 0 && fields[2] == 0) {
                         gameOver = 2;
                         endTime = System.currentTimeMillis();
+                        Difficulty diff = prefs.getDifficulty();
+                        if (diff != Difficulty.CUSTOM) {
+                            leaders.addEntry(diff, endTime - startTime);
+                        }
                         Window win = new SimpleWindow("Game won");
                         Panel panel = new Panel(new LinearLayout());
                         Panel ctl = new Panel(new LinearLayout(Direction.HORIZONTAL));

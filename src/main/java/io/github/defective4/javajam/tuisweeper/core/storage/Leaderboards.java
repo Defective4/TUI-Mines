@@ -24,6 +24,11 @@ public class Leaderboards {
 
     private final Map<Difficulty, List<Entry>> entries = new HashMap<>();
 
+    public void addEntry(Difficulty diff, long time) {
+        if (!entries.containsKey(diff)) entries.put(diff, new ArrayList<>());
+        entries.get(diff).add(new Entry(System.currentTimeMillis(), time));
+    }
+
     public Entry[] getEntries(Difficulty diff, int max) {
         if (!entries.containsKey(diff)) entries.put(diff, new ArrayList<>());
         List<Entry> entries = new ArrayList<>(this.entries.get(diff));
