@@ -170,6 +170,7 @@ public class TUISweeper {
                             }) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
+                                    super.afterEnterFocus(direction, previouslyInFocus);
                                     text.setText(" |  Adjust game's difficulty   \n" + " | \n" + " |");
                                 }
                             };
@@ -188,6 +189,7 @@ public class TUISweeper {
                                 ComboBox<ThemePreset> presets = new ComboBox<ThemePreset>(ThemePreset.values()) {
                                     @Override
                                     protected synchronized void afterLeaveFocus(FocusChangeDirection direction, Interactable nextInFocus) {
+                                        super.afterLeaveFocus(direction, nextInFocus);
                                         setSelectedIndex(0);
                                     }
                                 };
@@ -238,12 +240,14 @@ public class TUISweeper {
                             }) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
+                                    super.afterEnterFocus(direction, previouslyInFocus);
                                     text.setText(" | \n" + " |  Customize game's appearance\n" + " |");
                                 }
                             };
                             Button done = new Button("Done", win::close) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
+                                    super.afterEnterFocus(direction, previouslyInFocus);
                                     text.setText(" | \n" + " | \n" + " |  Close this menu            ");
                                 }
                             };

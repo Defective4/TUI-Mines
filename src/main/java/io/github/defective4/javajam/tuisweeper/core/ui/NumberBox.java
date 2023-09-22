@@ -17,6 +17,7 @@ public class NumberBox extends TextBox {
 
     @Override
     protected void afterLeaveFocus(FocusChangeDirection direction, Interactable nextInFocus) {
+        super.afterLeaveFocus(direction, nextInFocus);
         int val = getValue();
         if (val < min) setValue(min);
         else if (val > max) setValue(max);
