@@ -1,8 +1,11 @@
 package io.github.defective4.javajam.tuisweeper.core;
 
 import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.screen.Screen;
+import io.github.defective4.javajam.tuisweeper.core.storage.Leaderboards;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.ColorChooserButton;
 import io.github.defective4.javajam.tuisweeper.core.ui.NumberBox;
@@ -29,6 +32,7 @@ public class TUISweeper {
 
     private final Timer boardUpdater = new Timer(true);
     private final Preferences prefs = new Preferences();
+    private final Leaderboards leaders = new Leaderboards();
     private long startTime = -1;
     private long endTime = -1;
     private boolean placed = false;
@@ -55,6 +59,10 @@ public class TUISweeper {
                 case Character: {
                     if (gameOver == 0 && absY >= 0 && absX >= 0 && absX < board.getSizeX() && absY < board.getSizeY())
                         switch (keyStroke.getCharacter()) {
+                            case 'l': {
+                                displayLeaderboards();
+                                break;
+                            }
                             case 'f': {
                                 flag(absX, absY);
                                 updateBoard();
@@ -414,6 +422,43 @@ public class TUISweeper {
         gui.addWindowAndWait(mainWindow);
     }
 
+    public void displayLeaderboards() {
+        Window win = new SimpleWindow("Leaderboards");
+        Panel panel = new Panel(new LinearLayout());
+//        panel.setPreferredSize(new TerminalSize(35, 17));
+
+        Table<String> table = new Table<>("#", "Time", "Date (yy-mm-dd hh:mm)");
+        table.setPreferredSize(new TerminalSize(35, 11));
+
+        ComboBox<Difficulty> diff = new ComboBox<>(Difficulty.EASY, Difficulty.NORMAL, Difficulty.HARD);
+        Difficulty current = prefs.getDifficulty();
+        diff.addListener((i, i1, b) -> {
+            Difficulty sel = diff.getItem(i);
+            int index = 0;
+            table.getTableModel().clear();
+            Leaderboards.Entry[] entries = leaders.getEntries(sel, 10);
+            if (entries.length == 0) {
+                table.getTableModel().addRow("", "No entries", "");
+            } else for (Leaderboards.Entry et : entries) {
+                index++;
+                table.getTableModel()
+                     .addRow(Integer.toString(index),
+                             new SimpleDateFormat("mm:ss").format(new Date(et.getTime())),
+                             new SimpleDateFormat("(yy-MM-dd kk:mm)").format(new Date(et.getDate())));
+            }
+        });
+        diff.setSelectedItem(current == Difficulty.CUSTOM ? Difficulty.EASY : current);
+
+        panel.addComponent(new Label("Difficulty"));
+        panel.addComponent(diff);
+        panel.addComponent(new EmptySpace());
+        panel.addComponent(table);
+        panel.addComponent(new EmptySpace());
+        panel.addComponent(new Button("Close", win::close));
+        win.setComponent(panel);
+        gui.addWindow(win);
+    }
+
     public void start() {
         board.initialize(prefs.getWidth(), prefs.getHeight(), prefs.getBombs());
         resetVariables();
@@ -439,10 +484,6 @@ public class TUISweeper {
     private void updateBoard() {
         TerminalPosition caret = boardBox.getCaretPosition();
         updateBoard(caret.getColumn(), caret.getRow());
-    }
-
-    private void showLeaderboards() {
-
     }
 
     private void updateBoard(int cx, int cy) {
@@ -478,7 +519,7 @@ public class TUISweeper {
                         Panel ctl = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
                         ctl.addComponent(new Button("Close", win::close));
-                        ctl.addComponent(new Button("Leaderboards", this::showLeaderboards));
+                        ctl.addComponent(new Button("Leaderboards", this::displayLeaderboards));
 
                         panel.addComponent(new Label("You won!\n" + "Your time is " + getCurrentPlayingTime() + "\n "));
                         panel.addComponent(ctl);
