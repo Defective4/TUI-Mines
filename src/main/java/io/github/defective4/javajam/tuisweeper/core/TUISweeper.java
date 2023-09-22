@@ -532,7 +532,8 @@ public class TUISweeper {
                         Panel ctl = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
                         ctl.addComponent(new Button("Close", win::close));
-                        ctl.addComponent(new Button("Leaderboards", this::displayLeaderboards));
+                        if (diff != Difficulty.CUSTOM)
+                            ctl.addComponent(new Button("Leaderboards", this::displayLeaderboards));
 
                         panel.addComponent(new Label("You won!\n" + "Your time is " + getCurrentPlayingTime() + "\n "));
                         panel.addComponent(ctl);
