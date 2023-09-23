@@ -1,30 +1,16 @@
 package io.github.defective4.javajam.tuisweeper.core.ui;
 
-import com.googlecode.lanterna.TextColor;
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
+
+import static com.googlecode.lanterna.TextColor.ANSI;
 
 public enum ThemePreset {
     NONE,
-    PITCH_BLACK(TextColor.ANSI.BLACK,
-                TextColor.ANSI.WHITE_BRIGHT,
-                TextColor.ANSI.BLACK,
-                TextColor.ANSI.WHITE_BRIGHT,
-                TextColor.ANSI.WHITE_BRIGHT,
-                TextColor.ANSI.BLACK),
-    CLASSIC_TERMINAL(TextColor.ANSI.WHITE,
-                     TextColor.ANSI.BLACK,
-                     TextColor.ANSI.BLUE,
-                     TextColor.ANSI.WHITE_BRIGHT,
-                     TextColor.ANSI.BLUE,
-                     TextColor.ANSI.WHITE_BRIGHT),
-    GREEN_ON_BLACK(TextColor.ANSI.BLACK,
-                   TextColor.ANSI.GREEN_BRIGHT,
-                   TextColor.ANSI.BLACK,
-                   TextColor.ANSI.GREEN,
-                   TextColor.ANSI.GREEN_BRIGHT,
-                   TextColor.ANSI.BLACK);
+    PITCH_BLACK(ANSI.BLACK, ANSI.WHITE_BRIGHT, ANSI.BLACK, ANSI.WHITE_BRIGHT, ANSI.WHITE_BRIGHT, ANSI.BLACK),
+    CLASSIC_TERMINAL(ANSI.WHITE, ANSI.BLACK, ANSI.BLUE, ANSI.WHITE_BRIGHT, ANSI.BLUE, ANSI.WHITE_BRIGHT),
+    GREEN_ON_BLACK(ANSI.BLACK, ANSI.GREEN_BRIGHT, ANSI.BLACK, ANSI.GREEN, ANSI.GREEN_BRIGHT, ANSI.BLACK);
 
-    private final TextColor.ANSI bb, bf, eb, ef, sb, sf;
+    private final ANSI bb, bf, eb, ef, sb, sf;
 
     ThemePreset() {
         bb = null;
@@ -35,7 +21,7 @@ public enum ThemePreset {
         sf = null;
     }
 
-    ThemePreset(TextColor.ANSI bb, TextColor.ANSI bf, TextColor.ANSI eb, TextColor.ANSI ef, TextColor.ANSI sb, TextColor.ANSI sf) {
+    ThemePreset(ANSI bb, ANSI bf, ANSI eb, ANSI ef, ANSI sb, ANSI sf) {
         this.bb = bb;
         this.bf = bf;
         this.eb = eb;
@@ -44,27 +30,27 @@ public enum ThemePreset {
         this.sf = sf;
     }
 
-    public TextColor.ANSI getBb() {
+    public ANSI getBb() {
         return bb;
     }
 
-    public TextColor.ANSI getBf() {
+    public ANSI getBf() {
         return bf;
     }
 
-    public TextColor.ANSI getEb() {
+    public ANSI getEb() {
         return eb;
     }
 
-    public TextColor.ANSI getEf() {
+    public ANSI getEf() {
         return ef;
     }
 
-    public TextColor.ANSI getSb() {
+    public ANSI getSb() {
         return sb;
     }
 
-    public TextColor.ANSI getSf() {
+    public ANSI getSf() {
         return sf;
     }
 

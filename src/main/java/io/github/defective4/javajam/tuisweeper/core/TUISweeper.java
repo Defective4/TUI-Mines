@@ -38,11 +38,12 @@ public class TUISweeper {
     private boolean placed = false;
 
     private byte gameOver = 0;
+    private Difficulty localDifficulty = Difficulty.EASY;
 
-    public TUISweeper(Screen screen) {
+    public TUISweeper(Screen screen, WindowBasedTextGUI gui) {
         this.screen = screen;
-        gui = new MultiWindowTextGUI(screen);
-        gui.setTheme(prefs.getTheme().toTUITheme());
+        this.gui = gui;
+        this.gui.setTheme(prefs.getTheme().toTUITheme());
         mainWindow.setComponent(boardBox);
 
         boardBox.setInputFilter((interactable, keyStroke) -> {
@@ -90,7 +91,7 @@ public class TUISweeper {
                             panel.addComponent(ctl);
 
                             win.setComponent(panel);
-                            gui.addWindow(win);
+                            this.gui.addWindow(win);
                             break;
                         }
                         case 'm': {
@@ -178,12 +179,18 @@ public class TUISweeper {
                                 Panel panel2 = new Panel(new GridLayout(2));
 
                                 Preferences.UserTheme ut = prefs.getTheme();
-                                ColorChooserButton bfColor = new ColorChooserButton(gui, ut.getBaseForeground());
-                                ColorChooserButton bbColor = new ColorChooserButton(gui, ut.getBaseBackground());
-                                ColorChooserButton efColor = new ColorChooserButton(gui, ut.getEditableForeground());
-                                ColorChooserButton ebColor = new ColorChooserButton(gui, ut.getEditableBackground());
-                                ColorChooserButton sfColor = new ColorChooserButton(gui, ut.getSelectedForeground());
-                                ColorChooserButton sbColor = new ColorChooserButton(gui, ut.getSelectedBackground());
+                                ColorChooserButton bfColor = new ColorChooserButton(TUISweeper.this.gui,
+                                                                                    ut.getBaseForeground());
+                                ColorChooserButton bbColor = new ColorChooserButton(TUISweeper.this.gui,
+                                                                                    ut.getBaseBackground());
+                                ColorChooserButton efColor = new ColorChooserButton(TUISweeper.this.gui,
+                                                                                    ut.getEditableForeground());
+                                ColorChooserButton ebColor = new ColorChooserButton(TUISweeper.this.gui,
+                                                                                    ut.getEditableBackground());
+                                ColorChooserButton sfColor = new ColorChooserButton(TUISweeper.this.gui,
+                                                                                    ut.getSelectedForeground());
+                                ColorChooserButton sbColor = new ColorChooserButton(TUISweeper.this.gui,
+                                                                                    ut.getSelectedBackground());
                                 Button apply = new Button("Apply", () -> {
                                     ut.setBaseBackground(bbColor.getColor());
                                     ut.setBaseForeground(bfColor.getColor());
@@ -191,7 +198,7 @@ public class TUISweeper {
                                     ut.setSelectedForeground(sfColor.getColor());
                                     ut.setEditableBackground(ebColor.getColor());
                                     ut.setEditableForeground(efColor.getColor());
-                                    gui.setTheme(ut.toTUITheme());
+                                    TUISweeper.this.gui.setTheme(ut.toTUITheme());
                                     win.setComponent(panel);
                                 });
 
@@ -269,7 +276,7 @@ public class TUISweeper {
                             panel.addComponent(ctl);
                             panel.addComponent(text);
                             win.setComponent(panel);
-                            gui.addWindow(win);
+                            this.gui.addWindow(win);
                             break;
                         }
                         case 'q': {
@@ -287,7 +294,7 @@ public class TUISweeper {
                             panel.addComponent(ctl);
 
                             win.setComponent(panel);
-                            gui.addWindow(win);
+                            this.gui.addWindow(win);
                             break;
                         }
                         default:
@@ -446,7 +453,7 @@ public class TUISweeper {
     }
 
     public void show() {
-        gui.addWindowAndWait(mainWindow);
+        gui.addWindow(mainWindow);
     }
 
     public void displayLeaderboards() {
@@ -512,8 +519,6 @@ public class TUISweeper {
         TerminalPosition caret = boardBox.getCaretPosition();
         updateBoard(caret.getColumn(), caret.getRow());
     }
-
-    private Difficulty localDifficulty = Difficulty.EASY;
 
     private void updateBoard(int cx, int cy) {
         StringBuilder builder = new StringBuilder();
