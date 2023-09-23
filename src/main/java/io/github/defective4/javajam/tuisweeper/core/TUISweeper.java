@@ -118,6 +118,8 @@ public class TUISweeper {
 
                                 wBox.setMin(2);
                                 hBox.setMin(2);
+                                wBox.setMax(99);
+                                hBox.setMax(99);
 
                                 TextBox.TextChangeListener listener = (s, b) -> {
                                     if (b && radio.getCheckedItem() != Difficulty.CUSTOM)
@@ -526,6 +528,37 @@ public class TUISweeper {
         int numberLen = board.getMaxSizeLen();
         int offsetX = MineBoard.X_OFFSET + numberLen;
 
+        String bombs;
+        double percent;
+        if (gameOver > 0) {
+            bombs = "0";
+            percent = gameOver == 2 ? 1 : 0;
+        } else {
+            int[] fields = board.countAllFields(11, 12, 0, 13);
+            if (fields[0] == 0 && fields[1] == 0 && fields[2] == 0) {
+                gameOver = 2;
+                endTime = System.currentTimeMillis();
+                Difficulty diff = prefs.getDifficulty();
+                if (diff != Difficulty.CUSTOM) {
+                    leaders.addEntry(diff, endTime - startTime);
+                }
+                Window win = new SimpleWindow("Game won");
+                Panel panel = new Panel(new LinearLayout());
+                Panel ctl = new Panel(new LinearLayout(Direction.HORIZONTAL));
+
+                ctl.addComponent(new Button("Close", win::close));
+                if (diff != Difficulty.CUSTOM) ctl.addComponent(new Button("Leaderboards", this::displayLeaderboards));
+
+                panel.addComponent(new Label("You won!\n" + "Your time is " + getCurrentPlayingTime() + "\n "));
+                panel.addComponent(ctl);
+                win.setComponent(panel);
+                gui.addWindow(win);
+            }
+            percent = (double) (fields[2] + fields[0]) / (board.getSizeX() * board.getSizeY());
+            percent = 1 - percent;
+            bombs = Integer.toString(fields[0] - fields[1]);
+        }
+
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < board.getSizeX() + offsetX; j++) {
                 builder.append(j < offsetX ?
@@ -534,53 +567,38 @@ public class TUISweeper {
                                                j == cx ? 'v' : ' ' :
                                                i == 1 ? CHARS[(j - offsetX) % CHARS.length] : '=');
             }
-            if (i == 1) builder.append("    Timer   Bombs   Cleared");
-            else if (i == 2) {
-                String time = getCurrentPlayingTime();
-
-                String bombs;
-                double percent;
-                if (gameOver > 0) {
-                    bombs = "0";
-                    percent = gameOver == 2 ? 100 : 0;
-                } else {
-                    int[] fields = board.countAllFields(11, 12, 0, 13);
-                    if (fields[0] == 0 && fields[1] == 0 && fields[2] == 0) {
-                        gameOver = 2;
-                        endTime = System.currentTimeMillis();
-                        Difficulty diff = prefs.getDifficulty();
-                        if (diff != Difficulty.CUSTOM) {
-                            leaders.addEntry(diff, endTime - startTime);
-                        }
-                        Window win = new SimpleWindow("Game won");
-                        Panel panel = new Panel(new LinearLayout());
-                        Panel ctl = new Panel(new LinearLayout(Direction.HORIZONTAL));
-
-                        ctl.addComponent(new Button("Close", win::close));
-                        if (diff != Difficulty.CUSTOM)
-                            ctl.addComponent(new Button("Leaderboards", this::displayLeaderboards));
-
-                        panel.addComponent(new Label("You won!\n" + "Your time is " + getCurrentPlayingTime() + "\n "));
-                        panel.addComponent(ctl);
-                        win.setComponent(panel);
-                        gui.addWindow(win);
-                    }
-                    percent = (double) (fields[2] + fields[0]) / (board.getSizeX() * board.getSizeY());
-                    percent = 100 - (percent * 100);
-                    bombs = Integer.toString(fields[0] - fields[1]);
+            switch (i) {
+                case 0: {
+                    builder.append("      ");
+                    int stripes = (int) ((double) 23 * percent);
+                    for (int x = 0; x < 23; x++)
+                        builder.append(stripes > x ? "▰" : "▱");
+                    break;
                 }
+                case 1: {
+                    builder.append("      Timer   Bombs   Cleared");
+                    break;
+                }
+                case 2: {
+                    String time = getCurrentPlayingTime();
 
-                StringBuilder space = new StringBuilder();
-                for (int x = 0; x < 8 - bombs.length(); x++)
-                    space.append(" ");
+                    StringBuilder space = new StringBuilder();
+                    for (int x = 0; x < 8 - bombs.length(); x++)
+                        space.append(" ");
+                    String emote = gameOver == 0 ? ":)" : gameOver == 1 ? "X(" : "B)";
 
-                builder.append("    ")
-                       .append(time)
-                       .append("   ")
-                       .append(bombs)
-                       .append(space)
-                       .append(doubleFormat.format(percent))
-                       .append('%');
+                    builder.append("  ").append(emote).append("  ")
+                           .append(time)
+                           .append("   ")
+                           .append(bombs)
+                           .append(space)
+                           .append(doubleFormat.format(percent * 100))
+                           .append('%');
+                    break;
+                }
+                default: {
+                    break;
+                }
             }
             builder.append("\n");
         }

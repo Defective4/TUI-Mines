@@ -5,11 +5,13 @@ import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
 import com.googlecode.lanterna.gui2.TextBox;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
+import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
 
 import javax.imageio.ImageIO;
@@ -62,11 +64,23 @@ public final class Main {
                 }
             }, 0, 125);
 
+            box.setInputFilter((interactable, keyStroke) -> {
+                if (keyStroke.getKeyType() == KeyType.Character || keyStroke.getKeyType() == KeyType.Enter) {
+                    win.setVisible(false);
+                    flashTimer.cancel();
+                    TUISweeper game = new TUISweeper(screen, gui);
+                    game.start();
+                    game.show();
+                }
+                return true;
+            });
+
             win.setComponent(box);
 
             if (term instanceof SwingTerminalFrame) {
                 SwingTerminalFrame frame = (SwingTerminalFrame) term;
                 frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+                frame.setTitle("TUI-Sweeper");
                 try {
                     frame.setIconImage(ImageIO.read(Main.class.getResourceAsStream("/logo.png")));
                 } catch (Exception e) {
