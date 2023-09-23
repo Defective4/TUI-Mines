@@ -184,7 +184,16 @@ public class TUISweeper {
                                 ColorChooserButton ebColor = new ColorChooserButton(gui, ut.getEditableBackground());
                                 ColorChooserButton sfColor = new ColorChooserButton(gui, ut.getSelectedForeground());
                                 ColorChooserButton sbColor = new ColorChooserButton(gui, ut.getSelectedBackground());
-
+                                Button apply = new Button("Apply", () -> {
+                                    ut.setBaseBackground(bbColor.getColor());
+                                    ut.setBaseForeground(bfColor.getColor());
+                                    ut.setSelectedBackground(sbColor.getColor());
+                                    ut.setSelectedForeground(sfColor.getColor());
+                                    ut.setEditableBackground(ebColor.getColor());
+                                    ut.setEditableForeground(efColor.getColor());
+                                    gui.setTheme(ut.toTUITheme());
+                                    win.setComponent(panel);
+                                });
 
                                 ComboBox<ThemePreset> presets = new ComboBox<ThemePreset>(ThemePreset.values()) {
                                     @Override
@@ -202,6 +211,7 @@ public class TUISweeper {
                                         ebColor.setColor(preset.getEb());
                                         sfColor.setColor(preset.getSf());
                                         sbColor.setColor(preset.getSb());
+                                        apply.takeFocus();
                                     }
                                 });
 
@@ -224,16 +234,7 @@ public class TUISweeper {
                                 panel2.addComponent(new Label("\n "));
                                 panel2.addComponent(new Label("\n "));
                                 panel2.addComponent(new Button("Cancel", () -> win.setComponent(panel)));
-                                panel2.addComponent(new Button("Apply", () -> {
-                                    ut.setBaseBackground(bbColor.getColor());
-                                    ut.setBaseForeground(bfColor.getColor());
-                                    ut.setSelectedBackground(sbColor.getColor());
-                                    ut.setSelectedForeground(sfColor.getColor());
-                                    ut.setEditableBackground(ebColor.getColor());
-                                    ut.setEditableForeground(efColor.getColor());
-                                    gui.setTheme(ut.toTUITheme());
-                                    win.setComponent(panel);
-                                }));
+                                panel2.addComponent(apply);
 
 
                                 win.setComponent(panel2);
