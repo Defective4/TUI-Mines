@@ -130,25 +130,7 @@ public class TUISweeper {
                                 hBox.setTextChangeListener(listener);
                                 bBox.setTextChangeListener(listener);
 
-                                radio.addListener((i, i1) -> {
-                                    Difficulty sel = radio.getItemAt(i);
-                                    if (sel != Difficulty.CUSTOM) {
-                                        wBox.setValue(sel.getWidth());
-                                        hBox.setValue(sel.getHeight());
-                                        bBox.setValue(sel.getBombs());
-                                    } else if (radio.isFocused()) wBox.takeFocus();
-                                });
-                                radio.setCheckedItem(prefs.getDifficulty());
-
-                                left.addComponent(radio);
-                                right.addComponent(new Label("Width"));
-                                right.addComponent(wBox);
-                                right.addComponent(new Label("\nHeight"));
-                                right.addComponent(hBox);
-                                right.addComponent(new Label("\nBombs"));
-                                right.addComponent(bBox);
-                                ctl2.addComponent(new Button("Cancel", () -> win.setComponent(panel)));
-                                ctl2.addComponent(new Button("Confirm", () -> {
+                                Button confirm = new Button("Confirm", () -> {
                                     prefs.setDifficulty(radio.getCheckedItem());
                                     prefs.setWidth(wBox.getValue());
                                     prefs.setHeight(hBox.getValue());
@@ -165,7 +147,28 @@ public class TUISweeper {
                                             "The changes will take effect after starting a new game.\n" + "Do you want to start a new gamew now?\n "));
                                     panel3.addComponent(ctl3);
                                     win.setComponent(panel3);
-                                }));
+                                });
+
+                                radio.addListener((i, i1) -> {
+                                    Difficulty sel = radio.getItemAt(i);
+                                    if (sel != Difficulty.CUSTOM) {
+                                        wBox.setValue(sel.getWidth());
+                                        hBox.setValue(sel.getHeight());
+                                        bBox.setValue(sel.getBombs());
+                                        if (radio.isFocused()) confirm.takeFocus();
+                                    } else if (radio.isFocused()) wBox.takeFocus();
+                                });
+                                radio.setCheckedItem(prefs.getDifficulty());
+
+                                left.addComponent(radio);
+                                right.addComponent(new Label("Width"));
+                                right.addComponent(wBox);
+                                right.addComponent(new Label("\nHeight"));
+                                right.addComponent(hBox);
+                                right.addComponent(new Label("\nBombs"));
+                                right.addComponent(bBox);
+                                ctl2.addComponent(new Button("Cancel", () -> win.setComponent(panel)));
+                                ctl2.addComponent(confirm);
                                 panel2.addComponent(left);
                                 panel2.addComponent(right);
                                 panel2.addComponent(ctl2);
@@ -587,7 +590,9 @@ public class TUISweeper {
                         space.append(" ");
                     String emote = gameOver == 0 ? ":)" : gameOver == 1 ? "X(" : "B)";
 
-                    builder.append("  ").append(emote).append("  ")
+                    builder.append("  ")
+                           .append(emote)
+                           .append("  ")
                            .append(time)
                            .append("   ")
                            .append(bombs)
