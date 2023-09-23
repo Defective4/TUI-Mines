@@ -17,6 +17,8 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.googlecode.lanterna.TextColor.ANSI;
 
@@ -49,7 +51,16 @@ public final class Main {
             }
             String brand = brandBuilder.toString();
 
-            box.setText(brand);
+            Timer flashTimer = new Timer(true);
+            flashTimer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    box.setText(brand + "\n" + "\n                         " + ((System.currentTimeMillis() / 500 % 2 == 0) ?
+                            "PRESS ANY KEY TO START" :
+                            ""));
+
+                }
+            }, 0, 125);
 
             win.setComponent(box);
 
