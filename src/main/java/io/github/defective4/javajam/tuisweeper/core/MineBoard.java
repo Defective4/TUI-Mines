@@ -48,7 +48,7 @@ public class MineBoard {
     }
 
     public int getMaxSizeLen() {
-        return Integer.toString(getSizeY() + 1).length();
+        return Integer.toString(getSizeY()).length();
     }
 
     public int getXOffset() {
