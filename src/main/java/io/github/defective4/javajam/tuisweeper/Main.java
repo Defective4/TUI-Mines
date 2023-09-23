@@ -1,10 +1,12 @@
 package io.github.defective4.javajam.tuisweeper;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.SimpleTheme;
-import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
-import com.googlecode.lanterna.gui2.TextBox;
+import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.Button;
+import com.googlecode.lanterna.gui2.Label;
+import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.Window;
-import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
@@ -87,6 +89,25 @@ public final class Main {
                     e.printStackTrace();
                 }
             }
+
+            new Timer(true).schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    TerminalSize size = screen.getTerminalSize();
+                    System.out.println(size);
+                    if (size.getColumns() < 61 || size.getRows() < 34) {
+                        Window warn = new SimpleWindow("Warning");
+                        warn.setTheme(win.getTheme());
+                        Panel panel = new Panel(new LinearLayout());
+                        panel.addComponent(new Label("Your terminal has really small size. \n" + "Not all elements may be visible at once,\nso the playing experience may be affected\n" + "If you are using a terminal emulator/terminal screen \nplease resize/maximize the window.\n" + "Thank you!\n "));
+
+                        panel.addComponent(new Button("Ok", warn::close));
+                        warn.setComponent(panel);
+                        gui.addWindow(warn);
+                    }
+                }
+            }, 1000);
+
             gui.addWindowAndWait(win);
         } catch (IOException e) {
             e.printStackTrace();
