@@ -2,6 +2,8 @@ package io.github.defective4.javajam.tuisweeper.core;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
@@ -49,12 +51,27 @@ public class TUISweeper {
     private byte gameOver = 0;
     private Difficulty localDifficulty = Difficulty.EASY;
 
+    private final Label infoLabel;
+
+    private void updateTheme(Preferences.UserTheme theme) {
+        gui.setTheme(theme.toTUITheme());
+        infoLabel.setTheme(new SimpleTheme(TextColor.ANSI.BLACK, TextColor.ANSI.WHITE_BRIGHT));
+    }
+
     public TUISweeper(Screen screen, WindowBasedTextGUI gui, Terminal term) {
         this.screen = screen;
         this.gui = gui;
         this.term = term;
-        this.gui.setTheme(prefs.getTheme().toTUITheme());
-        mainWindow.setComponent(boardBox);
+        this.infoLabel = new Label("");
+        updateTheme(prefs.getTheme());
+
+        Panel root = new Panel(new LinearLayout());
+
+        root.addComponent(infoLabel);
+        boardBox.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill,
+                                                             LinearLayout.GrowPolicy.CanGrow));
+        root.addComponent(boardBox);
+        mainWindow.setComponent(root);
 
         boardBox.setInputFilter((interactable, keyStroke) -> {
             boolean allowed = false;
@@ -213,7 +230,7 @@ public class TUISweeper {
                                     ut.setSelectedForeground(sfColor.getColor());
                                     ut.setEditableBackground(ebColor.getColor());
                                     ut.setEditableForeground(efColor.getColor());
-                                    TUISweeper.this.gui.setTheme(ut.toTUITheme());
+                                    updateTheme(ut);
                                     win.setComponent(panel);
                                 });
 
@@ -610,7 +627,7 @@ public class TUISweeper {
                     break;
                 }
                 case 1: {
-                    builder.append("      Timer   Bombs   Cleared");
+                    builder.append("    Timer   Bombs   Cleared");
                     break;
                 }
                 case 2: {
@@ -619,11 +636,8 @@ public class TUISweeper {
                     StringBuilder space = new StringBuilder();
                     for (int x = 0; x < 8 - bombs.length(); x++)
                         space.append(" ");
-                    String emote = gameOver == 0 ? ":)" : gameOver == 1 ? "X(" : "B)";
 
-                    builder.append("  ")
-                           .append(emote)
-                           .append("  ")
+                    builder.append("    ")
                            .append(time)
                            .append("   ")
                            .append(bombs)
@@ -657,13 +671,20 @@ public class TUISweeper {
                .append(gameOver == 0 ? "" : gameOver == 2 ? "You won!" : "GAME OVER")
                .append("\n")
                .append("    ")
-               .append(localDifficulty)
-               .append(" mode")
-               .append("\n\n")
+               .append("\n")
                .append("    n - New Game\n")
                .append("    m - Game Menu\n")
                .append("    q - Quit");
 
         boardBox.setText(builder.toString());
+
+        StringBuilder labelText = new StringBuilder();
+
+        String emote = gameOver == 0 ? ":)" : gameOver == 1 ? "X(" : "B)";
+        labelText.append("  ").append(emote).append("   TUI-Sweeper    Difficulty: ").append(localDifficulty);
+        int wh = screen.getTerminalSize().getColumns();
+        for (int x = labelText.length(); x < wh; x++)
+            labelText.append(" ");
+        infoLabel.setText(labelText.toString());
     }
 }
