@@ -13,6 +13,8 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
+import io.github.defective4.javajam.tuisweeper.core.sfx.SFX;
+import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
 import io.github.defective4.javajam.tuisweeper.core.storage.Leaderboards;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.ColorChooserButton;
@@ -37,6 +39,7 @@ public class TUISweeper {
     private final Screen screen;
     private final WindowBasedTextGUI gui;
     private final Terminal term;
+    private final SFX sfx;
     private final Window mainWindow = new SimpleWindow(Window.Hint.FULL_SCREEN, Window.Hint.NO_DECORATIONS);
     private final TextBox boardBox = new TextBox();
     private final MineBoard board = new MineBoard();
@@ -58,10 +61,11 @@ public class TUISweeper {
         infoLabel.setTheme(new SimpleTheme(TextColor.ANSI.BLACK, TextColor.ANSI.WHITE_BRIGHT));
     }
 
-    public TUISweeper(Screen screen, WindowBasedTextGUI gui, Terminal term) {
+    public TUISweeper(Screen screen, WindowBasedTextGUI gui, Terminal term, SFX sfx) {
         this.screen = screen;
         this.gui = gui;
         this.term = term;
+        this.sfx = sfx;
         this.infoLabel = new Label("");
         updateTheme(prefs.getTheme());
 
@@ -93,8 +97,9 @@ public class TUISweeper {
                                 break;
                             }
                             case ' ': {
-                                reveal(absX, absY);
+                                int cnt = reveal(absX, absY);
                                 updateBoard();
+                                if (cnt > 0 && gameOver == 0) sfx.play(cnt > 10 ? "mass_reveal" : "reveal");
                                 break;
                             }
                             default:
@@ -109,8 +114,8 @@ public class TUISweeper {
 
                             panel.addComponent(new Label("Are you sure you want to start a new game?\n" + "Your current session will get discarded.\n "));
 
-                            ctl.addComponent(new Button("No", win::close));
-                            ctl.addComponent(new Button("Yes", () -> {
+                            ctl.addComponent(new SFXButton("No", sfx, true, win::close));
+                            ctl.addComponent(new SFXButton("Yes", sfx, () -> {
                                 win.close();
                                 start();
                             }));
@@ -128,7 +133,7 @@ public class TUISweeper {
                             Label text = new Label("");
                             text.setPreferredSize(new TerminalSize(32, 5));
 
-                            Button game = new Button("Game", () -> {
+                            Button game = new SFXButton("Game", sfx, () -> {
                                 Window win2 = new SimpleWindow("Game settings");
                                 Panel panel2 = new Panel(new GridLayout(2));
                                 Panel left = new Panel(new LinearLayout());
@@ -158,7 +163,7 @@ public class TUISweeper {
                                 hBox.setTextChangeListener(listener);
                                 bBox.setTextChangeListener(listener);
 
-                                Button confirm = new Button("Confirm", () -> {
+                                Button confirm = new SFXButton("Confirm", sfx, () -> {
                                     prefs.setDifficulty(radio.getCheckedItem());
                                     prefs.setWidth(wBox.getValue());
                                     prefs.setHeight(hBox.getValue());
@@ -166,8 +171,8 @@ public class TUISweeper {
                                     Panel panel3 = new Panel(new LinearLayout());
                                     Panel ctl3 = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
-                                    ctl3.addComponent(new Button("No", win2::close));
-                                    ctl3.addComponent(new Button("Yes", () -> {
+                                    ctl3.addComponent(new SFXButton("No", sfx, true, win2::close));
+                                    ctl3.addComponent(new SFXButton("Yes", sfx, () -> {
                                         start();
                                         win2.close();
                                     }));
@@ -197,7 +202,7 @@ public class TUISweeper {
                                 right.addComponent(new Label("\nBombs"));
                                 right.addComponent(bBox);
                                 ctl2.addComponent(confirm);
-                                ctl2.addComponent(new Button("Cancel", win2::close));
+                                ctl2.addComponent(new SFXButton("Cancel", sfx, true, win2::close));
                                 panel2.addComponent(left);
                                 panel2.addComponent(right);
                                 panel2.addComponent(ctl2);
@@ -210,7 +215,7 @@ public class TUISweeper {
                                     text.setText(" |  Adjust game's difficulty\n" + " | \n" + " | \n" + " | \n" + " |");
                                 }
                             };
-                            Button theme = new Button("Theme", () -> {
+                            Button theme = new SFXButton("Theme", sfx, () -> {
                                 Window win2 = new SimpleWindow("Theming");
                                 Panel panel2 = new Panel(new GridLayout(2));
 
@@ -227,7 +232,7 @@ public class TUISweeper {
                                                                                     ut.getSelectedForeground());
                                 ColorChooserButton sbColor = new ColorChooserButton(TUISweeper.this.gui,
                                                                                     ut.getSelectedBackground());
-                                Button apply = new Button("Apply", () -> {
+                                Button apply = new SFXButton("Apply", sfx, () -> {
                                     ut.setBaseBackground(bbColor.getColor());
                                     ut.setBaseForeground(bfColor.getColor());
                                     ut.setSelectedBackground(sbColor.getColor());
@@ -277,7 +282,7 @@ public class TUISweeper {
                                 panel2.addComponent(new Label("\n "));
                                 panel2.addComponent(new Label("\n "));
                                 panel2.addComponent(apply);
-                                panel2.addComponent(new Button("Cancel", win2::close));
+                                panel2.addComponent(new SFXButton("Cancel", sfx, true, win2::close));
 
 
                                 win2.setComponent(panel2);
@@ -289,21 +294,21 @@ public class TUISweeper {
                                     text.setText(" | \n" + " |  Customize game's appearance\n" + " | \n" + " | \n" + " |");
                                 }
                             };
-                            Button leaderboards = new Button("Leaderboards", this::displayLeaderboards) {
+                            Button leaderboards = new SFXButton("Leaderboards", sfx, this::displayLeaderboards) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
                                     text.setText(" | \n" + " | \n" + " | \n" + " |  Show top times by difficulty\n" + " |");
                                 }
                             };
-                            Button done = new Button("Done", win::close) {
+                            Button done = new SFXButton("Done", sfx, true, win::close) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
                                     text.setText(" | \n" + " | \n" + " | \n" + " | \n" + " |  Close this menu");
                                 }
                             };
-                            Button options = new Button("Options", () -> {
+                            Button options = new SFXButton("Options", sfx, () -> {
                                 Window win2 = new SimpleWindow("Options");
                                 Panel panel2 = new Panel(new LinearLayout());
                                 Panel ctl2 = new Panel(new LinearLayout(Direction.HORIZONTAL));
@@ -312,11 +317,11 @@ public class TUISweeper {
                                 CheckBox shaking = new CheckBox("Enable screen shaking");
                                 shaking.setChecked(ops.isScreenShaking());
 
-                                ctl2.addComponent(new Button("Confirm", () -> {
+                                ctl2.addComponent(new SFXButton("Confirm", sfx, () -> {
                                     ops.setScreenShaking(shaking.isChecked());
                                     win2.close();
                                 }));
-                                ctl2.addComponent(new Button("Cancel", win2::close));
+                                ctl2.addComponent(new SFXButton("Cancel", sfx, true, win2::close));
 
                                 panel2.addComponent(shaking);
                                 panel2.addComponent(new EmptySpace());
@@ -348,8 +353,8 @@ public class TUISweeper {
                             Panel panel = new Panel(new LinearLayout());
                             Panel ctl = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
-                            Button no = new Button("No", win::close);
-                            Button yes = new Button("Yes", () -> System.exit(0));
+                            Button no = new SFXButton("No", sfx, true, win::close);
+                            Button yes = new SFXButton("Yes", sfx, () -> System.exit(0));
 
                             ctl.addComponent(no);
                             ctl.addComponent(yes);
@@ -443,19 +448,23 @@ public class TUISweeper {
         switch (current) {
             case 0: {
                 if (fields[0] - fields[1] <= 0) break;
+                sfx.play("flag");
                 c = 12;
                 break;
             }
             case 11: {
                 if (fields[0] - fields[1] <= 0) break;
+                sfx.play("flag");
                 c = 13;
                 break;
             }
             case 12: {
+                sfx.play("unflag");
                 c = 0;
                 break;
             }
             case 13: {
+                sfx.play("unflag");
                 c = 11;
                 break;
             }
@@ -469,12 +478,13 @@ public class TUISweeper {
         }
     }
 
-    public void reveal(int x, int y) {
-        reveal(x, y, false);
+    public int reveal(int x, int y) {
+        return reveal(x, y, false);
     }
 
-    public void reveal(int x, int y, boolean revealFlags) {
+    public int reveal(int x, int y, boolean revealFlags) {
         startTimer();
+        int count = 0;
         byte current = board.getFieldAt(x, y);
         if (!placed) {
             placed = true;
@@ -513,12 +523,13 @@ public class TUISweeper {
                     for (int j = y - 1; j <= y + 1; j++) {
                         if (i >= 0 && j >= 0 && i < board.getSizeX() && j < board.getSizeY()) {
                             byte c = board.getFieldAt(i, j);
-                            if (c == 0 || c == 12) reveal(i, j, true);
+                            if (c == 0 || c == 12) count += reveal(i, j, true);
                         }
                     }
             } else {
                 board.setFieldAt(x, y, bombs);
             }
+            count++;
         } else if (current > 0 && current < 10) {
             int flags = board.countFlags(x, y);
             if (flags == current) {
@@ -526,7 +537,7 @@ public class TUISweeper {
                     for (int j = y - 1; j <= y + 1; j++) {
                         if (i >= 0 && j >= 0 && i < board.getSizeX() && j < board.getSizeY()) {
                             byte c = board.getFieldAt(i, j);
-                            if (c == 0 || c == 11) reveal(i, j, true);
+                            if (c == 0 || c == 11) count += reveal(i, j, true);
                         }
                     }
             }
@@ -534,8 +545,10 @@ public class TUISweeper {
             board.revealMines();
             gameOver = 1;
             endTime = System.currentTimeMillis();
+            sfx.play("bomb");
             shake();
         }
+        return count;
     }
 
     public void show() {
@@ -573,7 +586,7 @@ public class TUISweeper {
         panel.addComponent(new EmptySpace());
         panel.addComponent(table);
         panel.addComponent(new EmptySpace());
-        panel.addComponent(new Button("Close", win::close));
+        panel.addComponent(new SFXButton("Close", sfx, true, win::close));
         win.setComponent(panel);
         gui.addWindow(win);
     }
@@ -621,6 +634,7 @@ public class TUISweeper {
             int[] fields = board.countAllFields(11, 12, 0, 13);
             if (fields[0] == 0 && fields[1] == 0 && fields[2] == 0) {
                 gameOver = 2;
+                sfx.play("win");
                 endTime = System.currentTimeMillis();
                 Difficulty diff = prefs.getDifficulty();
                 if (diff != Difficulty.CUSTOM) {
@@ -631,7 +645,8 @@ public class TUISweeper {
                 Panel ctl = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
                 ctl.addComponent(new Button("Close", win::close));
-                if (diff != Difficulty.CUSTOM) ctl.addComponent(new Button("Leaderboards", this::displayLeaderboards));
+                if (diff != Difficulty.CUSTOM)
+                    ctl.addComponent(new SFXButton("Leaderboards", sfx, this::displayLeaderboards));
 
                 panel.addComponent(new Label("You won!\n" + "Your time is " + getCurrentPlayingTime() + "\n "));
                 panel.addComponent(ctl);

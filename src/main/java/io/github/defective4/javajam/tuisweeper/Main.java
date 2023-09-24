@@ -13,6 +13,7 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
+import io.github.defective4.javajam.tuisweeper.core.sfx.SFX;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
 
 import javax.imageio.ImageIO;
@@ -29,6 +30,8 @@ import static com.googlecode.lanterna.TextColor.ANSI;
 public final class Main {
     public static void main(String[] args) {
         try {
+            SFX sfx = new SFX();
+
             Terminal term = new DefaultTerminalFactory().createTerminal();
             Screen screen = new TerminalScreen(term);
             screen.startScreen();
@@ -70,7 +73,7 @@ public final class Main {
                 if (keyStroke.getKeyType() == KeyType.Character || keyStroke.getKeyType() == KeyType.Enter) {
                     win.setVisible(false);
                     flashTimer.cancel();
-                    TUISweeper game = new TUISweeper(screen, gui, term);
+                    TUISweeper game = new TUISweeper(screen, gui, term, sfx);
                     game.start();
                     game.show();
                 }
