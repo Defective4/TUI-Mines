@@ -2,21 +2,21 @@ package io.github.defective4.javajam.tuisweeper;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.SimpleTheme;
-import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.Window;
+import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -70,7 +70,7 @@ public final class Main {
                 if (keyStroke.getKeyType() == KeyType.Character || keyStroke.getKeyType() == KeyType.Enter) {
                     win.setVisible(false);
                     flashTimer.cancel();
-                    TUISweeper game = new TUISweeper(screen, gui);
+                    TUISweeper game = new TUISweeper(screen, gui, term);
                     game.start();
                     game.show();
                 }
@@ -79,9 +79,11 @@ public final class Main {
 
             win.setComponent(box);
 
-            if (term instanceof SwingTerminalFrame) {
-                SwingTerminalFrame frame = (SwingTerminalFrame) term;
-                frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+            if (term instanceof JFrame) {
+                JFrame frame = (JFrame) term;
+                Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+                frame.setSize((int) (dim.getWidth() - 4), (int) dim.getHeight());
+                frame.setLocation(2, 0);
                 frame.setTitle("TUI-Sweeper");
                 try {
                     frame.setIconImage(ImageIO.read(Main.class.getResourceAsStream("/logo.png")));

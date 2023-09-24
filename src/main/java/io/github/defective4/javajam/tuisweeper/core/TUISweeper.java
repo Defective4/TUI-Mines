@@ -2,9 +2,15 @@ package io.github.defective4.javajam.tuisweeper.core;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.gui2.Button;
+import com.googlecode.lanterna.gui2.GridLayout;
+import com.googlecode.lanterna.gui2.Label;
+import com.googlecode.lanterna.gui2.Panel;
+import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.terminal.Terminal;
 import io.github.defective4.javajam.tuisweeper.core.storage.Leaderboards;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.ColorChooserButton;
@@ -12,6 +18,8 @@ import io.github.defective4.javajam.tuisweeper.core.ui.NumberBox;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
 import io.github.defective4.javajam.tuisweeper.core.ui.ThemePreset;
 
+import javax.swing.*;
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,6 +34,7 @@ public class TUISweeper {
 
     private final Screen screen;
     private final WindowBasedTextGUI gui;
+    private final Terminal term;
     private final Window mainWindow = new SimpleWindow(Window.Hint.FULL_SCREEN, Window.Hint.NO_DECORATIONS);
     private final TextBox boardBox = new TextBox();
     private final MineBoard board = new MineBoard();
@@ -40,9 +49,10 @@ public class TUISweeper {
     private byte gameOver = 0;
     private Difficulty localDifficulty = Difficulty.EASY;
 
-    public TUISweeper(Screen screen, WindowBasedTextGUI gui) {
+    public TUISweeper(Screen screen, WindowBasedTextGUI gui, Terminal term) {
         this.screen = screen;
         this.gui = gui;
+        this.term = term;
         this.gui.setTheme(prefs.getTheme().toTUITheme());
         mainWindow.setComponent(boardBox);
 
@@ -344,6 +354,26 @@ public class TUISweeper {
         }, 250, 250);
     }
 
+    public void shake() {
+        if (term instanceof JFrame) {
+            JFrame frame = (JFrame) term;
+            Point original = frame.getLocation();
+            boardUpdater.scheduleAtFixedRate(new TimerTask() {
+                int x = 50;
+
+                @Override
+                public void run() {
+                    frame.setLocation((int) (original.getX() + (x % 2 == 0 ? 2 : -2)), (int) original.getY());
+                    x--;
+                    if (x <= 0) {
+                        cancel();
+                        frame.setLocation(original);
+                    }
+                }
+            }, 10, 10);
+        }
+    }
+
     public static String capitalize(Enum<?> en) {
         String[] split = en.name().split("_");
         for (int x = 0; x < split.length; x++)
@@ -454,6 +484,7 @@ public class TUISweeper {
             board.revealMines();
             gameOver = 1;
             endTime = System.currentTimeMillis();
+            shake();
         }
     }
 
