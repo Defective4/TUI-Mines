@@ -81,16 +81,34 @@ public class Preferences {
         }
     }
 
+    public static class Options {
+        private boolean screenShaking = true;
+
+        public boolean isScreenShaking() {
+            return screenShaking;
+        }
+
+        public void setScreenShaking(boolean screenShaking) {
+            this.screenShaking = screenShaking;
+        }
+    }
+
     private final UserTheme theme = new UserTheme(ANSI.WHITE_BRIGHT,
                                                   ANSI.BLACK,
                                                   ANSI.WHITE_BRIGHT,
                                                   ANSI.BLACK,
                                                   ANSI.BLACK,
                                                   ANSI.WHITE_BRIGHT);
+    private final Options options = new Options();
+
     private Difficulty difficulty = Difficulty.EASY;
     private int width = difficulty.getWidth();
     private int height = difficulty.getHeight();
     private int bombs = difficulty.getBombs();
+
+    public Options getOptions() {
+        return options;
+    }
 
     public int getWidth() {
         return width;

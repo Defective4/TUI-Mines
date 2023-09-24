@@ -126,9 +126,10 @@ public class TUISweeper {
                             Panel panel = new Panel(new GridLayout(2));
                             Panel ctl = new Panel(new LinearLayout());
                             Label text = new Label("");
-                            text.setPreferredSize(new TerminalSize(32, 4));
+                            text.setPreferredSize(new TerminalSize(32, 5));
 
                             Button game = new Button("Game", () -> {
+                                Window win2 = new SimpleWindow("Game settings");
                                 Panel panel2 = new Panel(new GridLayout(2));
                                 Panel left = new Panel(new LinearLayout());
                                 Panel right = new Panel(new LinearLayout());
@@ -165,15 +166,16 @@ public class TUISweeper {
                                     Panel panel3 = new Panel(new LinearLayout());
                                     Panel ctl3 = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
-                                    ctl3.addComponent(new Button("No", win::close));
+                                    ctl3.addComponent(new Button("No", win2::close));
                                     ctl3.addComponent(new Button("Yes", () -> {
                                         start();
-                                        win.close();
+                                        win2.close();
                                     }));
                                     panel3.addComponent(new Label(
-                                            "The changes will take effect after starting a new game.\n" + "Do you want to start a new gamew now?\n "));
+                                            "The changes will take effect after starting a new game.\n" + "Do you want to start a new game now?\n "));
                                     panel3.addComponent(ctl3);
-                                    win.setComponent(panel3);
+                                    win2.setComponent(panel3);
+                                    win.close();
                                 });
 
                                 radio.addListener((i, i1) -> {
@@ -194,20 +196,22 @@ public class TUISweeper {
                                 right.addComponent(hBox);
                                 right.addComponent(new Label("\nBombs"));
                                 right.addComponent(bBox);
-                                ctl2.addComponent(new Button("Cancel", () -> win.setComponent(panel)));
                                 ctl2.addComponent(confirm);
+                                ctl2.addComponent(new Button("Cancel", win2::close));
                                 panel2.addComponent(left);
                                 panel2.addComponent(right);
                                 panel2.addComponent(ctl2);
-                                win.setComponent(panel2);
+                                win2.setComponent(panel2);
+                                gui.addWindow(win2);
                             }) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" |  Adjust game's difficulty\n" + " | \n" + " | \n" + " |");
+                                    text.setText(" |  Adjust game's difficulty\n" + " | \n" + " | \n" + " | \n" + " |");
                                 }
                             };
                             Button theme = new Button("Theme", () -> {
+                                Window win2 = new SimpleWindow("Theming");
                                 Panel panel2 = new Panel(new GridLayout(2));
 
                                 Preferences.UserTheme ut = prefs.getTheme();
@@ -231,7 +235,7 @@ public class TUISweeper {
                                     ut.setEditableBackground(ebColor.getColor());
                                     ut.setEditableForeground(efColor.getColor());
                                     updateTheme(ut);
-                                    win.setComponent(panel);
+                                    win2.close();
                                 });
 
                                 ComboBox<ThemePreset> presets = new ComboBox<ThemePreset>(ThemePreset.values()) {
@@ -272,36 +276,64 @@ public class TUISweeper {
                                 panel2.addComponent(sbColor);
                                 panel2.addComponent(new Label("\n "));
                                 panel2.addComponent(new Label("\n "));
-                                panel2.addComponent(new Button("Cancel", () -> win.setComponent(panel)));
                                 panel2.addComponent(apply);
+                                panel2.addComponent(new Button("Cancel", win2::close));
 
 
-                                win.setComponent(panel2);
+                                win2.setComponent(panel2);
+                                gui.addWindow(win2);
                             }) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " |  Customize game's appearance\n" + " | \n" + " |");
+                                    text.setText(" | \n" + " |  Customize game's appearance\n" + " | \n" + " | \n" + " |");
                                 }
                             };
                             Button leaderboards = new Button("Leaderboards", this::displayLeaderboards) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " | \n" + " |  Show top times by difficulty\n" + " |");
+                                    text.setText(" | \n" + " | \n" + " | \n" + " |  Show top times by difficulty\n" + " |");
                                 }
                             };
-
                             Button done = new Button("Done", win::close) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " | \n" + " | \n" + " |  Close this menu");
+                                    text.setText(" | \n" + " | \n" + " | \n" + " | \n" + " |  Close this menu");
+                                }
+                            };
+                            Button options = new Button("Options", () -> {
+                                Window win2 = new SimpleWindow("Options");
+                                Panel panel2 = new Panel(new LinearLayout());
+                                Panel ctl2 = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                                Preferences.Options ops = prefs.getOptions();
+
+                                CheckBox shaking = new CheckBox("Enable screen shaking");
+                                shaking.setChecked(ops.isScreenShaking());
+
+                                ctl2.addComponent(new Button("Confirm", () -> {
+                                    ops.setScreenShaking(shaking.isChecked());
+                                    win2.close();
+                                }));
+                                ctl2.addComponent(new Button("Cancel", win2::close));
+
+                                panel2.addComponent(shaking);
+                                panel2.addComponent(new EmptySpace());
+                                panel2.addComponent(ctl2);
+                                win2.setComponent(panel2);
+                                gui.addWindowAndWait(win2);
+                            }) {
+                                @Override
+                                protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
+                                    super.afterEnterFocus(direction, previouslyInFocus);
+                                    text.setText(" | \n" + " | \n" + " |  Adjust game settings\n" + " | \n" + " |");
                                 }
                             };
 
                             ctl.addComponent(game);
                             ctl.addComponent(theme);
+                            ctl.addComponent(options);
                             ctl.addComponent(leaderboards);
                             ctl.addComponent(done);
 
@@ -372,6 +404,7 @@ public class TUISweeper {
     }
 
     public void shake() {
+        if (!prefs.getOptions().isScreenShaking()) return;
         if (term instanceof JFrame) {
             JFrame frame = (JFrame) term;
             Point original = frame.getLocation();
