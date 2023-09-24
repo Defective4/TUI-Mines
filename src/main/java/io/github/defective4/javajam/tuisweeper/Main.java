@@ -59,7 +59,7 @@ public final class Main {
             flashTimer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
-                    box.setText(brand + "\n" + "\n                         " + ((System.currentTimeMillis() / 500 % 2 == 0) ?
+                    box.setText(brand + "\n" + "\n                     " + ((System.currentTimeMillis() / 500 % 2 == 0) ?
                             "PRESS ANY KEY TO START" :
                             ""));
 
@@ -94,7 +94,6 @@ public final class Main {
                 @Override
                 public void run() {
                     TerminalSize size = screen.getTerminalSize();
-                    System.out.println(size);
                     if (size.getColumns() < 61 || size.getRows() < 34) {
                         Window warn = new SimpleWindow("Warning");
                         warn.setTheme(win.getTheme());
