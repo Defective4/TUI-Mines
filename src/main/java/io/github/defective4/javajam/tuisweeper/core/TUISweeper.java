@@ -5,7 +5,6 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.gui2.Button;
-import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.Window;
@@ -13,9 +12,9 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXComboBox;
+import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXRadioBoxList;
 import io.github.defective4.javajam.tuisweeper.core.storage.Leaderboards;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
@@ -73,13 +72,9 @@ public class TUISweeper {
         this.infoLabel = new Label("");
         updateTheme(this.prefs.getTheme());
 
-        Panel root = new Panel(new LinearLayout());
-
-        root.addComponent(infoLabel);
         boardBox.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill,
                                                              LinearLayout.GrowPolicy.CanGrow));
-        root.addComponent(boardBox);
-        mainWindow.setComponent(root);
+        mainWindow.setComponent(Panels.vertical(infoLabel, boardBox));
 
         boardBox.setInputFilter((interactable, keyStroke) -> {
             boolean allowed = false;
@@ -113,11 +108,6 @@ public class TUISweeper {
                     switch (keyStroke.getCharacter()) {
                         case 'g': {
                             Window win = new SimpleWindow("Go to field...");
-                            Panel panel = new Panel(new GridLayout(2));
-                            panel.addComponent(new Label("Enter coordinates"));
-                            panel.addComponent(new EmptySpace());
-                            panel.addComponent(new Label("Column (X)"));
-                            panel.addComponent(new Label("Row (Y)"));
 
                             NumberBox x = new NumberBox(1, sfx);
                             NumberBox y = new NumberBox(1, sfx);
@@ -126,54 +116,47 @@ public class TUISweeper {
                             x.setMax(board.getSizeX());
                             y.setMax(board.getSizeY());
 
-                            panel.addComponent(x);
-                            panel.addComponent(y);
-
-                            panel.addComponent(new EmptySpace());
-                            panel.addComponent(new EmptySpace());
-
-                            panel.addComponent(new SFXButton("Go", sfx, false, () -> {
-                                boardBox.setCaretPosition(2 + y.getValue(), board.getXOffset() + x.getValue() - 1);
-                                win.close();
-                            }));
-                            panel.addComponent(new SFXButton("Cancel", sfx, true, win::close));
-
-                            win.setComponent(panel);
+                            win.setComponent(Panels.grid(2,
+                                                         new Label("Enter coordinates"),
+                                                         new EmptySpace(),
+                                                         new Label("Column (X)"),
+                                                         new Label("Row (Y)"),
+                                                         x,
+                                                         y,
+                                                         new EmptySpace(),
+                                                         new EmptySpace(),
+                                                         new SFXButton("Go", sfx, false, () -> {
+                                                             boardBox.setCaretPosition(2 + y.getValue(),
+                                                                                       board.getXOffset() + x.getValue() - 1);
+                                                             win.close();
+                                                         }),
+                                                         new SFXButton("Cancel", sfx, true, win::close)));
                             gui.addWindow(win);
                             break;
                         }
                         case 'n': {
                             Window win = new SimpleWindow("New game");
-                            Panel panel = new Panel(new LinearLayout());
-                            Panel ctl = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
-                            panel.addComponent(new Label("Are you sure you want to start a new game?\n" + "Your current session will get discarded.\n "));
-
-                            ctl.addComponent(new SFXButton("No", sfx, true, win::close));
-                            ctl.addComponent(new SFXButton("Yes", sfx, () -> {
-                                win.close();
-                                start();
-                            }));
-
-                            panel.addComponent(ctl);
-
-                            win.setComponent(panel);
+                            win.setComponent(Panels.vertical(new Label("Are you sure you want to start a new game?\n" + "Your current session will get discarded."),
+                                                             new EmptySpace(),
+                                                             Panels.horizontal(new SFXButton("No",
+                                                                                             sfx,
+                                                                                             true,
+                                                                                             win::close),
+                                                                               new SFXButton("Yes", sfx, () -> {
+                                                                                   win.close();
+                                                                                   start();
+                                                                               }))));
                             this.gui.addWindow(win);
                             break;
                         }
                         case 'm': {
                             Window win = new SimpleWindow("Game Menu");
-                            Panel panel = new Panel(new GridLayout(2));
-                            Panel ctl = new Panel(new LinearLayout());
                             Label text = new Label("");
                             text.setPreferredSize(new TerminalSize(32, 5));
 
                             Button game = new SFXButton("Game", sfx, () -> {
                                 Window win2 = new SimpleWindow("Game settings");
-                                Panel panel2 = new Panel(new GridLayout(2));
-                                Panel left = new Panel(new LinearLayout());
-                                Panel right = new Panel(new LinearLayout());
-                                Panel ctl2 = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
                                 Difficulty[] diffs = Difficulty.values();
                                 SFXRadioBoxList<Difficulty> radio = new SFXRadioBoxList<>(sfx);
@@ -203,18 +186,19 @@ public class TUISweeper {
                                     TUISweeper.this.prefs.setWidth(wBox.getValue());
                                     TUISweeper.this.prefs.setHeight(hBox.getValue());
                                     TUISweeper.this.prefs.setBombs(bBox.getValue());
-                                    Panel panel3 = new Panel(new LinearLayout());
-                                    Panel ctl3 = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
-                                    ctl3.addComponent(new SFXButton("No", sfx, true, win2::close));
-                                    ctl3.addComponent(new SFXButton("Yes", sfx, () -> {
-                                        start();
-                                        win2.close();
-                                    }));
-                                    panel3.addComponent(new Label(
-                                            "The changes will take effect after starting a new game.\n" + "Do you want to start a new game now?\n "));
-                                    panel3.addComponent(ctl3);
-                                    win2.setComponent(panel3);
+                                    win2.setComponent(Panels.vertical(new Label(
+                                                                              "The changes will take effect after starting a new game.\n" + "Do you want to start a new game now?\n "),
+                                                                      Panels.horizontal(new SFXButton("No",
+                                                                                                      sfx,
+                                                                                                      true,
+                                                                                                      win2::close),
+                                                                                        new SFXButton("Yes",
+                                                                                                      sfx,
+                                                                                                      () -> {
+                                                                                                          start();
+                                                                                                          win2.close();
+                                                                                                      }))));
                                     win.close();
                                 });
 
@@ -228,20 +212,19 @@ public class TUISweeper {
                                     } else if (radio.isFocused()) wBox.takeFocus();
                                 });
                                 radio.setCheckedItem(TUISweeper.this.prefs.getDifficulty());
-
-                                left.addComponent(radio);
-                                right.addComponent(new Label("Width"));
-                                right.addComponent(wBox);
-                                right.addComponent(new Label("\nHeight"));
-                                right.addComponent(hBox);
-                                right.addComponent(new Label("\nBombs"));
-                                right.addComponent(bBox);
-                                ctl2.addComponent(confirm);
-                                ctl2.addComponent(new SFXButton("Cancel", sfx, true, win2::close));
-                                panel2.addComponent(left);
-                                panel2.addComponent(right);
-                                panel2.addComponent(ctl2);
-                                win2.setComponent(panel2);
+                                win2.setComponent(Panels.grid(2,
+                                                              Panels.vertical(radio),
+                                                              Panels.vertical(new Label("Width"),
+                                                                                wBox,
+                                                                                new Label("\nHeight"),
+                                                                                hBox,
+                                                                                new Label("\nBombs"),
+                                                                                bBox),
+                                                              Panels.horizontal(confirm,
+                                                                                new SFXButton("Cancel",
+                                                                                              sfx,
+                                                                                              true,
+                                                                                              win2::close))));
                                 gui.addWindow(win2);
                             }) {
                                 @Override
@@ -252,7 +235,6 @@ public class TUISweeper {
                             };
                             Button theme = new SFXButton("Theme", sfx, () -> {
                                 Window win2 = new SimpleWindow("Theming");
-                                Panel panel2 = new Panel(new GridLayout(2));
 
                                 Preferences.UserTheme ut = TUISweeper.this.prefs.getTheme();
                                 ColorChooserButton bfColor = new ColorChooserButton(TUISweeper.this.gui,
@@ -305,29 +287,28 @@ public class TUISweeper {
                                     }
                                 });
 
-                                panel2.addComponent(new Label("Choose a preset"));
-                                panel2.addComponent(new EmptySpace());
-                                panel2.addComponent(presets);
-                                panel2.addComponent(new EmptySpace());
-                                panel2.addComponent(new Label("\nBase color"));
-                                panel2.addComponent(new Label("\nBase background"));
-                                panel2.addComponent(bfColor);
-                                panel2.addComponent(bbColor);
-                                panel2.addComponent(new Label("\nField color"));
-                                panel2.addComponent(new Label("\nField background"));
-                                panel2.addComponent(efColor);
-                                panel2.addComponent(ebColor);
-                                panel2.addComponent(new Label("\nSelected color    "));
-                                panel2.addComponent(new Label("\nSelected background"));
-                                panel2.addComponent(sfColor);
-                                panel2.addComponent(sbColor);
-                                panel2.addComponent(new Label("\n "));
-                                panel2.addComponent(new Label("\n "));
-                                panel2.addComponent(apply);
-                                panel2.addComponent(new SFXButton("Cancel", sfx, true, win2::close));
 
-
-                                win2.setComponent(panel2);
+                                win2.setComponent(Panels.grid(2,
+                                                              new Label("Choose a preset"),
+                                                              new EmptySpace(),
+                                                              presets,
+                                                              new EmptySpace(),
+                                                              new Label("\nBase color"),
+                                                              new Label("\nBase background"),
+                                                              bfColor,
+                                                              bbColor,
+                                                              new Label("\nField color"),
+                                                              new Label("\nField background"),
+                                                              efColor,
+                                                              ebColor,
+                                                              new Label("\nSelected color    "),
+                                                              new Label("\nSelected background"),
+                                                              sfColor,
+                                                              sbColor,
+                                                              new Label("\n "),
+                                                              new Label("\n "),
+                                                              apply,
+                                                              new SFXButton("Cancel", sfx, true, win2::close)));
                                 gui.addWindow(win2);
                             }) {
                                 @Override
@@ -352,8 +333,6 @@ public class TUISweeper {
                             };
                             Button options = new SFXButton("Options", sfx, () -> {
                                 Window win2 = new SimpleWindow("Options");
-                                Panel panel2 = new Panel(new LinearLayout());
-                                Panel ctl2 = new Panel(new LinearLayout(Direction.HORIZONTAL));
                                 Preferences.Options ops = TUISweeper.this.prefs.getOptions();
                                 boolean sndAvailable = sfx.isAvailable();
 
@@ -363,19 +342,23 @@ public class TUISweeper {
                                 sounds.setChecked(sndAvailable && ops.isSounds());
                                 sounds.setEnabled(sndAvailable);
 
-                                ctl2.addComponent(new SFXButton("Confirm", sfx, () -> {
-                                    ops.setScreenShaking(shaking.isChecked());
-                                    ops.setSounds(sounds.isChecked());
-                                    sfx.setEnabled(ops.isSounds());
-                                    win2.close();
-                                }));
-                                ctl2.addComponent(new SFXButton("Cancel", sfx, true, win2::close));
-
-                                panel2.addComponent(shaking);
-                                panel2.addComponent(sounds);
-                                panel2.addComponent(new EmptySpace());
-                                panel2.addComponent(ctl2);
-                                win2.setComponent(panel2);
+                                win2.setComponent(Panels.vertical(shaking,
+                                                                  sounds,
+                                                                  new EmptySpace(),
+                                                                  Panels.horizontal(new SFXButton("Confirm",
+                                                                                                  sfx,
+                                                                                                  () -> {
+                                                                                                      ops.setScreenShaking(
+                                                                                                              shaking.isChecked());
+                                                                                                      ops.setSounds(
+                                                                                                              sounds.isChecked());
+                                                                                                      sfx.setEnabled(ops.isSounds());
+                                                                                                      win2.close();
+                                                                                                  }),
+                                                                                    new SFXButton("Cancel",
+                                                                                                  sfx,
+                                                                                                  true,
+                                                                                                  win2::close))));
                                 gui.addWindow(win2);
                             }) {
                                 @Override
@@ -385,33 +368,20 @@ public class TUISweeper {
                                 }
                             };
 
-                            ctl.addComponent(game);
-                            ctl.addComponent(theme);
-                            ctl.addComponent(options);
-                            ctl.addComponent(leaderboards);
-                            ctl.addComponent(done);
-
-                            panel.addComponent(ctl);
-                            panel.addComponent(text);
-                            win.setComponent(panel);
+                            win.setComponent(Panels.grid(2,
+                                                         Panels.vertical(game, theme, options, leaderboards, done),
+                                                         text));
                             this.gui.addWindow(win);
                             break;
                         }
                         case 'q': {
                             Window win = new SimpleWindow("Quiting the game");
-                            Panel panel = new Panel(new LinearLayout());
-                            Panel ctl = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
                             Button no = new SFXButton("No", sfx, true, win::close);
                             Button yes = new SFXButton("Yes", sfx, () -> System.exit(0));
 
-                            ctl.addComponent(no);
-                            ctl.addComponent(yes);
-
-                            panel.addComponent(new Label("Are you sure you want to discard\n" + "current game and close the application?\n "));
-                            panel.addComponent(ctl);
-
-                            win.setComponent(panel);
+                            win.setComponent(Panels.vertical(new Label("Are you sure you want to discard\n" + "current game and close the application?\n "),
+                                                             Panels.horizontal(no, yes)));
                             this.gui.addWindow(win);
                             break;
                         }
@@ -606,7 +576,6 @@ public class TUISweeper {
 
     public void displayLeaderboards() {
         Window win = new SimpleWindow("Leaderboards");
-        Panel panel = new Panel(new LinearLayout());
 
         Table<String> table = new Table<>("#", "Time", "Date (yy-mm-dd hh:mm)");
         table.setPreferredSize(new TerminalSize(35, 11));
@@ -630,13 +599,12 @@ public class TUISweeper {
         });
         diff.setSelectedItem(current == Difficulty.CUSTOM ? Difficulty.EASY : current);
 
-        panel.addComponent(new Label("Difficulty"));
-        panel.addComponent(diff);
-        panel.addComponent(new EmptySpace());
-        panel.addComponent(table);
-        panel.addComponent(new EmptySpace());
-        panel.addComponent(new SFXButton("Close", sfx, true, win::close));
-        win.setComponent(panel);
+        win.setComponent(Panels.vertical(new Label("Difficulty"),
+                                         diff,
+                                         new EmptySpace(),
+                                         table,
+                                         new EmptySpace(),
+                                         new SFXButton("Close", sfx, true, win::close)));
         gui.addWindow(win);
     }
 
@@ -690,16 +658,15 @@ public class TUISweeper {
                     leaders.addEntry(diff, endTime - startTime);
                 }
                 Window win = new SimpleWindow("Game won");
-                Panel panel = new Panel(new LinearLayout());
-                Panel ctl = new Panel(new LinearLayout(Direction.HORIZONTAL));
-
-                ctl.addComponent(new Button("Close", win::close));
+                Panel ctl = Panels.horizontal(new Button("Close", win::close));
                 if (diff != Difficulty.CUSTOM)
                     ctl.addComponent(new SFXButton("Leaderboards", sfx, this::displayLeaderboards));
 
-                panel.addComponent(new Label("You won!\n" + "Your time is " + getCurrentPlayingTime() + "\n "));
-                panel.addComponent(ctl);
-                win.setComponent(panel);
+                win.setComponent(Panels.vertical(new Label("You won!\n" + "Your time is " + getCurrentPlayingTime()),
+                                                 new EmptySpace(),
+                                                 ctl
+
+                ));
                 gui.addWindow(win);
             }
             percent = (double) (fields[2] + fields[0]) / (board.getSizeX() * board.getSizeY());

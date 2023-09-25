@@ -1,10 +1,8 @@
 package io.github.defective4.javajam.tuisweeper;
 
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.Label;
-import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.input.KeyType;
@@ -28,8 +26,6 @@ import java.util.Collections;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.googlecode.lanterna.TextColor.ANSI;
-
 public final class Main {
     public static void main(String[] args) {
         try {
@@ -51,14 +47,6 @@ public final class Main {
             WindowBasedTextGUI gui = new MultiWindowTextGUI(screen);
             gui.setTheme(prefs.getTheme().toTUITheme());
             Window win = new SimpleWindow(Window.Hint.FULL_SCREEN, Window.Hint.NO_DECORATIONS);
-            win.setTheme(SimpleTheme.makeTheme(true,
-                                               ANSI.WHITE_BRIGHT,
-                                               ANSI.BLACK,
-                                               ANSI.WHITE_BRIGHT,
-                                               ANSI.BLACK,
-                                               ANSI.WHITE_BRIGHT,
-                                               ANSI.BLACK,
-                                               ANSI.BLACK));
 
             StringBuilder brandBuilder = new StringBuilder();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream(
@@ -123,12 +111,9 @@ public final class Main {
                     public void run() {
                         Window warn = new BasicWindow("Native warning");
                         warn.setHints(Collections.singleton(Window.Hint.CENTERED));
-                        Panel panel = new Panel(new LinearLayout());
-
-                        panel.addComponent(new Label("It looks like you are running TUI-Sweeper\n" + "in a native terminal.\n" + "If you run into any issues try launching\n" + "this app with argument \"-gui\",\n" + "for example:\n" + "java -jar tui-sweeper.jar -gui"));
-
-                        panel.addComponent(new Button("Continue", warn::close));
-                        warn.setComponent(panel);
+                        warn.setComponent(Panels.vertical(new Label("It looks like you are running TUI-Sweeper\n" + "in a native terminal.\n" + "If you run into any issues try launching\n" + "this app with argument \"-gui\",\n" + "for example:\n" + "java -jar tui-sweeper.jar -gui"),
+                                                          new EmptySpace(),
+                                                          new Button("Continue", warn::close)));
                         gui.addWindowAndWait(warn);
                     }
                 }, 1);
@@ -140,12 +125,11 @@ public final class Main {
                     TerminalSize size = screen.getTerminalSize();
                     if (size.getColumns() < 61 || size.getRows() < 34) {
                         Window warn = new SimpleWindow("Warning");
-                        warn.setTheme(win.getTheme());
-                        Panel panel = new Panel(new LinearLayout());
-                        panel.addComponent(new Label("Your terminal has really small size. \n" + "Not all elements may be visible at once,\nso the playing experience may be affected\n" + "If you are using a terminal emulator/terminal screen \nplease resize/maximize the window.\n" + "Thank you!\n "));
+                        warn.setComponent(Panels.vertical(new Label("Your terminal has really small size. \n" + "Not all elements may be visible at once,\nso the playing experience may be affected\n" + "If you are using a terminal emulator/terminal screen \nplease resize/maximize the window.\n" + "Thank you!"),
+                                                          new EmptySpace(),
+                                                          new Button("Ok", warn::close))
 
-                        panel.addComponent(new Button("Ok", warn::close));
-                        warn.setComponent(panel);
+                        );
                         gui.addWindowAndWait(warn);
                     }
                 }
