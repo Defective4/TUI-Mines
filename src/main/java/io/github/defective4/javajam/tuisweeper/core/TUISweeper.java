@@ -47,7 +47,7 @@ public class TUISweeper {
     private final MineBoard board = new MineBoard();
 
     private final Timer boardUpdater = new Timer(true);
-    private final Preferences prefs = new Preferences();
+    private final Preferences prefs;
     private final Leaderboards leaders = new Leaderboards();
     private long startTime = -1;
     private long endTime = -1;
@@ -63,14 +63,15 @@ public class TUISweeper {
         infoLabel.setTheme(new SimpleTheme(TextColor.ANSI.BLACK, TextColor.ANSI.WHITE_BRIGHT));
     }
 
-    public TUISweeper(Screen screen, WindowBasedTextGUI gui, Terminal term, SFXEngine sfx) {
+    public TUISweeper(Screen screen, WindowBasedTextGUI gui, Terminal term, SFXEngine sfx, Preferences prefs) {
         this.screen = screen;
         this.gui = gui;
         this.term = term;
         this.sfx = sfx;
-        this.sfx.setEnabled(prefs.getOptions().isSounds());
+        this.prefs = prefs;
+        this.sfx.setEnabled(this.prefs.getOptions().isSounds());
         this.infoLabel = new Label("");
-        updateTheme(prefs.getTheme());
+        updateTheme(this.prefs.getTheme());
 
         Panel root = new Panel(new LinearLayout());
 
@@ -198,10 +199,10 @@ public class TUISweeper {
                                 bBox.setTextChangeListener(listener);
 
                                 Button confirm = new SFXButton("Confirm", sfx, () -> {
-                                    prefs.setDifficulty(radio.getCheckedItem());
-                                    prefs.setWidth(wBox.getValue());
-                                    prefs.setHeight(hBox.getValue());
-                                    prefs.setBombs(bBox.getValue());
+                                    TUISweeper.this.prefs.setDifficulty(radio.getCheckedItem());
+                                    TUISweeper.this.prefs.setWidth(wBox.getValue());
+                                    TUISweeper.this.prefs.setHeight(hBox.getValue());
+                                    TUISweeper.this.prefs.setBombs(bBox.getValue());
                                     Panel panel3 = new Panel(new LinearLayout());
                                     Panel ctl3 = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
@@ -226,7 +227,7 @@ public class TUISweeper {
                                         if (radio.isFocused()) confirm.takeFocus();
                                     } else if (radio.isFocused()) wBox.takeFocus();
                                 });
-                                radio.setCheckedItem(prefs.getDifficulty());
+                                radio.setCheckedItem(TUISweeper.this.prefs.getDifficulty());
 
                                 left.addComponent(radio);
                                 right.addComponent(new Label("Width"));
@@ -253,7 +254,7 @@ public class TUISweeper {
                                 Window win2 = new SimpleWindow("Theming");
                                 Panel panel2 = new Panel(new GridLayout(2));
 
-                                Preferences.UserTheme ut = prefs.getTheme();
+                                Preferences.UserTheme ut = TUISweeper.this.prefs.getTheme();
                                 ColorChooserButton bfColor = new ColorChooserButton(TUISweeper.this.gui,
                                                                                     ut.getBaseForeground(),
                                                                                     sfx);
@@ -353,7 +354,7 @@ public class TUISweeper {
                                 Window win2 = new SimpleWindow("Options");
                                 Panel panel2 = new Panel(new LinearLayout());
                                 Panel ctl2 = new Panel(new LinearLayout(Direction.HORIZONTAL));
-                                Preferences.Options ops = prefs.getOptions();
+                                Preferences.Options ops = TUISweeper.this.prefs.getOptions();
                                 boolean sndAvailable = sfx.isAvailable();
 
                                 CheckBox shaking = new CheckBox("Enable screen shaking");

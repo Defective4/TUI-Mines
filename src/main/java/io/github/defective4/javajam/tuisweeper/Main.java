@@ -15,6 +15,7 @@ import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal;
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
+import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
 
 import javax.imageio.ImageIO;
@@ -32,18 +33,23 @@ import static com.googlecode.lanterna.TextColor.ANSI;
 public final class Main {
     public static void main(String[] args) {
         try {
-            SFXEngine sfx = new SFXEngine();
-
             DefaultTerminalFactory factory = new DefaultTerminalFactory();
+            Timer timer = new Timer(true);
+            Preferences prefs = new Preferences();
+            SFXEngine sfx = new SFXEngine();
+            TextBox box = new TextBox();
+            box.setReadOnly(true);
 
             factory.setPreferTerminalEmulator(System.getProperty("os.name")
                                                     .equalsIgnoreCase("windows") || (args.length > 0 && args[0].equalsIgnoreCase(
                     "-gui")));
-            Terminal term = factory.createTerminal();
 
+            Terminal term = factory.createTerminal();
             Screen screen = new TerminalScreen(term);
             screen.startScreen();
+
             WindowBasedTextGUI gui = new MultiWindowTextGUI(screen);
+            gui.setTheme(prefs.getTheme().toTUITheme());
             Window win = new SimpleWindow(Window.Hint.FULL_SCREEN, Window.Hint.NO_DECORATIONS);
             win.setTheme(SimpleTheme.makeTheme(true,
                                                ANSI.WHITE_BRIGHT,
@@ -53,8 +59,6 @@ public final class Main {
                                                ANSI.WHITE_BRIGHT,
                                                ANSI.BLACK,
                                                ANSI.BLACK));
-            TextBox box = new TextBox();
-            box.setReadOnly(true);
 
             StringBuilder brandBuilder = new StringBuilder();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream(
@@ -66,10 +70,10 @@ public final class Main {
             }
             String brand = brandBuilder.toString();
 
-            Timer flashTimer = new Timer(true);
-            flashTimer.scheduleAtFixedRate(new TimerTask() {
+            timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
+                    if (!win.isVisible()) cancel();
                     box.setText(brand + "\n" + "\n                     " + ((System.currentTimeMillis() / 500 % 2 == 0) ?
                             "PRESS ANY KEY TO START" :
                             ""));
@@ -79,9 +83,18 @@ public final class Main {
 
             box.setInputFilter((interactable, keyStroke) -> {
                 if (keyStroke.getKeyType() == KeyType.Character || keyStroke.getKeyType() == KeyType.Enter) {
+                    Window sndWin = new SimpleWindow("Enable sounds?");
+                    sndWin.setComponent(Panels.vertical(new Label("Do you want to enable sounds?\n" + "You can always change this setting in\n" + "game menu!"),
+                                                        new EmptySpace(),
+                                                        Panels.horizontal(new Button("Yes", sndWin::close),
+                                                                          new Button("No", () -> {
+                                                                              prefs.getOptions().setSounds(false);
+                                                                              sndWin.close();
+                                                                          }))));
+                    gui.addWindowAndWait(sndWin);
                     win.setVisible(false);
-                    flashTimer.cancel();
-                    TUISweeper game = new TUISweeper(screen, gui, term, sfx);
+                    timer.cancel();
+                    TUISweeper game = new TUISweeper(screen, gui, term, sfx, prefs);
                     game.start();
                     game.show();
                 }
@@ -89,6 +102,7 @@ public final class Main {
             });
 
             win.setComponent(box);
+
 
             if (term instanceof JFrame) {
                 JFrame frame = (JFrame) term;
@@ -103,10 +117,8 @@ public final class Main {
                 }
             }
 
-
-            Timer tm = new Timer(true);
             if (term instanceof UnixLikeTerminal) {
-                tm.schedule(new TimerTask() {
+                timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
                         Window warn = new BasicWindow("Native warning");
@@ -122,7 +134,7 @@ public final class Main {
                 }, 1);
             }
 
-            tm.schedule(new TimerTask() {
+            timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     TerminalSize size = screen.getTerminalSize();
