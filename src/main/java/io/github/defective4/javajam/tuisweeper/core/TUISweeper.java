@@ -110,6 +110,37 @@ public class TUISweeper {
                         }
 
                     switch (keyStroke.getCharacter()) {
+                        case 'g': {
+                            Window win = new SimpleWindow("Go to field...");
+                            Panel panel = new Panel(new GridLayout(2));
+                            panel.addComponent(new Label("Enter coordinates"));
+                            panel.addComponent(new EmptySpace());
+                            panel.addComponent(new Label("Column (X)"));
+                            panel.addComponent(new Label("Row (Y)"));
+
+                            NumberBox x = new NumberBox(1, sfx);
+                            NumberBox y = new NumberBox(1, sfx);
+                            x.setMin(1);
+                            y.setMin(1);
+                            x.setMax(board.getSizeX());
+                            y.setMax(board.getSizeY());
+
+                            panel.addComponent(x);
+                            panel.addComponent(y);
+
+                            panel.addComponent(new EmptySpace());
+                            panel.addComponent(new EmptySpace());
+
+                            panel.addComponent(new SFXButton("Go", sfx, false, () -> {
+                                boardBox.setCaretPosition(2 + y.getValue(), board.getXOffset() + x.getValue() - 1);
+                                win.close();
+                            }));
+                            panel.addComponent(new SFXButton("Cancel", sfx, true, win::close));
+
+                            win.setComponent(panel);
+                            gui.addWindow(win);
+                            break;
+                        }
                         case 'n': {
                             Window win = new SimpleWindow("New game");
                             Panel panel = new Panel(new LinearLayout());
@@ -737,7 +768,7 @@ public class TUISweeper {
                .append("\n")
                .append("    ")
                .append("\n")
-               .append("    n - New Game\n")
+               .append("    n - New Game     g - Go to field...\n")
                .append("    m - Game Menu\n")
                .append("    q - Quit");
 
