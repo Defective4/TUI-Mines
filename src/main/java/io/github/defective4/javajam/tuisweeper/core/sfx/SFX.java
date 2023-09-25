@@ -2,17 +2,44 @@ package io.github.defective4.javajam.tuisweeper.core.sfx;
 
 import javax.sound.sampled.*;
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SFX {
     private final AudioFormat FORMAT = new AudioFormat(44100, 16, 1, true, false);
 
     private final Map<String, byte[]> loadedSounds = new HashMap<>();
+    private final List<String> queue = Collections.synchronizedList(new ArrayList<>());
     private boolean enabled = true;
 
     public SFX() {
         load();
+        new Thread(() -> {
+            while (true) {
+                synchronized (queue) {
+                    if (!queue.isEmpty()) for (String entry : queue.toArray(new String[0])) {
+                        queue.remove(entry);
+                        try {
+                            byte[] data = loadedSounds.get(entry);
+                            if (data != null) {
+                                Clip c = AudioSystem.getClip();
+                                c.open(FORMAT, data, 0, data.length);
+                                c.addLineListener(event -> {
+                                    if (event.getType() == LineEvent.Type.STOP) c.close();
+                                });
+                                c.start();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     public boolean isEnabled() {
@@ -25,18 +52,8 @@ public class SFX {
 
     public void play(String sound) {
         if (!isAvailable() || !enabled) return;
-        try {
-            byte[] data = loadedSounds.get(sound.toLowerCase());
-            if (data != null) {
-                Clip c = AudioSystem.getClip();
-                c.open(FORMAT, data, 0, data.length);
-                c.addLineListener(event -> {
-                    if (event.getType() == LineEvent.Type.STOP) c.close();
-                });
-                c.start();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        synchronized (queue) {
+            queue.add(sound.toLowerCase());
         }
     }
 
@@ -44,7 +61,7 @@ public class SFX {
         return AudioSystem.isLineSupported(new DataLine.Info(SourceDataLine.class, FORMAT));
     }
 
-    public void load() {
+    private void load() {
         if (enabled && isAvailable())
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(SFX.class.getResourceAsStream(
                     "/sfx/index")))) {
