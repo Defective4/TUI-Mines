@@ -34,7 +34,7 @@ public final class Main {
 
             DefaultTerminalFactory factory = new DefaultTerminalFactory();
 
-            factory.setPreferTerminalEmulator(!(args.length > 0 && args[0].equalsIgnoreCase("-native")));
+            factory.setPreferTerminalEmulator(args.length > 0 && args[0].equalsIgnoreCase("-gui"));
             Terminal term = factory.createTerminal();
 
             Screen screen = new TerminalScreen(term);
