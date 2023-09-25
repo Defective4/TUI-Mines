@@ -13,7 +13,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFX;
+import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXComboBox;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXRadioBoxList;
@@ -41,7 +41,7 @@ public class TUISweeper {
     private final Screen screen;
     private final WindowBasedTextGUI gui;
     private final Terminal term;
-    private final SFX sfx;
+    private final SFXEngine sfx;
     private final Window mainWindow = new SimpleWindow(Window.Hint.FULL_SCREEN, Window.Hint.NO_DECORATIONS);
     private final TextBox boardBox = new TextBox();
     private final MineBoard board = new MineBoard();
@@ -63,7 +63,7 @@ public class TUISweeper {
         infoLabel.setTheme(new SimpleTheme(TextColor.ANSI.BLACK, TextColor.ANSI.WHITE_BRIGHT));
     }
 
-    public TUISweeper(Screen screen, WindowBasedTextGUI gui, Terminal term, SFX sfx) {
+    public TUISweeper(Screen screen, WindowBasedTextGUI gui, Terminal term, SFXEngine sfx) {
         this.screen = screen;
         this.gui = gui;
         this.term = term;

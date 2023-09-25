@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class SFX {
+public class SFXEngine {
     private final AudioFormat FORMAT = new AudioFormat(44100, 16, 1, true, false);
 
     private final ScheduledExecutorService service = Executors.newScheduledThreadPool(10);
@@ -17,7 +17,7 @@ public class SFX {
     private final boolean available = AudioSystem.isLineSupported(new DataLine.Info(DataLine.class, FORMAT));
     private boolean enabled = true;
 
-    public SFX() {
+    public SFXEngine() {
         load();
 
         service.scheduleAtFixedRate(() -> {
@@ -64,11 +64,11 @@ public class SFX {
 
     private void load() {
         if (isAvailable())
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(SFX.class.getResourceAsStream(
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(SFXEngine.class.getResourceAsStream(
                     "/sfx/index")))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    try (InputStream is = SFX.class.getResourceAsStream("/sfx/" + line + ".wav")) {
+                    try (InputStream is = SFXEngine.class.getResourceAsStream("/sfx/" + line + ".wav")) {
                         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                         int read;
                         byte[] tmp = new byte[1024];

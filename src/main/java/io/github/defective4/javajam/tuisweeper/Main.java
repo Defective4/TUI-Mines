@@ -14,7 +14,7 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal;
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFX;
+import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
 
 import javax.imageio.ImageIO;
@@ -32,7 +32,7 @@ import static com.googlecode.lanterna.TextColor.ANSI;
 public final class Main {
     public static void main(String[] args) {
         try {
-            SFX sfx = new SFX();
+            SFXEngine sfx = new SFXEngine();
 
             DefaultTerminalFactory factory = new DefaultTerminalFactory();
 

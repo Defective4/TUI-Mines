@@ -3,7 +3,7 @@ package io.github.defective4.javajam.tuisweeper.core.ui;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.gui2.*;
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFX;
+import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
 
 import static com.googlecode.lanterna.TextColor.ANSI;
@@ -12,7 +12,7 @@ public class ColorChooserButton extends SFXButton {
 
     private ANSI color;
 
-    public ColorChooserButton(WindowBasedTextGUI gui, ANSI color, SFX sfx) {
+    public ColorChooserButton(WindowBasedTextGUI gui, ANSI color, SFXEngine sfx) {
         super("", sfx, false, () -> {});
         addListener(button -> {
             Window win = new SimpleWindow("Color chooser");

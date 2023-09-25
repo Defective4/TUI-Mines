@@ -7,10 +7,10 @@ import com.googlecode.lanterna.input.KeyType;
 
 public class SFXComboBox<T> extends ComboBox<T> {
 
-    private final SFX sfx;
+    private final SFXEngine sfx;
 
     @SafeVarargs
-    public SFXComboBox(SFX sfx, T... items) {
+    public SFXComboBox(SFXEngine sfx, T... items) {
         super(items);
         this.sfx = sfx;
     }
