@@ -12,10 +12,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXComboBox;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXRadioBoxList;
+import io.github.defective4.javajam.tuisweeper.core.sfx.*;
 import io.github.defective4.javajam.tuisweeper.core.storage.Leaderboards;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.ColorChooserButton;
@@ -215,11 +212,11 @@ public class TUISweeper {
                                 win2.setComponent(Panels.grid(2,
                                                               Panels.vertical(radio),
                                                               Panels.vertical(new Label("Width"),
-                                                                                wBox,
-                                                                                new Label("\nHeight"),
-                                                                                hBox,
-                                                                                new Label("\nBombs"),
-                                                                                bBox),
+                                                                              wBox,
+                                                                              new Label("\nHeight"),
+                                                                              hBox,
+                                                                              new Label("\nBombs"),
+                                                                              bBox),
                                                               Panels.horizontal(confirm,
                                                                                 new SFXButton("Cancel",
                                                                                               sfx,
@@ -336,10 +333,8 @@ public class TUISweeper {
                                 Preferences.Options ops = TUISweeper.this.prefs.getOptions();
                                 boolean sndAvailable = sfx.isAvailable();
 
-                                CheckBox shaking = new CheckBox("Enable screen shaking");
-                                CheckBox sounds = new CheckBox("Enable sounds");
-                                shaking.setChecked(ops.isScreenShaking());
-                                sounds.setChecked(sndAvailable && ops.isSounds());
+                                CheckBox shaking = new SFXCheckBox("Enable screen shaking", ops.isScreenShaking(), sfx);
+                                CheckBox sounds = new SFXCheckBox("Enable sounds", ops.isSounds() && sndAvailable, sfx);
                                 sounds.setEnabled(sndAvailable);
 
                                 win2.setComponent(Panels.vertical(shaking,
