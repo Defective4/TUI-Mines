@@ -173,7 +173,6 @@ public class Preferences {
 
     public void setWidth(int width) {
         this.width = width;
-        save();
     }
 
     public int getHeight() {
@@ -182,7 +181,6 @@ public class Preferences {
 
     public void setHeight(int height) {
         this.height = height;
-        save();
     }
 
     public int getBombs() {
@@ -191,7 +189,6 @@ public class Preferences {
 
     public void setBombs(int bombs) {
         this.bombs = bombs;
-        save();
     }
 
     public UserTheme getTheme() {
@@ -204,6 +201,5 @@ public class Preferences {
 
     public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
-        save();
     }
 }

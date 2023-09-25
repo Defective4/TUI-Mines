@@ -184,6 +184,7 @@ public class TUISweeper {
                                     TUISweeper.this.prefs.setWidth(wBox.getValue());
                                     TUISweeper.this.prefs.setHeight(hBox.getValue());
                                     TUISweeper.this.prefs.setBombs(bBox.getValue());
+                                    prefs.save();
 
                                     win2.setComponent(Panels.vertical(new Label(
                                                                               "The changes will take effect after starting a new game.\n" + "Do you want to start a new game now?\n "),
@@ -349,6 +350,7 @@ public class TUISweeper {
                                                                                                       ops.setSounds(
                                                                                                               sounds.isChecked());
                                                                                                       sfx.setEnabled(ops.isSounds());
+                                                                                                      prefs.save();
                                                                                                       win2.close();
                                                                                                   }),
                                                                                     new SFXButton("Cancel",
