@@ -56,6 +56,7 @@ public class TUISweeper {
 
     private void updateTheme(Preferences.UserTheme theme) {
         gui.setTheme(theme.toTUITheme());
+        prefs.save();
         infoLabel.setTheme(new SimpleTheme(TextColor.ANSI.BLACK, TextColor.ANSI.WHITE_BRIGHT));
     }
 

@@ -31,13 +31,14 @@ public final class Main {
         try {
             DefaultTerminalFactory factory = new DefaultTerminalFactory();
             Timer timer = new Timer(true);
-            Preferences prefs = new Preferences();
+            Preferences prefs = Preferences.load();
             SFXEngine sfx = new SFXEngine();
             TextBox box = new TextBox();
             box.setReadOnly(true);
 
             factory.setPreferTerminalEmulator(System.getProperty("os.name")
-                                                    .equalsIgnoreCase("windows") || (args.length > 0 && args[0].equalsIgnoreCase(
+                                                    .toLowerCase()
+                                                    .contains("windows") || (args.length > 0 && args[0].equalsIgnoreCase(
                     "-gui")));
 
             Terminal term = factory.createTerminal();
@@ -71,15 +72,17 @@ public final class Main {
 
             box.setInputFilter((interactable, keyStroke) -> {
                 if (keyStroke.getKeyType() == KeyType.Character || keyStroke.getKeyType() == KeyType.Enter) {
-                    Window sndWin = new SimpleWindow("Enable sounds?");
-                    sndWin.setComponent(Panels.vertical(new Label("Do you want to enable sounds?\n" + "You can always change this setting in\n" + "game menu!"),
-                                                        new EmptySpace(),
-                                                        Panels.horizontal(new Button("Yes", sndWin::close),
-                                                                          new Button("No", () -> {
-                                                                              prefs.getOptions().setSounds(false);
-                                                                              sndWin.close();
-                                                                          }))));
-                    gui.addWindowAndWait(sndWin);
+                    if (prefs.isFirstBoot()) {
+                        Window sndWin = new SimpleWindow("Enable sounds?");
+                        sndWin.setComponent(Panels.vertical(new Label("Do you want to enable sounds?\n" + "You can always change this setting in\n" + "game menu!"),
+                                                            new EmptySpace(),
+                                                            Panels.horizontal(new Button("Yes", sndWin::close),
+                                                                              new Button("No", () -> {
+                                                                                  prefs.getOptions().setSounds(false);
+                                                                                  sndWin.close();
+                                                                              }))));
+                        gui.addWindowAndWait(sndWin);
+                    }
                     win.setVisible(false);
                     timer.cancel();
                     TUISweeper game = new TUISweeper(screen, gui, term, sfx, prefs);
@@ -95,6 +98,7 @@ public final class Main {
             if (term instanceof JFrame) {
                 JFrame frame = (JFrame) term;
                 Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setSize((int) (dim.getWidth() - 4), (int) dim.getHeight());
                 frame.setLocation(2, 0);
                 frame.setTitle("TUI-Sweeper");
