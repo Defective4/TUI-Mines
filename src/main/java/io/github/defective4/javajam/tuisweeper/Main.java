@@ -32,7 +32,11 @@ public final class Main {
         try {
             SFX sfx = new SFX();
 
-            Terminal term = new DefaultTerminalFactory().createTerminal();
+            DefaultTerminalFactory factory = new DefaultTerminalFactory();
+
+            factory.setPreferTerminalEmulator(!(args.length > 0 && args[0].equalsIgnoreCase("-native")));
+            Terminal term = factory.createTerminal();
+
             Screen screen = new TerminalScreen(term);
             screen.startScreen();
             WindowBasedTextGUI gui = new MultiWindowTextGUI(screen);
