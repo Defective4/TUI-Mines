@@ -2,6 +2,7 @@ package io.github.defective4.javajam.tuisweeper.core.sfx;
 
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.Interactable;
+import com.googlecode.lanterna.input.KeyStroke;
 
 public class SFXButton extends Button {
 

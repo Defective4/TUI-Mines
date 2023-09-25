@@ -3,7 +3,9 @@ click
 flag
 focus
 mass_reveal
+confirm
 reveal
 unflag
 win
 bomb
+key

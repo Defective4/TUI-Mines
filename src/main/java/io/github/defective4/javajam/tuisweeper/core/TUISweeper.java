@@ -15,6 +15,8 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFX;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
+import io.github.defective4.javajam.tuisweeper.core.sfx.SFXComboBox;
+import io.github.defective4.javajam.tuisweeper.core.sfx.SFXRadioBoxList;
 import io.github.defective4.javajam.tuisweeper.core.storage.Leaderboards;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.ColorChooserButton;
@@ -141,13 +143,13 @@ public class TUISweeper {
                                 Panel ctl2 = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
                                 Difficulty[] diffs = Difficulty.values();
-                                RadioBoxList<Difficulty> radio = new RadioBoxList<>();
+                                SFXRadioBoxList<Difficulty> radio = new SFXRadioBoxList<>(sfx);
                                 for (Difficulty dif : diffs)
                                     radio.addItem(dif);
 
-                                NumberBox wBox = new NumberBox(board.getSizeX());
-                                NumberBox hBox = new NumberBox(board.getSizeY());
-                                NumberBox bBox = new NumberBox(board.getBombs());
+                                NumberBox wBox = new NumberBox(board.getSizeX(), sfx);
+                                NumberBox hBox = new NumberBox(board.getSizeY(), sfx);
+                                NumberBox bBox = new NumberBox(board.getBombs(), sfx);
 
                                 wBox.setMin(2);
                                 hBox.setMin(2);
@@ -221,17 +223,17 @@ public class TUISweeper {
 
                                 Preferences.UserTheme ut = prefs.getTheme();
                                 ColorChooserButton bfColor = new ColorChooserButton(TUISweeper.this.gui,
-                                                                                    ut.getBaseForeground());
+                                                                                    ut.getBaseForeground(), sfx);
                                 ColorChooserButton bbColor = new ColorChooserButton(TUISweeper.this.gui,
-                                                                                    ut.getBaseBackground());
+                                                                                    ut.getBaseBackground(), sfx);
                                 ColorChooserButton efColor = new ColorChooserButton(TUISweeper.this.gui,
-                                                                                    ut.getEditableForeground());
+                                                                                    ut.getEditableForeground(), sfx);
                                 ColorChooserButton ebColor = new ColorChooserButton(TUISweeper.this.gui,
-                                                                                    ut.getEditableBackground());
+                                                                                    ut.getEditableBackground(), sfx);
                                 ColorChooserButton sfColor = new ColorChooserButton(TUISweeper.this.gui,
-                                                                                    ut.getSelectedForeground());
+                                                                                    ut.getSelectedForeground(), sfx);
                                 ColorChooserButton sbColor = new ColorChooserButton(TUISweeper.this.gui,
-                                                                                    ut.getSelectedBackground());
+                                                                                    ut.getSelectedBackground(), sfx);
                                 Button apply = new SFXButton("Apply", sfx, () -> {
                                     ut.setBaseBackground(bbColor.getColor());
                                     ut.setBaseForeground(bfColor.getColor());
@@ -243,7 +245,7 @@ public class TUISweeper {
                                     win2.close();
                                 });
 
-                                ComboBox<ThemePreset> presets = new ComboBox<ThemePreset>(ThemePreset.values()) {
+                                ComboBox<ThemePreset> presets = new SFXComboBox<ThemePreset>(sfx, ThemePreset.values()) {
                                     @Override
                                     protected synchronized void afterLeaveFocus(FocusChangeDirection direction, Interactable nextInFocus) {
                                         super.afterLeaveFocus(direction, nextInFocus);
@@ -562,7 +564,7 @@ public class TUISweeper {
         Table<String> table = new Table<>("#", "Time", "Date (yy-mm-dd hh:mm)");
         table.setPreferredSize(new TerminalSize(35, 11));
 
-        ComboBox<Difficulty> diff = new ComboBox<>(Difficulty.EASY, Difficulty.NORMAL, Difficulty.HARD);
+        ComboBox<Difficulty> diff = new SFXComboBox<>(sfx, Difficulty.EASY, Difficulty.NORMAL, Difficulty.HARD);
         Difficulty current = prefs.getDifficulty();
         diff.addListener((i, i1, b) -> {
             Difficulty sel = diff.getItem(i);
