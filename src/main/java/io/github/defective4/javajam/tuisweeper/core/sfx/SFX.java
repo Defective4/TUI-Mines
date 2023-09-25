@@ -3,9 +3,14 @@ package io.github.defective4.javajam.tuisweeper.core.sfx;
 import javax.sound.sampled.*;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class SFX {
     private final AudioFormat FORMAT = new AudioFormat(44100, 16, 1, true, false);
+
+    private final ScheduledExecutorService service = Executors.newScheduledThreadPool(10);
 
     private final Map<String, byte[]> loadedSounds = new HashMap<>();
     private final List<String> queue = Collections.synchronizedList(new ArrayList<>());
@@ -13,33 +18,28 @@ public class SFX {
 
     public SFX() {
         load();
-        new Thread(() -> {
-            while (true) {
-                synchronized (queue) {
-                    if (!queue.isEmpty()) for (String entry : queue.toArray(new String[0])) {
-                        queue.remove(entry);
-                        try {
-                            byte[] data = loadedSounds.get(entry);
-                            if (data != null) {
-                                Clip c = AudioSystem.getClip();
-                                c.open(FORMAT, data, 0, data.length);
-                                c.addLineListener(event -> {
-                                    if (event.getType() == LineEvent.Type.STOP) c.close();
-                                });
-                                c.start();
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+
+        service.scheduleAtFixedRate(() -> {
+
+            synchronized (queue) {
+                if (!queue.isEmpty()) for (String entry : queue.toArray(new String[0])) {
+                    queue.remove(entry);
+                    try {
+                        byte[] data = loadedSounds.get(entry);
+                        if (data != null) {
+                            Clip c = AudioSystem.getClip();
+                            c.open(FORMAT, data, 0, data.length);
+                            c.addLineListener(event -> {
+                                if (event.getType() == LineEvent.Type.STOP) c.close();
+                            });
+                            c.start();
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
-        }).start();
+        }, 0, 10, TimeUnit.MILLISECONDS);
     }
 
     public boolean isEnabled() {
