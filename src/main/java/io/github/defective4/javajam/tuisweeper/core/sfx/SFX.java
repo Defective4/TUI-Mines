@@ -14,6 +14,7 @@ public class SFX {
 
     private final Map<String, byte[]> loadedSounds = new HashMap<>();
     private final List<String> queue = Collections.synchronizedList(new ArrayList<>());
+    private final boolean available = AudioSystem.isLineSupported(new DataLine.Info(DataLine.class, FORMAT));
     private boolean enabled = true;
 
     public SFX() {
@@ -58,11 +59,11 @@ public class SFX {
     }
 
     public boolean isAvailable() {
-        return AudioSystem.isLineSupported(new DataLine.Info(SourceDataLine.class, FORMAT));
+        return available;
     }
 
     private void load() {
-        if (enabled && isAvailable())
+        if (isAvailable())
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(SFX.class.getResourceAsStream(
                     "/sfx/index")))) {
                 String line;
