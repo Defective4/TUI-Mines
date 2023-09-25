@@ -68,6 +68,7 @@ public class TUISweeper {
         this.gui = gui;
         this.term = term;
         this.sfx = sfx;
+        this.sfx.setEnabled(prefs.getOptions().isSounds());
         this.infoLabel = new Label("");
         updateTheme(prefs.getTheme());
 
@@ -223,17 +224,23 @@ public class TUISweeper {
 
                                 Preferences.UserTheme ut = prefs.getTheme();
                                 ColorChooserButton bfColor = new ColorChooserButton(TUISweeper.this.gui,
-                                                                                    ut.getBaseForeground(), sfx);
+                                                                                    ut.getBaseForeground(),
+                                                                                    sfx);
                                 ColorChooserButton bbColor = new ColorChooserButton(TUISweeper.this.gui,
-                                                                                    ut.getBaseBackground(), sfx);
+                                                                                    ut.getBaseBackground(),
+                                                                                    sfx);
                                 ColorChooserButton efColor = new ColorChooserButton(TUISweeper.this.gui,
-                                                                                    ut.getEditableForeground(), sfx);
+                                                                                    ut.getEditableForeground(),
+                                                                                    sfx);
                                 ColorChooserButton ebColor = new ColorChooserButton(TUISweeper.this.gui,
-                                                                                    ut.getEditableBackground(), sfx);
+                                                                                    ut.getEditableBackground(),
+                                                                                    sfx);
                                 ColorChooserButton sfColor = new ColorChooserButton(TUISweeper.this.gui,
-                                                                                    ut.getSelectedForeground(), sfx);
+                                                                                    ut.getSelectedForeground(),
+                                                                                    sfx);
                                 ColorChooserButton sbColor = new ColorChooserButton(TUISweeper.this.gui,
-                                                                                    ut.getSelectedBackground(), sfx);
+                                                                                    ut.getSelectedBackground(),
+                                                                                    sfx);
                                 Button apply = new SFXButton("Apply", sfx, () -> {
                                     ut.setBaseBackground(bbColor.getColor());
                                     ut.setBaseForeground(bfColor.getColor());
@@ -245,7 +252,8 @@ public class TUISweeper {
                                     win2.close();
                                 });
 
-                                ComboBox<ThemePreset> presets = new SFXComboBox<ThemePreset>(sfx, ThemePreset.values()) {
+                                ComboBox<ThemePreset> presets = new SFXComboBox<ThemePreset>(sfx,
+                                                                                             ThemePreset.values()) {
                                     @Override
                                     protected synchronized void afterLeaveFocus(FocusChangeDirection direction, Interactable nextInFocus) {
                                         super.afterLeaveFocus(direction, nextInFocus);
@@ -315,21 +323,28 @@ public class TUISweeper {
                                 Panel panel2 = new Panel(new LinearLayout());
                                 Panel ctl2 = new Panel(new LinearLayout(Direction.HORIZONTAL));
                                 Preferences.Options ops = prefs.getOptions();
+                                boolean sndAvailable = sfx.isAvailable();
 
                                 CheckBox shaking = new CheckBox("Enable screen shaking");
+                                CheckBox sounds = new CheckBox("Enable sounds");
                                 shaking.setChecked(ops.isScreenShaking());
+                                sounds.setChecked(sndAvailable && ops.isSounds());
+                                sounds.setEnabled(sndAvailable);
 
                                 ctl2.addComponent(new SFXButton("Confirm", sfx, () -> {
                                     ops.setScreenShaking(shaking.isChecked());
+                                    ops.setSounds(sounds.isChecked());
+                                    sfx.setEnabled(ops.isSounds());
                                     win2.close();
                                 }));
                                 ctl2.addComponent(new SFXButton("Cancel", sfx, true, win2::close));
 
                                 panel2.addComponent(shaking);
+                                panel2.addComponent(sounds);
                                 panel2.addComponent(new EmptySpace());
                                 panel2.addComponent(ctl2);
                                 win2.setComponent(panel2);
-                                gui.addWindowAndWait(win2);
+                                gui.addWindow(win2);
                             }) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {

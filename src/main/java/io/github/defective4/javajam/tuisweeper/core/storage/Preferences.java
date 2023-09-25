@@ -83,6 +83,15 @@ public class Preferences {
 
     public static class Options {
         private boolean screenShaking = true;
+        private boolean sounds = true;
+
+        public boolean isSounds() {
+            return sounds;
+        }
+
+        public void setSounds(boolean sounds) {
+            this.sounds = sounds;
+        }
 
         public boolean isScreenShaking() {
             return screenShaking;
