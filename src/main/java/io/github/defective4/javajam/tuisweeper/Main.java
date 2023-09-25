@@ -12,6 +12,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal;
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFX;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
@@ -22,6 +23,7 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -34,7 +36,9 @@ public final class Main {
 
             DefaultTerminalFactory factory = new DefaultTerminalFactory();
 
-            factory.setPreferTerminalEmulator(args.length > 0 && args[0].equalsIgnoreCase("-gui"));
+            factory.setPreferTerminalEmulator(System.getProperty("os.name")
+                                                    .equalsIgnoreCase("windows") || (args.length > 0 && args[0].equalsIgnoreCase(
+                    "-gui")));
             Terminal term = factory.createTerminal();
 
             Screen screen = new TerminalScreen(term);
@@ -99,7 +103,26 @@ public final class Main {
                 }
             }
 
-            new Timer(true).schedule(new TimerTask() {
+
+            Timer tm = new Timer(true);
+            if (term instanceof UnixLikeTerminal) {
+                tm.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Window warn = new BasicWindow("Native warning");
+                        warn.setHints(Collections.singleton(Window.Hint.CENTERED));
+                        Panel panel = new Panel(new LinearLayout());
+
+                        panel.addComponent(new Label("It looks like you are running TUI-Sweeper\n" + "in a native terminal.\n" + "If you run into any issues try launching\n" + "this app with argument \"-gui\",\n" + "for example:\n" + "java -jar tui-sweeper.jar -gui"));
+
+                        panel.addComponent(new Button("Continue", warn::close));
+                        warn.setComponent(panel);
+                        gui.addWindowAndWait(warn);
+                    }
+                }, 1);
+            }
+
+            tm.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     TerminalSize size = screen.getTerminalSize();
@@ -111,11 +134,10 @@ public final class Main {
 
                         panel.addComponent(new Button("Ok", warn::close));
                         warn.setComponent(panel);
-                        gui.addWindow(warn);
+                        gui.addWindowAndWait(warn);
                     }
                 }
             }, 1000);
-
             gui.addWindowAndWait(win);
         } catch (IOException e) {
             e.printStackTrace();
