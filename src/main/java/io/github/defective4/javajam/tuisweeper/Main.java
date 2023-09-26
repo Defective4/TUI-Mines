@@ -85,6 +85,7 @@ public final class Main {
                     }
                     win.setVisible(false);
                     timer.cancel();
+                    prefs.setFirstBoot(false);
                     TUISweeper game = new TUISweeper(screen, gui, term, sfx, prefs);
                     game.start();
                     game.show();

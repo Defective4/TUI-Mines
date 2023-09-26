@@ -118,11 +118,15 @@ public class Preferences {
                                                   ANSI.WHITE_BRIGHT);
     private final Options options = new Options();
 
-    private transient boolean firstBoot = true;
+    private boolean firstBoot = true;
     private Difficulty difficulty = Difficulty.EASY;
     private int width = difficulty.getWidth();
     private int height = difficulty.getHeight();
     private int bombs = difficulty.getBombs();
+
+    public Preferences() {
+        Runtime.getRuntime().addShutdownHook(new Thread(this::save));
+    }
 
     public static File getConfigDirectory() {
         String subdir = System.getProperty("os.name").toLowerCase().contains("windows") ?
@@ -138,9 +142,7 @@ public class Preferences {
     public static Preferences load() {
         File in = getConfigFile();
         if (in.isFile()) try (InputStreamReader reader = new FileReader(in)) {
-            Preferences prefs = new Gson().fromJson(reader, Preferences.class);
-            prefs.firstBoot = false;
-            return prefs;
+            return new Gson().fromJson(reader, Preferences.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -161,6 +163,10 @@ public class Preferences {
 
     public boolean isFirstBoot() {
         return firstBoot;
+    }
+
+    public void setFirstBoot(boolean firstBoot) {
+        this.firstBoot = firstBoot;
     }
 
     public Options getOptions() {
