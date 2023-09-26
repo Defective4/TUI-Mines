@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.graphics.Theme;
 import io.github.defective4.javajam.tuisweeper.core.Difficulty;
+import io.github.defective4.javajam.tuisweeper.core.ui.ThemePreset;
 
 import java.io.File;
 import java.io.FileReader;
@@ -110,13 +111,8 @@ public class Preferences {
         }
     }
 
-    private final UserTheme theme = new UserTheme(ANSI.WHITE_BRIGHT,
-                                                  ANSI.BLACK,
-                                                  ANSI.WHITE_BRIGHT,
-                                                  ANSI.BLACK,
-                                                  ANSI.BLACK,
-                                                  ANSI.WHITE_BRIGHT);
-    private final Options options = new Options();
+    private UserTheme theme = ThemePreset.PITCH_BLACK.toTheme();
+    private Options options = new Options();
 
     private boolean firstBoot = true;
     private Difficulty difficulty = Difficulty.EASY;
@@ -170,11 +166,12 @@ public class Preferences {
     }
 
     public Options getOptions() {
+        if (options == null) options = new Options();
         return options;
     }
 
     public int getWidth() {
-        return width;
+        return Math.max(width, 1);
     }
 
     public void setWidth(int width) {
@@ -182,7 +179,7 @@ public class Preferences {
     }
 
     public int getHeight() {
-        return height;
+        return Math.max(height, 1);
     }
 
     public void setHeight(int height) {
@@ -190,7 +187,7 @@ public class Preferences {
     }
 
     public int getBombs() {
-        return bombs;
+        return Math.max(bombs, 1);
     }
 
     public void setBombs(int bombs) {
@@ -198,10 +195,12 @@ public class Preferences {
     }
 
     public UserTheme getTheme() {
+        if (theme == null) theme = ThemePreset.PITCH_BLACK.toTheme();
         return theme;
     }
 
     public Difficulty getDifficulty() {
+        if (difficulty == null) difficulty = Difficulty.EASY;
         return difficulty;
     }
 

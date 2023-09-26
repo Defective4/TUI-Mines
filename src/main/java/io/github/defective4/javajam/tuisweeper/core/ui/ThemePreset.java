@@ -1,6 +1,7 @@
 package io.github.defective4.javajam.tuisweeper.core.ui;
 
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
+import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 
 import static com.googlecode.lanterna.TextColor.ANSI;
 
@@ -28,6 +29,10 @@ public enum ThemePreset {
         this.ef = ef;
         this.sb = sb;
         this.sf = sf;
+    }
+
+    public Preferences.UserTheme toTheme() {
+        return new Preferences.UserTheme(bf, bb, ef, eb, sf, sb);
     }
 
     public ANSI getBb() {
