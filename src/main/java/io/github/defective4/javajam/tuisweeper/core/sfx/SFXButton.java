@@ -8,11 +8,9 @@ public class SFXButton extends Button {
     private final SFXEngine sfx;
 
     public SFXButton(String label, SFXEngine sfx, boolean back, Runnable action) {
-        super(label, action);
+        super(label, () -> sfx.play(back ? "back" : "click"));
         this.sfx = sfx;
-        addListener(e -> {
-            sfx.play(back ? "back" : "click");
-        });
+        addListener(b -> action.run());
     }
 
     public SFXButton(String label, SFXEngine sfx, Runnable action) {

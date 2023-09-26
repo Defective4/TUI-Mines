@@ -15,13 +15,11 @@ import com.googlecode.lanterna.terminal.Terminal;
 import io.github.defective4.javajam.tuisweeper.core.sfx.*;
 import io.github.defective4.javajam.tuisweeper.core.storage.Leaderboards;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
-import io.github.defective4.javajam.tuisweeper.core.ui.ColorChooserButton;
-import io.github.defective4.javajam.tuisweeper.core.ui.NumberBox;
-import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
-import io.github.defective4.javajam.tuisweeper.core.ui.ThemePreset;
+import io.github.defective4.javajam.tuisweeper.core.ui.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -286,6 +284,19 @@ public class TUISweeper {
                                     }
                                 });
 
+                                Button share = new SFXButton("Share theme", sfx, false, () -> {
+                                    CustomFileDialogBuilder bd = (CustomFileDialogBuilder) new CustomFileDialogBuilder(true,
+                                                                                                                       sfx).setActionLabel("Save")
+                                                                                                                           .setDescription(
+                                                                                                  "Choose location to save your theme")
+                                                                                                                           .setTitle("Exporting theme")
+                                                                                                                           .setSelectedFile(new File(
+                                                                                                  "theme.json"));
+                                    File file = bd.buildAndShow(gui);
+                                    System.out.println(file);
+                                });
+
+                                Button imp = new SFXButton("Import theme", sfx, false, () -> {});
 
                                 win2.setComponent(Panels.grid(2,
                                                               new Label("Choose a preset"),
@@ -306,6 +317,10 @@ public class TUISweeper {
                                                               sbColor,
                                                               new Label("\n "),
                                                               new Label("\n "),
+                                                              Panels.horizontal(share, imp),
+                                                              new EmptySpace(),
+                                                              new EmptySpace(),
+                                                              new EmptySpace(),
                                                               apply,
                                                               new SFXButton("Cancel", sfx, true, win2::close)));
                                 gui.addWindow(win2);
