@@ -1,18 +1,19 @@
 package io.github.defective4.javajam.tuisweeper.core.ui;
 
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.gui2.*;
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
+import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
 
 import static com.googlecode.lanterna.TextColor.ANSI;
 
 public class ColorChooserButton extends SFXButton {
 
-    private ANSI color;
+    private TextColor color;
 
-    public ColorChooserButton(WindowBasedTextGUI gui, ANSI color, SFXEngine sfx) {
+    public ColorChooserButton(WindowBasedTextGUI gui, TextColor color, SFXEngine sfx) {
         super("", sfx, false, () -> {});
         addListener(button -> {
             Window win = new SimpleWindow("Color chooser");
@@ -33,13 +34,14 @@ public class ColorChooserButton extends SFXButton {
         setColor(color);
     }
 
-    public ANSI getColor() {
+    public TextColor getColor() {
         return color;
     }
 
-    public void setColor(ANSI color) {
+    public void setColor(TextColor color) {
         this.color = color;
-        setLabel(TUISweeper.capitalize(color));
-        setTheme(new SimpleTheme(color.isBright() ? ANSI.BLACK : ANSI.WHITE_BRIGHT, color));
+        ANSI ansi = color instanceof ANSI ? (ANSI) color : null;
+        setLabel(ansi == null ? "Custom" : TUISweeper.capitalize(ansi));
+        setTheme(new SimpleTheme((ansi == null || ansi.isBright()) ? ANSI.BLACK : ANSI.WHITE_BRIGHT, color));
     }
 }
