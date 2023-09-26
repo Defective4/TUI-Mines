@@ -32,7 +32,8 @@ public class Leaderboards {
 
     public Leaderboards() {
         try (Statement stmt = mkStatement()) {
-            try (ResultSet set = stmt.executeQuery("select * from sqlite_master where type = \"table\" AND name = \"times\"")) {
+            try (ResultSet set = stmt.executeQuery(
+                    "select * from sqlite_master where type = \"table\" AND name = \"times\"")) {
                 if (!set.next()) {
                     stmt.execute(
                             "create table times (id integer not null primary key autoincrement, difficulty integer, time integer, date integer)");

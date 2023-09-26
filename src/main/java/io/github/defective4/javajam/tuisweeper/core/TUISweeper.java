@@ -43,20 +43,12 @@ public class TUISweeper {
     private final Timer boardUpdater = new Timer(true);
     private final Preferences prefs;
     private final Leaderboards leaders = new Leaderboards();
+    private final Label infoLabel;
     private long startTime = -1;
     private long endTime = -1;
     private boolean placed = false;
-
     private byte gameOver = 0;
     private Difficulty localDifficulty = Difficulty.EASY;
-
-    private final Label infoLabel;
-
-    private void updateTheme(Preferences.UserTheme theme) {
-        gui.setTheme(theme.toTUITheme());
-        prefs.save();
-        infoLabel.setTheme(new SimpleTheme(TextColor.ANSI.BLACK, TextColor.ANSI.WHITE_BRIGHT));
-    }
 
     public TUISweeper(Screen screen, WindowBasedTextGUI gui, Terminal term, SFXEngine sfx, Preferences prefs) {
         this.screen = screen;
@@ -440,6 +432,19 @@ public class TUISweeper {
         }, 250, 250);
     }
 
+    public static String capitalize(Enum<?> en) {
+        String[] split = en.name().split("_");
+        for (int x = 0; x < split.length; x++)
+            split[x] = split[x].substring(0, 1).toUpperCase() + split[x].substring(1).toLowerCase();
+        return String.join(" ", split);
+    }
+
+    private void updateTheme(Preferences.UserTheme theme) {
+        gui.setTheme(theme.toTUITheme());
+        prefs.save();
+        infoLabel.setTheme(new SimpleTheme(TextColor.ANSI.BLACK, TextColor.ANSI.WHITE_BRIGHT));
+    }
+
     public void shake() {
         if (!prefs.getOptions().isScreenShaking()) return;
         if (term instanceof JFrame) {
@@ -459,13 +464,6 @@ public class TUISweeper {
                 }
             }, 10, 10);
         }
-    }
-
-    public static String capitalize(Enum<?> en) {
-        String[] split = en.name().split("_");
-        for (int x = 0; x < split.length; x++)
-            split[x] = split[x].substring(0, 1).toUpperCase() + split[x].substring(1).toLowerCase();
-        return String.join(" ", split);
     }
 
     public String getCurrentPlayingTime() {
