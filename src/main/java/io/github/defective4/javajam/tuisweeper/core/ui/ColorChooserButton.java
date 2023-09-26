@@ -25,7 +25,7 @@ public class ColorChooserButton extends SFXButton {
                     win.close();
                     setColor(c);
                 });
-                btn.setTheme(new SimpleTheme(c.isBright() ? ANSI.BLACK : ANSI.WHITE_BRIGHT, c));
+                btn.setTheme(new SimpleTheme(ColorConverter.isDark(c) ? ANSI.WHITE_BRIGHT : ANSI.BLACK, c));
                 colorPanel.addComponent(btn);
             }
 
@@ -85,6 +85,6 @@ public class ColorChooserButton extends SFXButton {
         this.color = color;
         ANSI ansi = color instanceof ANSI ? (ANSI) color : null;
         setLabel(ansi == null ? "Custom" : TUISweeper.capitalize(ansi));
-        setTheme(new SimpleTheme((ansi == null || ansi.isBright()) ? ANSI.BLACK : ANSI.WHITE_BRIGHT, color));
+        setTheme(new SimpleTheme(ColorConverter.isDark(color) ? ANSI.WHITE_BRIGHT : ANSI.BLACK, color));
     }
 }
