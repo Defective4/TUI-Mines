@@ -6,6 +6,7 @@ import com.googlecode.lanterna.gui2.*;
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
+import io.github.defective4.javajam.tuisweeper.core.util.ColorConverter;
 
 import static com.googlecode.lanterna.TextColor.ANSI;
 
@@ -28,7 +29,49 @@ public class ColorChooserButton extends SFXButton {
                 colorPanel.addComponent(btn);
             }
 
-            win.setComponent(colorPanel);
+            win.setComponent(Panels.vertical(colorPanel,
+                                             new EmptySpace(),
+                                             Panels.horizontal(new SFXButton("Custom color", sfx, false, () -> {
+                                                 Window cw = new SimpleWindow("Make a custom color");
+
+                                                 TextColor cc = getColor();
+                                                 NumberBox r = new NumberBox(cc.getRed(), sfx);
+                                                 NumberBox g = new NumberBox(cc.getGreen(), sfx);
+                                                 NumberBox b = new NumberBox(cc.getBlue(), sfx);
+
+                                                 Button cApply = new SFXButton("Confirm", sfx, false, () -> {
+                                                     setColor(ColorConverter.optimize(new TextColor.RGB(r.getValue(),
+                                                                                                        g.getValue(),
+                                                                                                        b.getValue())));
+                                                     cw.close();
+                                                     win.close();
+                                                 });
+
+                                                 r.setMin(0);
+                                                 r.setMax(255);
+                                                 g.setMin(0);
+                                                 g.setMax(255);
+                                                 b.setMin(0);
+                                                 b.setMax(255);
+
+                                                 cw.setComponent(Panels.vertical(new Label("Enter color values below:"),
+                                                                                 new EmptySpace(),
+                                                                                 Panels.grid(3,
+                                                                                             new Label("Red"),
+                                                                                             new Label("Green"),
+                                                                                             new Label("Blue"),
+                                                                                             r,
+                                                                                             g,
+                                                                                             b),
+                                                                                 new EmptySpace(),
+                                                                                 Panels.horizontal(cApply,
+                                                                                                   new SFXButton(
+                                                                                                           "Cancel",
+                                                                                                           sfx,
+                                                                                                           true,
+                                                                                                           cw::close))));
+                                                 gui.addWindow(cw);
+                                             }), new SFXButton("Cancel", sfx, true, win::close))));
             gui.addWindow(win);
         });
         setColor(color);
