@@ -134,6 +134,9 @@ public class Preferences {
     public static File getConfigFile() {
         return new File(getConfigDirectory(), "config.json");
     }
+    public static File getDatabaseFile() {
+        return new File(getConfigDirectory(), "storage.db");
+    }
 
     public static Preferences load() {
         File in = getConfigFile();

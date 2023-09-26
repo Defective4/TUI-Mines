@@ -2,9 +2,13 @@ package io.github.defective4.javajam.tuisweeper.core.storage;
 
 import io.github.defective4.javajam.tuisweeper.core.Difficulty;
 
-import java.util.*;
+import java.io.File;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Leaderboards {
+
     public static class Entry {
         private final long date, time;
 
@@ -22,19 +26,65 @@ public class Leaderboards {
         }
     }
 
-    private final Map<Difficulty, List<Entry>> entries = new HashMap<>();
+    private Connection con;
+
+    private boolean isAvailable = false;
+
+    public Leaderboards() {
+        try (Statement stmt = mkStatement()) {
+            stmt.execute("create table if not exists times (difficulty integer, time integer, date integer)");
+            isAvailable = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            // TODO
+        }
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    private void connect() throws SQLException {
+        File dbFile = Preferences.getDatabaseFile();
+        dbFile.getParentFile().mkdirs();
+        con = DriverManager.getConnection("jdbc:sqlite:" + dbFile.getAbsolutePath());
+    }
+
+    private Statement mkStatement() throws SQLException {
+        try {
+            if (!con.isValid(1000)) connect();
+            return con.createStatement();
+        } catch (Exception e) {
+            connect();
+            return con.createStatement();
+        }
+    }
 
     public void addEntry(Difficulty diff, long time) {
-        if (!entries.containsKey(diff)) entries.put(diff, new ArrayList<>());
-        entries.get(diff).add(new Entry(System.currentTimeMillis(), time));
+        try (Statement stmt = mkStatement()) {
+            stmt.execute(String.format("insert into times (difficulty, time, date) values (%s, %s, %s)",
+                                       diff.getId(),
+                                       time,
+                                       System.currentTimeMillis()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public Entry[] getEntries(Difficulty diff, int max) {
-        if (!entries.containsKey(diff)) entries.put(diff, new ArrayList<>());
-        List<Entry> entries = new ArrayList<>(this.entries.get(diff));
-
-        entries.sort((o1, o2) -> (int) (o1.getTime() - o2.getTime()));
-
-        return Arrays.copyOf(entries.toArray(new Entry[0]), Math.min(max, entries.size()));
+        try (Statement stmt = mkStatement()) {
+            try (ResultSet set = stmt.executeQuery(String.format(
+                    "select * from times where difficulty = %s order by time asc limit 10",
+                    diff.getId()))) {
+                List<Entry> entries = new ArrayList<>();
+                while (set.next()) {
+                    entries.add(new Entry(set.getLong(3), set.getLong(2)));
+                }
+                return entries.toArray(new Entry[0]);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Entry[0];
+        }
     }
 }
