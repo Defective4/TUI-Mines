@@ -285,13 +285,13 @@ public class TUISweeper {
                                 });
 
                                 Button share = new SFXButton("Share theme", sfx, false, () -> {
-                                    CustomFileDialogBuilder bd = (CustomFileDialogBuilder) new CustomFileDialogBuilder(true,
-                                                                                                                       sfx).setActionLabel("Save")
-                                                                                                                           .setDescription(
-                                                                                                  "Choose location to save your theme")
-                                                                                                                           .setTitle("Exporting theme")
-                                                                                                                           .setSelectedFile(new File(
-                                                                                                  "theme.json"));
+                                    CustomFileDialogBuilder bd = (CustomFileDialogBuilder) new CustomFileDialogBuilder(
+                                            true,
+                                            sfx).setActionLabel("Save")
+                                                .setDescription("Choose location to save your theme")
+                                                .setTitle("Exporting theme")
+                                                .setSelectedFile(new File("theme.json"));
+                                    bd.setForcedExtension("json");
                                     File file = bd.buildAndShow(gui);
                                     System.out.println(file);
                                 });

@@ -14,12 +14,14 @@ import java.util.List;
 public class SFXMessageDialogBuilder extends MessageDialogBuilder {
     private final SFXEngine sfx;
 
-    public SFXMessageDialogBuilder(SFXEngine sfx) {this.sfx = sfx;}
+    public SFXMessageDialogBuilder(SFXEngine sfx) {
+        this.sfx = sfx;
+        setExtraWindowHints(Arrays.asList(Window.Hint.NO_POST_RENDERING, Window.Hint.CENTERED));
+    }
 
     @Override
     public MessageDialog build() {
         MessageDialog dial = super.build();
-        dial.setHints(Arrays.asList(Window.Hint.NO_POST_RENDERING, Window.Hint.CENTERED));
 
         Panel buttonPanel = (Panel) ((Panel) dial.getComponent()).getChildrenList().get(2);
         List<Component> cpts = buttonPanel.getChildrenList();
