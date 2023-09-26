@@ -32,7 +32,13 @@ public class Leaderboards {
 
     public Leaderboards() {
         try (Statement stmt = mkStatement()) {
-            stmt.execute("create table if not exists times (difficulty integer, time integer, date integer)");
+            try (ResultSet set = stmt.executeQuery("select * from sqlite_master where type = \"table\" AND name = \"times\"")) {
+                if (!set.next()) {
+                    stmt.execute(
+                            "create table times (id integer not null primary key autoincrement, difficulty integer, time integer, date integer)");
+                    stmt.execute("create index diff on times (difficulty)");
+                }
+            }
             isAvailable = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -78,7 +84,7 @@ public class Leaderboards {
                     diff.getId()))) {
                 List<Entry> entries = new ArrayList<>();
                 while (set.next()) {
-                    entries.add(new Entry(set.getLong(3), set.getLong(2)));
+                    entries.add(new Entry(set.getLong(4), set.getLong(3)));
                 }
                 return entries.toArray(new Entry[0]);
             }
