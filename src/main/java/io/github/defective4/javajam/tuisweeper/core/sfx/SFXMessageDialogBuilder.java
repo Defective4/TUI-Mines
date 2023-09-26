@@ -42,6 +42,10 @@ public class SFXMessageDialogBuilder extends MessageDialogBuilder {
 
             }
         }
+        cpts = buttonPanel.getChildrenList();
+        if (!cpts.isEmpty() && cpts.get(0) instanceof Button) {
+            ((Button) cpts.get(0)).takeFocus();
+        }
 
         return dial;
     }
