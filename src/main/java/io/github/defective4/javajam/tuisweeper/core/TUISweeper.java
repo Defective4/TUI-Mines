@@ -130,19 +130,15 @@ public class TUISweeper {
                             break;
                         }
                         case 'n': {
-                            Window win = new SimpleWindow("New game");
-
-                            win.setComponent(Panels.vertical(new Label("Are you sure you want to start a new game?\n" + "Your current session will get discarded."),
-                                                             new EmptySpace(),
-                                                             Panels.horizontal(new SFXButton("No",
-                                                                                             sfx,
-                                                                                             true,
-                                                                                             win::close),
-                                                                               new SFXButton("Yes", sfx, () -> {
-                                                                                   win.close();
-                                                                                   start();
-                                                                               }))));
-                            this.gui.addWindow(win);
+                            if (new SFXMessageDialogBuilder(sfx).setText(
+                                                                        "Are you sure you want to start a new game?\nYour current session will get discarded.")
+                                                                .setTitle("New Game")
+                                                                .addButton(MessageDialogButton.No)
+                                                                .addButton(MessageDialogButton.Yes)
+                                                                .build()
+                                                                .showDialog(gui) == MessageDialogButton.Yes) {
+                                start();
+                            }
                             break;
                         }
                         case 'm': {
@@ -183,19 +179,17 @@ public class TUISweeper {
                                     TUISweeper.this.prefs.setBombs(bBox.getValue());
                                     prefs.save();
 
-                                    win2.setComponent(Panels.vertical(new Label(
-                                                                              "The changes will take effect after starting a new game.\n" + "Do you want to start a new game now?\n "),
-                                                                      Panels.horizontal(new SFXButton("No",
-                                                                                                      sfx,
-                                                                                                      true,
-                                                                                                      win2::close),
-                                                                                        new SFXButton("Yes",
-                                                                                                      sfx,
-                                                                                                      () -> {
-                                                                                                          start();
-                                                                                                          win2.close();
-                                                                                                      }))));
                                     win.close();
+                                    win2.close();
+                                    if (new SFXMessageDialogBuilder(sfx).setTitle("Start new game?")
+                                                                        .addButton(MessageDialogButton.No)
+                                                                        .addButton(MessageDialogButton.Yes)
+                                                                        .setText(
+                                                                                "The changes will take effect after starting a new game.\nDo you want to start a new game now?\n ")
+                                                                        .build()
+                                                                        .showDialog(gui) == MessageDialogButton.Yes) {
+                                        start();
+                                    }
                                 });
 
                                 radio.addListener((i, i1) -> {
@@ -436,14 +430,14 @@ public class TUISweeper {
                             break;
                         }
                         case 'q': {
-                            Window win = new SimpleWindow("Quiting the game");
-
-                            Button no = new SFXButton("No", sfx, true, win::close);
-                            Button yes = new SFXButton("Yes", sfx, () -> System.exit(0));
-
-                            win.setComponent(Panels.vertical(new Label("Are you sure you want to discard\n" + "current game and close the application?\n "),
-                                                             Panels.horizontal(no, yes)));
-                            this.gui.addWindow(win);
+                            if (new SFXMessageDialogBuilder(sfx).setText("Are you sure you want to discard\n" + "current game and close the application?\n ")
+                                                                .setTitle("Quiting the game")
+                                                                .addButton(MessageDialogButton.No)
+                                                                .addButton(MessageDialogButton.Yes)
+                                                                .build()
+                                                                .showDialog(gui) == MessageDialogButton.Yes) {
+                                System.exit(0);
+                            }
                             break;
                         }
                         default:
