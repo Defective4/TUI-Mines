@@ -9,6 +9,8 @@ import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
@@ -20,6 +22,9 @@ import io.github.defective4.javajam.tuisweeper.core.ui.*;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -244,7 +249,8 @@ public class TUISweeper {
                                 ColorChooserButton sbColor = new ColorChooserButton(TUISweeper.this.gui,
                                                                                     ut.getSelectedBackground(),
                                                                                     sfx);
-                                Button apply = new SFXButton("Apply", sfx, () -> {
+
+                                Runnable save = () -> {
                                     ut.setBaseBackground(bbColor.getColor());
                                     ut.setBaseForeground(bfColor.getColor());
                                     ut.setSelectedBackground(sbColor.getColor());
@@ -252,6 +258,10 @@ public class TUISweeper {
                                     ut.setEditableBackground(ebColor.getColor());
                                     ut.setEditableForeground(efColor.getColor());
                                     updateTheme(ut);
+                                };
+
+                                Button apply = new SFXButton("Apply", sfx, () -> {
+                                    save.run();
                                     win2.close();
                                 });
 
@@ -285,7 +295,20 @@ public class TUISweeper {
                                                 .setSelectedFile(new File("theme.json"));
                                     bd.setForcedExtension("json");
                                     File file = bd.buildAndShow(gui);
-                                    System.out.println(file);
+                                    if (file != null) {
+                                        MessageDialogBuilder builder = new SFXMessageDialogBuilder(sfx);
+                                        builder.setTitle("Exporting theme");
+                                        builder.addButton(MessageDialogButton.OK);
+                                        try (OutputStream os = Files.newOutputStream(file.toPath())) {
+                                            save.run();
+                                            os.write(prefs.getTheme().toJSON().getBytes(StandardCharsets.UTF_8));
+                                            builder.setText("Theme exported to " + file);
+                                        } catch (Exception e) {
+                                            builder.setText("An error occured while exporting theme");
+                                            e.printStackTrace();
+                                        }
+                                        builder.build().showDialog(gui);
+                                    }
                                 });
 
                                 Button imp = new SFXButton("Import theme", sfx, false, () -> {});

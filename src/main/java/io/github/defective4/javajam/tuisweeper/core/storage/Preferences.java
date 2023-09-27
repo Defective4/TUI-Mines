@@ -1,16 +1,16 @@
 package io.github.defective4.javajam.tuisweeper.core.storage;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.graphics.Theme;
 import io.github.defective4.javajam.tuisweeper.core.Difficulty;
 import io.github.defective4.javajam.tuisweeper.core.ui.ThemePreset;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -91,6 +91,21 @@ public class Preferences {
                                          getSelectedForeground(),
                                          getSelectedBackground(),
                                          ANSI.BLACK);
+        }
+
+        public String toJSON() {
+            JsonObject obj = new Gson().toJsonTree(this).getAsJsonObject();
+            obj.add("themeVersion", new JsonPrimitive(1));
+            return new GsonBuilder().setPrettyPrinting().create().toJson(obj);
+        }
+
+        public static UserTheme fromJSON(Reader reader) {
+            try {
+                return new Gson().fromJson(reader, UserTheme.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     }
 
