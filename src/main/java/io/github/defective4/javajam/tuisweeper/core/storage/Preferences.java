@@ -34,6 +34,15 @@ public class Preferences {
             setSelectedForeground(selectedForeground);
         }
 
+        public static UserTheme fromJSON(Reader reader) {
+            try {
+                return new Gson().fromJson(reader, UserTheme.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
         public void fromTheme(UserTheme target) {
             setBaseBackground(target.getBaseBackground());
             setBaseForeground(target.getBaseForeground());
@@ -110,15 +119,6 @@ public class Preferences {
             JsonObject obj = new Gson().toJsonTree(this).getAsJsonObject();
             obj.add("themeVersion", new JsonPrimitive(1));
             return new GsonBuilder().setPrettyPrinting().create().toJson(obj);
-        }
-
-        public static UserTheme fromJSON(Reader reader) {
-            try {
-                return new Gson().fromJson(reader, UserTheme.class);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
         }
     }
 
