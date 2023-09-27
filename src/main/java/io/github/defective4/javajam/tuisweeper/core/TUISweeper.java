@@ -4,10 +4,6 @@ import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.SimpleTheme;
-import com.googlecode.lanterna.gui2.Button;
-import com.googlecode.lanterna.gui2.Label;
-import com.googlecode.lanterna.gui2.Panel;
-import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
@@ -19,8 +15,8 @@ import io.github.defective4.javajam.tuisweeper.core.storage.Leaderboards;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.*;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import java.awt.Point;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -738,10 +734,10 @@ public class TUISweeper {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < board.getSizeX() + offsetX; j++) {
                 builder.append(j < offsetX ?
-                                       ' ' :
-                                       i == 0 ?
-                                               j == cx ? 'v' : ' ' :
-                                               i == 1 ? CHARS[(j - offsetX) % CHARS.length] : '=');
+                               ' ' :
+                               i == 0 ?
+                               j == cx ? 'v' : ' ' :
+                               i == 1 ? CHARS[(j - offsetX) % CHARS.length] : '=');
             }
             switch (i) {
                 case 0: {

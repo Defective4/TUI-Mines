@@ -1,9 +1,6 @@
 package io.github.defective4.javajam.tuisweeper;
 
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.gui2.Button;
-import com.googlecode.lanterna.gui2.Label;
-import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
@@ -17,8 +14,9 @@ import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -64,8 +62,8 @@ public final class Main {
                 public void run() {
                     if (!win.isVisible()) cancel();
                     box.setText(brand + "\n" + "\n                     " + ((System.currentTimeMillis() / 500 % 2 == 0) ?
-                            "PRESS ANY KEY TO START" :
-                            ""));
+                                                                            "PRESS ANY KEY TO START" :
+                                                                            ""));
 
                 }
             }, 0, 125);

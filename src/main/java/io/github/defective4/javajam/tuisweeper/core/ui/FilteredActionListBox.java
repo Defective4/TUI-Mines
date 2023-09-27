@@ -15,8 +15,8 @@ public class FilteredActionListBox extends ActionListBox {
     @Override
     public ActionListBox addItem(String label, Runnable action) {
         return label.equals("<empty>") ?
-                super.addItem("<No applicable items>", action) :
-                label.toLowerCase().endsWith(filterExtension) ? super.addItem(label, action) : this;
+               super.addItem("<No applicable items>", action) :
+               label.toLowerCase().endsWith(filterExtension) ? super.addItem(label, action) : this;
     }
 
 }

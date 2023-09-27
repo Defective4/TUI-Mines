@@ -158,8 +158,8 @@ public class Preferences {
 
     public static File getConfigDirectory() {
         String subdir = System.getProperty("os.name").toLowerCase().contains("windows") ?
-                "AppData/Roaming/TUISweeper" :
-                ".config/tuisweeper";
+                        "AppData/Roaming/TUISweeper" :
+                        ".config/tuisweeper";
         return new File(System.getProperty("user.home") + "/" + subdir);
     }
 
