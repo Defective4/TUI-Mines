@@ -22,7 +22,7 @@ public class CustomFileDialogBuilder extends FileDialogBuilder {
     private final boolean save;
     private final SFXEngine sfx;
 
-    private String forcedExtension = null;
+    private String forcedExtension;
 
     public CustomFileDialogBuilder(boolean save, SFXEngine sfx) {
         this.save = save;

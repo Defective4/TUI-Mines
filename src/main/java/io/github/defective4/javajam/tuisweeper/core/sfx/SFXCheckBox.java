@@ -12,9 +12,7 @@ public class SFXCheckBox extends CheckBox {
         super(label);
         this.sfx = sfx;
         setChecked(checked);
-        addListener(b -> {
-            sfx.play("check");
-        });
+        addListener(b -> sfx.play("check"));
     }
 
     @Override

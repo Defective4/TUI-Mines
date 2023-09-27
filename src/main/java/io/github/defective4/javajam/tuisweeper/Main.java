@@ -25,6 +25,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public final class Main {
+    private Main() {
+    }
+
     public static void main(String[] args) {
         try {
             DefaultTerminalFactory factory = new DefaultTerminalFactory();
@@ -36,8 +39,8 @@ public final class Main {
 
             factory.setPreferTerminalEmulator(System.getProperty("os.name")
                                                     .toLowerCase()
-                                                    .contains("windows") || (args.length > 0 && args[0].equalsIgnoreCase(
-                    "-gui")));
+                                                    .contains("windows") || args.length > 0 && args[0].equalsIgnoreCase(
+                    "-gui"));
 
             Terminal term = factory.createTerminal();
             Screen screen = new TerminalScreen(term);
@@ -61,7 +64,7 @@ public final class Main {
                 @Override
                 public void run() {
                     if (!win.isVisible()) cancel();
-                    box.setText(brand + "\n" + "\n                     " + ((System.currentTimeMillis() / 500 % 2 == 0) ?
+                    box.setText(brand + "\n" + "\n                     " + (System.currentTimeMillis() / 500 % 2 == 0 ?
                                                                             "PRESS ANY KEY TO START" :
                                                                             ""));
 

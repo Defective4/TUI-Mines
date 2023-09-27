@@ -25,7 +25,7 @@ public class SFXComboBox<T> extends ComboBox<T> {
     public synchronized Result handleKeyStroke(KeyStroke keyStroke) {
         Result res = super.handleKeyStroke(keyStroke);
         if (res == Result.HANDLED) sfx.play("focus");
-        else if (keyStroke.getKeyType() == KeyType.Enter || (keyStroke.getKeyType() == KeyType.Character && keyStroke.getCharacter() == ' '))
+        else if (keyStroke.getKeyType() == KeyType.Enter || keyStroke.getKeyType() == KeyType.Character && keyStroke.getCharacter() == ' ')
             sfx.play("confirm");
         return res;
     }

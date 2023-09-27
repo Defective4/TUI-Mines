@@ -3,6 +3,9 @@ package io.github.defective4.javajam.tuisweeper.core.util;
 import com.googlecode.lanterna.TextColor;
 
 public final class ColorConverter {
+    private ColorConverter() {
+    }
+
     public static TextColor.RGB toRGB(TextColor color) {
         if (color instanceof TextColor.RGB) return (TextColor.RGB) color;
         else return new TextColor.RGB(color.getRed(), color.getGreen(), color.getBlue());

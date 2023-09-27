@@ -28,7 +28,7 @@ public class Leaderboards {
 
     private Connection con;
 
-    private boolean isAvailable = false;
+    private boolean isAvailable;
 
     public Leaderboards() {
         try (Statement stmt = mkStatement()) {

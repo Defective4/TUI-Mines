@@ -49,8 +49,8 @@ public class TUISweeper {
     private final Label infoLabel;
     private long startTime = -1;
     private long endTime = -1;
-    private boolean placed = false;
-    private byte gameOver = 0;
+    private boolean placed;
+    private byte gameOver;
     private Difficulty localDifficulty = Difficulty.EASY;
 
     public TUISweeper(Screen screen, WindowBasedTextGUI gui, Terminal term, SFXEngine sfx, Preferences prefs) {
@@ -591,7 +591,7 @@ public class TUISweeper {
                 }
             }
         }
-        if (current == 0 || (revealFlags && current == 12)) {
+        if (current == 0 || revealFlags && current == 12) {
             int bombs = board.countBombs(x, y);
             if (bombs == 0) {
                 board.setFieldAt(x, y, 10);
