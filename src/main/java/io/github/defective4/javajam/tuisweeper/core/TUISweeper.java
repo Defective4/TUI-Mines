@@ -22,6 +22,8 @@ import io.github.defective4.javajam.tuisweeper.core.ui.*;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -292,7 +294,7 @@ public class TUISweeper {
                                             sfx).setActionLabel("Save")
                                                 .setDescription("Choose location to save your theme")
                                                 .setTitle("Exporting theme")
-                                                .setSelectedFile(new File("theme.json"));
+                                                .setSelectedFile(new File("."));
                                     bd.setForcedExtension("json");
                                     File file = bd.buildAndShow(gui);
                                     if (file != null) {
@@ -311,7 +313,38 @@ public class TUISweeper {
                                     }
                                 });
 
-                                Button imp = new SFXButton("Import theme", sfx, false, () -> {});
+                                Button imp = new SFXButton("Import theme", sfx, false, () -> {
+                                    CustomFileDialogBuilder builder = (CustomFileDialogBuilder) new CustomFileDialogBuilder(
+                                            sfx).setSelectedFile(new File("theme.json"))
+                                                .setTitle("Importing a theme")
+                                                .setDescription("Select a theme file to import")
+                                                .setActionLabel("Import");
+                                    builder.setForcedExtension("json");
+
+                                    File file = builder.buildAndShow(gui);
+                                    if (file != null) {
+                                        MessageDialogBuilder md = new SFXMessageDialogBuilder(sfx);
+                                        md.addButton(MessageDialogButton.OK);
+                                        md.setText("Importing theme");
+                                        if (file.isFile()) {
+                                            try (FileReader rdr = new FileReader(file)) {
+                                                Preferences.UserTheme imported = Preferences.UserTheme.fromJSON(rdr);
+                                                if (imported == null || !imported.isValid())
+                                                    throw new IOException("Invalid theme");
+                                                updateTheme(imported);
+                                                prefs.getTheme().fromTheme(imported);
+                                                md.setText("Theme imported!");
+                                                win2.close();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                                md.setText("There was an error while importing the theme");
+                                            }
+                                        } else {
+                                            md.setText("This file does not exist!");
+                                        }
+                                        md.build().showDialog(gui);
+                                    }
+                                });
 
                                 win2.setComponent(Panels.grid(2,
                                                               new Label("Choose a preset"),

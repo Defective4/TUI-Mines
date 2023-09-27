@@ -34,6 +34,19 @@ public class Preferences {
             setSelectedForeground(selectedForeground);
         }
 
+        public void fromTheme(UserTheme target) {
+            setBaseBackground(target.getBaseBackground());
+            setBaseForeground(target.getBaseForeground());
+            setSelectedForeground(target.getSelectedForeground());
+            setSelectedBackground(target.getSelectedBackground());
+            setEditableForeground(target.getEditableForeground());
+            setEditableBackground(target.getEditableBackground());
+        }
+
+        public boolean isValid() {
+            return baseForeground != null && baseBackground != null && editableBackground != null && editableForeground != null && selectedBackground != null && selectedForeground != null;
+        }
+
         public TextColor getBaseForeground() {
             return optimize(baseForeground);
         }
@@ -161,7 +174,9 @@ public class Preferences {
     public static Preferences load() {
         File in = getConfigFile();
         if (in.isFile()) try (InputStreamReader reader = new FileReader(in)) {
-            return new Gson().fromJson(reader, Preferences.class);
+            Preferences prefs = new Gson().fromJson(reader, Preferences.class);
+            if (!prefs.getTheme().isValid()) prefs.getTheme().fromTheme(ThemePreset.PITCH_BLACK.toTheme());
+            return prefs;
         } catch (Exception e) {
             e.printStackTrace();
         }

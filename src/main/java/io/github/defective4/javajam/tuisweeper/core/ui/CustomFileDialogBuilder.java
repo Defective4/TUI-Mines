@@ -1,9 +1,7 @@
 package io.github.defective4.javajam.tuisweeper.core.ui;
 
-import com.googlecode.lanterna.gui2.Button;
-import com.googlecode.lanterna.gui2.TextBox;
-import com.googlecode.lanterna.gui2.Window;
-import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.FileDialog;
 import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
@@ -13,7 +11,11 @@ import io.github.defective4.javajam.tuisweeper.core.sfx.SFXMessageDialogBuilder;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.List;
 
 public class CustomFileDialogBuilder extends FileDialogBuilder {
 
@@ -46,10 +48,9 @@ public class CustomFileDialogBuilder extends FileDialogBuilder {
         FileDialog dial = super.buildDialog();
         dial.setHints(Arrays.asList(Window.Hint.NO_POST_RENDERING, Window.Hint.CENTERED));
         File file = getSelectedFile();
-        if (file != null && !file.isFile()) {
+        try {
             Field field;
-
-            try {
+            if (file != null && !file.isFile()) {
 
                 field = FileDialog.class.getDeclaredField("fileBox");
                 field.setAccessible(true);
@@ -59,10 +60,41 @@ public class CustomFileDialogBuilder extends FileDialogBuilder {
                 field.setAccessible(true);
                 ((Button) field.get(dial)).takeFocus();
 
+                if (forcedExtension != null && !save) {
+                    field = FileDialog.class.getDeclaredField("fileListBox");
+                    field.setAccessible(true);
+                    Field fin = Field.class.getDeclaredField("modifiers");
+                    fin.setAccessible(true);
+                    fin.set(field, field.getModifiers() & ~Modifier.FINAL);
 
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                e.printStackTrace();
+                    ActionListBox fileListBox = new FilteredActionListBox(new TerminalSize(30, 10), forcedExtension);
+                    field.set(dial, fileListBox);
+
+                    Panel panel = (Panel) dial.getComponent();
+                    field = Panel.class.getDeclaredField("components");
+                    field.setAccessible(true);
+                    List<Component> cpt = (List<Component>) field.get(panel);
+                    fileListBox.withBorder(Borders.singleLine())
+                               .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING,
+                                                                          GridLayout.Alignment.CENTER,
+                                                                          false,
+                                                                          false))
+                               .addTo(panel);
+
+                    cpt.set(2, cpt.get(cpt.size() - 1));
+                    cpt.remove(cpt.size() - 1);
+
+                    field = FileDialog.class.getDeclaredField("directory");
+                    field.setAccessible(true);
+
+                    Method meth = FileDialog.class.getDeclaredMethod("reloadViews", File.class);
+                    meth.setAccessible(true);
+                    meth.invoke(dial, field.get(dial));
+
+                }
             }
+        } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            e.printStackTrace();
         }
         return dial;
     }
@@ -70,17 +102,21 @@ public class CustomFileDialogBuilder extends FileDialogBuilder {
     public File buildAndShow(WindowBasedTextGUI gui) {
         FileDialog dial = buildDialog();
         File file = dial.showDialog(gui);
-        if (file != null && forcedExtension != null && !file.getName().endsWith("." + forcedExtension)) {
-            file = new File(file.getParentFile(), file.getName() + "." + forcedExtension);
-        }
-        if (file != null && file.isFile()) {
-            MessageDialog md = new SFXMessageDialogBuilder(sfx).setText("A file with this name already exists\n" + "in this location. \n" + "Do you want to overwrite it?")
-                                                               .setTitle("Overwriting file")
-                                                               .addButton(MessageDialogButton.No)
-                                                               .addButton(MessageDialogButton.Yes)
-                                                               .build();
+        if (save) {
+            if (file != null && forcedExtension != null && !file.getName()
+                                                                .toLowerCase()
+                                                                .endsWith("." + forcedExtension)) {
+                file = new File(file.getParentFile(), file.getName() + "." + forcedExtension);
+            }
+            if (file != null && file.isFile()) {
+                MessageDialog md = new SFXMessageDialogBuilder(sfx).setText("A file with this name already exists\n" + "in this location. \n" + "Do you want to overwrite it?")
+                                                                   .setTitle("Overwriting file")
+                                                                   .addButton(MessageDialogButton.No)
+                                                                   .addButton(MessageDialogButton.Yes)
+                                                                   .build();
 
-            if (md.showDialog(gui) != MessageDialogButton.Yes) return null;
+                if (md.showDialog(gui) != MessageDialogButton.Yes) return null;
+            }
         }
         return file;
     }
