@@ -21,7 +21,7 @@ public class NumberBox extends SFXTextBox {
         super.afterLeaveFocus(direction, nextInFocus);
         int val = getValue();
         if (val < min) setValue(min);
-        else if (val > max) setValue(max);
+        else setValue(Math.min(val, max));
     }
 
     public int getMin() {
