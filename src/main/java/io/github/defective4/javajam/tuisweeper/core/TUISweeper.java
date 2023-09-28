@@ -284,7 +284,7 @@ public class TUISweeper {
                                             sfx).setActionLabel("Save")
                                                 .setDescription("Choose location to save your theme")
                                                 .setTitle("Exporting theme")
-                                                .setSelectedFile(new File("."));
+                                                .setSelectedFile(new File("theme.json"));
                                     bd.setForcedExtension("json");
                                     File file = bd.buildAndShow(gui);
                                     if (file != null) {
