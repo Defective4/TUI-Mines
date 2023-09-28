@@ -1,7 +1,12 @@
 package io.github.defective4.javajam.tuisweeper;
 
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
+import com.googlecode.lanterna.gui2.TextBox;
+import com.googlecode.lanterna.gui2.Window;
+import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
@@ -20,7 +25,6 @@ import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Collections;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -74,15 +78,14 @@ public final class Main {
             box.setInputFilter((interactable, keyStroke) -> {
                 if (keyStroke.getKeyType() == KeyType.Character || keyStroke.getKeyType() == KeyType.Enter) {
                     if (prefs.isFirstBoot()) {
-                        Window sndWin = new SimpleWindow("Enable sounds?");
-                        sndWin.setComponent(Panels.vertical(new Label("Do you want to enable sounds?\n" + "You can always change this setting in\n" + "game menu!"),
-                                                            new EmptySpace(),
-                                                            Panels.horizontal(new Button("Yes", sndWin::close),
-                                                                              new Button("No", () -> {
-                                                                                  prefs.getOptions().setSounds(false);
-                                                                                  sndWin.close();
-                                                                              }))));
-                        gui.addWindowAndWait(sndWin);
+                        prefs
+                                .getOptions().setSounds(new MessageDialogBuilder()
+                                                                .setText(
+                                                                        "Do you want to enable sounds?\nYou can always change this setting in\ngame menu!")
+                                                                .setTitle("Enable sounds?")
+                                                                .addButton(MessageDialogButton.Yes)
+                                                                .addButton(MessageDialogButton.No)
+                                                                .build().showDialog(gui) == MessageDialogButton.Yes);
                     }
                     win.setVisible(false);
                     timer.cancel();
@@ -115,12 +118,11 @@ public final class Main {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        Window warn = new BasicWindow("Native warning");
-                        warn.setHints(Collections.singleton(Window.Hint.CENTERED));
-                        warn.setComponent(Panels.vertical(new Label("It looks like you are running TUI-Sweeper\n" + "in a native terminal.\n" + "If you run into any issues try launching\n" + "this app with argument \"-gui\",\n" + "for example:\n" + "java -jar tui-sweeper.jar -gui"),
-                                                          new EmptySpace(),
-                                                          new Button("Continue", warn::close)));
-                        gui.addWindowAndWait(warn);
+                        new MessageDialogBuilder()
+                                .setTitle("Native warning")
+                                .addButton(MessageDialogButton.Continue)
+                                .setText("It looks like you are running TUI-Sweeper\n" + "in a native terminal.\n" + "If you run into any issues try launching\n" + "this app with argument \"-gui\",\n" + "for example:\n" + "java -jar tui-sweeper.jar -gui")
+                                .build().showDialog(gui);
                     }
                 }, 1);
             }
@@ -130,13 +132,11 @@ public final class Main {
                 public void run() {
                     TerminalSize size = screen.getTerminalSize();
                     if (size.getColumns() < 61 || size.getRows() < 34) {
-                        Window warn = new SimpleWindow("Warning");
-                        warn.setComponent(Panels.vertical(new Label("Your terminal has really small size. \n" + "Not all elements may be visible at once,\nso the playing experience may be affected\n" + "If you are using a terminal emulator/terminal screen \nplease resize/maximize the window.\n" + "Thank you!"),
-                                                          new EmptySpace(),
-                                                          new Button("Ok", warn::close))
-
-                        );
-                        gui.addWindowAndWait(warn);
+                        new MessageDialogBuilder()
+                                .setTitle("Warning")
+                                .addButton(MessageDialogButton.OK)
+                                .setText("Your terminal has really small size. \n" + "Not all elements may be visible at once,\nso the playing experience may be affected\n" + "If you are using a terminal emulator/terminal screen \nplease resize/maximize the window.\n" + "Thank you!")
+                                .build().showDialog(gui);
                     }
                 }
             }, 1000);
