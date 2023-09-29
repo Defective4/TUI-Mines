@@ -5,11 +5,15 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.dialogs.ListSelectDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
+import io.github.defective4.javajam.tuisweeper.core.network.NullTheme;
+import io.github.defective4.javajam.tuisweeper.core.network.RemoteTheme;
+import io.github.defective4.javajam.tuisweeper.core.network.Repository;
 import io.github.defective4.javajam.tuisweeper.core.sfx.*;
 import io.github.defective4.javajam.tuisweeper.core.storage.Leaderboards;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
@@ -46,6 +50,7 @@ public class TUISweeper {
     private final Timer boardUpdater = new Timer(true);
     private final Preferences prefs;
     private final Leaderboards leaders = new Leaderboards();
+    private final Repository remoteRepo = new Repository();
     private final Label infoLabel;
     private long startTime = -1;
     private long endTime = -1;
@@ -267,7 +272,25 @@ public class TUISweeper {
                                 };
                                 presets.addListener((i, i1, b) -> {
                                     ThemePreset preset = presets.getItem(i);
-                                    if (preset != ThemePreset.NONE) {
+                                    if (preset == ThemePreset.ONLINE) {
+                                        remoteRepo.fetch();
+                                        ListSelectDialogBuilder<RemoteTheme> builder = new SFXListSelectDialogBuilder<>(
+                                                sfx);
+                                        builder.setTitle("Theme repository");
+                                        builder.setDescription("Browse themes made by others!");
+                                        int width = 6;
+                                        RemoteTheme[] ths = remoteRepo.getThemes();
+                                        if (ths.length > 0)
+                                            for (RemoteTheme th : ths) {
+                                                width = Math.max(width, th.toString().length());
+                                                builder.addListItem(th);
+                                            }
+                                        else
+                                            builder.addListItem(new NullTheme());
+
+                                        builder.setListBoxSize(new TerminalSize(width + 4, 10));
+                                        builder.build().showDialog(gui);
+                                    } else if (preset != ThemePreset.NONE) {
                                         bfColor.setColor(preset.getBf());
                                         bbColor.setColor(preset.getBb());
                                         efColor.setColor(preset.getEf());
