@@ -34,6 +34,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.applyBackground;
+
 public class TUISweeper {
 
     private static final DecimalFormat doubleFormat = new DecimalFormat("#.##");
@@ -289,7 +291,10 @@ public class TUISweeper {
                                             builder.addListItem(new NullTheme());
 
                                         builder.setListBoxSize(new TerminalSize(width + 4, 10));
-                                        builder.build().showDialog(gui);
+                                        RemoteTheme selected = builder.build().showDialog(gui);
+                                        sfx.play(selected == null ? "back" : "confirm");
+                                        if (selected != null && !(selected instanceof NullTheme))
+                                            showThemeDetails(selected);
                                     } else if (preset != ThemePreset.NONE) {
                                         if (preset == ThemePreset.SEPARATOR) {
                                             presets.setSelectedIndex(0);
@@ -505,6 +510,59 @@ public class TUISweeper {
                 updateBoard();
             }
         }, 250, 250);
+    }
+
+    private void showThemeDetails(RemoteTheme theme) {
+        Preferences.UserTheme local = theme.fetch();
+        if (local == null || !local.isValid()) {
+            new SFXMessageDialogBuilder(sfx)
+                    .setTitle("Error")
+                    .setText("Couldn't download selected theme...")
+                    .build().showDialog(gui);
+            return;
+        }
+
+        Window win = new SimpleWindow("Theme details");
+
+
+        Label b1 = new Label("Base color");
+        Label b2 = new Label("Base background");
+        Label b3 = new Label("Field color");
+        Label b4 = new Label("Field background");
+        Label b5 = new Label("Selected color");
+        Label b6 = new Label("Selected background");
+
+        applyBackground(local.getBaseForeground(), b1);
+        applyBackground(local.getBaseBackground(), b2);
+        applyBackground(local.getEditableForeground(), b3);
+        applyBackground(local.getEditableBackground(), b4);
+        applyBackground(local.getSelectedForeground(), b5);
+        applyBackground(local.getSelectedBackground(), b6);
+
+
+        win.setComponent(
+                Panels.vertical(
+                        new Label("Name: " + theme.getName()),
+                        new Label("Author: " + theme.getAuthor()),
+                        new Label("Version: " + theme.getVersion()),
+                        new EmptySpace(),
+                        new Label(theme.getDescription()).withBorder(Borders.singleLine()),
+                        Panels.grid(2, b1, b2, b3, b4, b5, b6).withBorder(Borders.singleLine()),
+                        Panels.horizontal(
+                                new SFXButton("Cancel", sfx, true, win::close),
+                                new SFXButton("Apply", sfx, false, () -> {
+                                    win.close();
+                                    updateTheme(local);
+                                    prefs.getTheme().fromTheme(local);
+                                    new SFXMessageDialogBuilder(sfx)
+                                            .setTitle("Success!")
+                                            .setText("Theme applied!")
+                                            .build().showDialog(gui);
+                                })
+                        )
+                )
+        );
+        gui.addWindowAndWait(win);
     }
 
     public static String capitalize(Enum<?> en) {

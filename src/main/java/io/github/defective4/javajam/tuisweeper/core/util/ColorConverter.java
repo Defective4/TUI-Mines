@@ -1,9 +1,16 @@
 package io.github.defective4.javajam.tuisweeper.core.util;
 
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.TextColor.ANSI;
+import com.googlecode.lanterna.graphics.SimpleTheme;
+import com.googlecode.lanterna.gui2.Component;
 
 public final class ColorConverter {
     private ColorConverter() {
+    }
+
+    public static void applyBackground(TextColor color, Component cpt) {
+        cpt.setTheme(new SimpleTheme(isDark(color) ? ANSI.WHITE_BRIGHT : ANSI.BLACK, color));
     }
 
     public static TextColor.RGB toRGB(TextColor color) {
@@ -12,17 +19,18 @@ public final class ColorConverter {
     }
 
     public static TextColor optimize(TextColor color) {
-        if (color instanceof TextColor.ANSI) return color;
+        if (color instanceof ANSI) return color;
         int r = color.getRed();
         int g = color.getGreen();
         int b = color.getBlue();
-        for (TextColor.ANSI ans : TextColor.ANSI.values()) {
+        for (ANSI ans : ANSI.values()) {
             if (ans.getBlue() == b && ans.getGreen() == g && ans.getRed() == r) return ans;
         }
         return color;
     }
 
     public static boolean isDark(TextColor color) {
+        // TODO better luma calc
         double luma = 0.299 * color.getRed() + 0.587 * color.getGreen() + 0.144 * color.getBlue();
         return luma < 0.5;
     }
