@@ -5,6 +5,7 @@ import com.googlecode.lanterna.gui2.dialogs.ListSelectDialog;
 import com.googlecode.lanterna.gui2.dialogs.ListSelectDialogBuilder;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
 public class SFXListSelectDialogBuilder<T> extends ListSelectDialogBuilder<T> {
@@ -18,6 +19,7 @@ public class SFXListSelectDialogBuilder<T> extends ListSelectDialogBuilder<T> {
     @Override
     protected ListSelectDialog<T> buildDialog() {
         ListSelectDialog<T> dial = super.buildDialog();
+        dial.setHints(Arrays.asList(Window.Hint.NO_POST_RENDERING, Window.Hint.CENTERED));
         Panel panel = (Panel) dial.getComponent();
         try {
             Field field = Panel.class.getDeclaredField("components");

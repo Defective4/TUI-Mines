@@ -7,6 +7,7 @@ import static com.googlecode.lanterna.TextColor.ANSI;
 
 public enum ThemePreset {
     NONE,
+    SEPARATOR,
     ONLINE,
     PITCH_BLACK(ANSI.BLACK, ANSI.WHITE_BRIGHT, ANSI.BLACK, ANSI.WHITE_BRIGHT, ANSI.WHITE_BRIGHT, ANSI.BLACK),
     CLASSIC_TERMINAL(ANSI.WHITE, ANSI.BLACK, ANSI.BLUE, ANSI.WHITE_BRIGHT, ANSI.BLUE, ANSI.WHITE_BRIGHT),
@@ -62,6 +63,15 @@ public enum ThemePreset {
 
     @Override
     public String toString() {
-        return this == ONLINE ? "<Browse online>" : this == NONE ? "<Choose>" : TUISweeper.capitalize(this);
+        switch (this) {
+            case SEPARATOR:
+                return "--------";
+            case ONLINE:
+                return "<Browse online>";
+            case NONE:
+                return "<Choose>";
+            default:
+                return TUISweeper.capitalize(this);
+        }
     }
 }

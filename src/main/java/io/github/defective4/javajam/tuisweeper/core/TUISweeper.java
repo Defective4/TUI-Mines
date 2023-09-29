@@ -204,13 +204,13 @@ public class TUISweeper {
                                 });
                                 radio.setCheckedItem(TUISweeper.this.prefs.getDifficulty());
                                 win2.setComponent(Panels.grid(2,
-                                                              Panels.vertical(radio),
+                                                              Panels.vertical(radio.withBorder(Borders.singleLine())),
                                                               Panels.vertical(new Label("Width"),
                                                                               wBox,
                                                                               new Label("\nHeight"),
                                                                               hBox,
                                                                               new Label("\nBombs"),
-                                                                              bBox),
+                                                                              bBox).withBorder(Borders.singleLine()),
                                                               Panels.horizontal(confirm,
                                                                                 new SFXButton("Cancel",
                                                                                               sfx,
@@ -291,13 +291,17 @@ public class TUISweeper {
                                         builder.setListBoxSize(new TerminalSize(width + 4, 10));
                                         builder.build().showDialog(gui);
                                     } else if (preset != ThemePreset.NONE) {
-                                        bfColor.setColor(preset.getBf());
-                                        bbColor.setColor(preset.getBb());
-                                        efColor.setColor(preset.getEf());
-                                        ebColor.setColor(preset.getEb());
-                                        sfColor.setColor(preset.getSf());
-                                        sbColor.setColor(preset.getSb());
-                                        apply.takeFocus();
+                                        if (preset == ThemePreset.SEPARATOR) {
+                                            presets.setSelectedIndex(0);
+                                        } else {
+                                            bfColor.setColor(preset.getBf());
+                                            bbColor.setColor(preset.getBb());
+                                            efColor.setColor(preset.getEf());
+                                            ebColor.setColor(preset.getEb());
+                                            sfColor.setColor(preset.getSf());
+                                            sbColor.setColor(preset.getSb());
+                                            apply.takeFocus();
+                                        }
                                     }
                                 });
 
@@ -360,9 +364,8 @@ public class TUISweeper {
                                 });
 
                                 win2.setComponent(Panels.grid(2,
-                                                              new Label("Choose a preset"),
-                                                              new EmptySpace(),
-                                                              presets,
+                                                              Panels.vertical(new Label("Choose a preset"),
+                                                                              presets),
                                                               new EmptySpace(),
                                                               new Label("\nBase color"),
                                                               new Label("\nBase background"),
@@ -378,7 +381,8 @@ public class TUISweeper {
                                                               sbColor,
                                                               new Label("\n "),
                                                               new Label("\n "),
-                                                              Panels.horizontal(share, imp),
+                                                              Panels.horizontal(share, imp)
+                                                                    .withBorder(Borders.singleLine()),
                                                               new EmptySpace(),
                                                               new EmptySpace(),
                                                               new EmptySpace(),
@@ -415,24 +419,26 @@ public class TUISweeper {
                                 CheckBox sounds = new SFXCheckBox("Enable sounds", ops.isSounds() && sndAvailable, sfx);
                                 sounds.setEnabled(sndAvailable);
 
-                                win2.setComponent(Panels.vertical(shaking,
-                                                                  sounds,
-                                                                  new EmptySpace(),
-                                                                  Panels.horizontal(new SFXButton("Confirm",
-                                                                                                  sfx,
-                                                                                                  () -> {
-                                                                                                      ops.setScreenShaking(
-                                                                                                              shaking.isChecked());
-                                                                                                      ops.setSounds(
-                                                                                                              sounds.isChecked());
-                                                                                                      sfx.setEnabled(ops.isSounds());
-                                                                                                      prefs.save();
-                                                                                                      win2.close();
-                                                                                                  }),
-                                                                                    new SFXButton("Cancel",
-                                                                                                  sfx,
-                                                                                                  true,
-                                                                                                  win2::close))));
+                                win2.setComponent(Panels.vertical(
+                                        Panels.vertical(shaking,
+                                                        sounds).withBorder(Borders.singleLine())
+                                        ,
+                                        new EmptySpace(),
+                                        Panels.horizontal(new SFXButton("Confirm",
+                                                                        sfx,
+                                                                        () -> {
+                                                                            ops.setScreenShaking(
+                                                                                    shaking.isChecked());
+                                                                            ops.setSounds(
+                                                                                    sounds.isChecked());
+                                                                            sfx.setEnabled(ops.isSounds());
+                                                                            prefs.save();
+                                                                            win2.close();
+                                                                        }),
+                                                          new SFXButton("Cancel",
+                                                                        sfx,
+                                                                        true,
+                                                                        win2::close))));
                                 gui.addWindow(win2);
                             }) {
                                 @Override
@@ -682,7 +688,7 @@ public class TUISweeper {
         win.setComponent(Panels.vertical(new Label("Difficulty"),
                                          diff,
                                          new EmptySpace(),
-                                         table,
+                                         table.withBorder(Borders.singleLine()),
                                          new EmptySpace(),
                                          new SFXButton("Close", sfx, true, win::close)));
         gui.addWindow(win);
