@@ -294,7 +294,7 @@ public class TUISweeper {
                                         RemoteTheme selected = builder.build().showDialog(gui);
                                         sfx.play(selected == null ? "back" : "confirm");
                                         if (selected != null && !(selected instanceof NullTheme))
-                                            showThemeDetails(selected);
+                                            showThemeDetails(selected, win2);
                                     } else if (preset != ThemePreset.NONE) {
                                         if (preset == ThemePreset.SEPARATOR) {
                                             presets.setSelectedIndex(0);
@@ -512,7 +512,7 @@ public class TUISweeper {
         }, 250, 250);
     }
 
-    private void showThemeDetails(RemoteTheme theme) {
+    private void showThemeDetails(RemoteTheme theme, Window themes) {
         Preferences.UserTheme local = theme.fetch();
         if (local == null || !local.isValid()) {
             new SFXMessageDialogBuilder(sfx)
@@ -545,6 +545,7 @@ public class TUISweeper {
                         new Label("Name: " + theme.getName()),
                         new Label("Author: " + theme.getAuthor()),
                         new Label("Version: " + theme.getVersion()),
+                        new Label("Added: "+RemoteTheme.DATE_FORMAT.format(new Date(theme.getAddedDate()))),
                         new EmptySpace(),
                         new Label(theme.getDescription()).withBorder(Borders.singleLine()),
                         Panels.grid(2, b1, b2, b3, b4, b5, b6).withBorder(Borders.singleLine()),
@@ -554,6 +555,7 @@ public class TUISweeper {
                                     win.close();
                                     updateTheme(local);
                                     prefs.getTheme().fromTheme(local);
+                                    themes.close();
                                     new SFXMessageDialogBuilder(sfx)
                                             .setTitle("Success!")
                                             .setText("Theme applied!")
