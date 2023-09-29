@@ -30,8 +30,7 @@ public final class ColorConverter {
     }
 
     public static boolean isDark(TextColor color) {
-        // TODO better luma calc
-        double luma = 0.299 * color.getRed() + 0.587 * color.getGreen() + 0.144 * color.getBlue();
+        double luma = (0.299 * color.getRed() + 0.587 * color.getGreen() + 0.144 * color.getBlue()) / 255;
         return luma < 0.5;
     }
 }
