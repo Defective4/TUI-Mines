@@ -1,17 +1,17 @@
 package io.github.defective4.javajam.tuisweeper.core.replay;
 
 import io.github.defective4.javajam.tuisweeper.core.MineBoard;
-import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
+import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
 
 public class ReplayRecorder {
     private final MineBoard board;
-    private final Preferences prefs;
+    private final TUISweeper game;
     private Replay replay;
     private boolean enabled;
 
-    public ReplayRecorder(MineBoard board, Preferences prefs) {
+    public ReplayRecorder(MineBoard board, TUISweeper game) {
         this.board = board;
-        this.prefs = prefs;
+        this.game = game;
     }
 
     public boolean isEnabled() {
@@ -31,7 +31,7 @@ public class ReplayRecorder {
                         replay.getBombs().add(new Replay.CoordPair(x, y));
             replay.setWidth(matrix.length);
             replay.setHeight(matrix.length > 0 ? matrix[0].length : 0);
-            replay.getMetadata().setDifficulty(prefs.getDifficulty());
+            replay.getMetadata().setDifficulty(game.getLocalDifficulty());
         }
     }
 

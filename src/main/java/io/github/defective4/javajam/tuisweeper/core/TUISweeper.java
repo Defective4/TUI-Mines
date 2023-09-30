@@ -8,8 +8,8 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.ListSelectDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
-import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
 import com.googlecode.lanterna.gui2.table.Table;
+import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
@@ -35,10 +35,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.applyBackground;
 
@@ -74,7 +72,7 @@ public class TUISweeper {
         this.term = term;
         this.sfx = sfx;
         this.prefs = prefs;
-        this.recorder = new ReplayRecorder(board, prefs);
+        this.recorder = new ReplayRecorder(board, this);
         this.sfx.setEnabled(this.prefs.getOptions().isSounds());
         this.infoLabel = new Label("");
         this.player = new ReplayPlayer(this, boardBox, sfx);
@@ -89,7 +87,8 @@ public class TUISweeper {
                 if (keyStroke.getKeyType() == KeyType.Character && keyStroke.getCharacter() == 'n') {
                     start();
                 }
-                return false;
+                if (gameOver == 0)
+                    return false;
             }
             boolean allowed = false;
             TerminalPosition pos = boardBox.getCaretPosition();
@@ -165,7 +164,7 @@ public class TUISweeper {
                         case 'm': {
                             Window win = new SimpleWindow("Game Menu");
                             Label text = new Label("");
-                            text.setPreferredSize(new TerminalSize(32, 5));
+                            text.setPreferredSize(new TerminalSize(32, 6));
 
                             Button game = new SFXButton("Game", sfx, () -> {
                                 Window win2 = new SimpleWindow("Game settings");
@@ -241,7 +240,7 @@ public class TUISweeper {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" |  Adjust game's difficulty\n" + " | \n" + " | \n" + " | \n" + " |");
+                                    text.setText(" |  Adjust game's difficulty\n" + " | \n" + " | \n" + " | \n" + " | \n" + " |");
                                 }
                             };
                             Button theme = new SFXButton("Theme", sfx, () -> {
@@ -416,21 +415,21 @@ public class TUISweeper {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " |  Customize game's appearance\n" + " | \n" + " | \n" + " |");
+                                    text.setText(" | \n" + " | \n" + " |  Customize game's appearance\n" + " | \n" + " | \n" + " |");
                                 }
                             };
                             Button leaderboards = new SFXButton("Leaderboards", sfx, this::displayLeaderboards) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " | \n" + " | \n" + " |  Show top times by difficulty\n" + " |");
+                                    text.setText(" | \n" + " | \n" + " | \n" + " | \n" + " |  Show top times by difficulty\n" + " |");
                                 }
                             };
                             Button done = new SFXButton("Done", sfx, true, win::close) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " | \n" + " | \n" + " | \n" + " |  Close this menu");
+                                    text.setText(" | \n" + " | \n" + " | \n" + " | \n" + " | \n" + " |  Close this menu");
                                 }
                             };
                             Button options = new SFXButton("Options", sfx, () -> {
@@ -467,14 +466,64 @@ public class TUISweeper {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " | \n" + " |  Adjust game settings\n" + " | \n" + " |");
+                                    text.setText(" | \n" + " | \n" + " | \n" + " |  Adjust game settings\n" + " | \n" + " |");
+                                }
+                            };
+
+                            Button replays = new SFXButton("Replays", sfx, () -> {
+                                Window win2 = new SimpleWindow("Replays");
+
+                                Label text2 = new Label("");
+                                text2.setPreferredSize(new TerminalSize(38, 3));
+
+                                Button local = new SFXButton("Local", sfx, () -> {
+                                    win2.close();
+                                    win.close();
+                                    openLocalReplayBrowser();
+                                }) {
+                                    @Override
+                                    protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
+                                        super.afterEnterFocus(direction, previouslyInFocus);
+                                        text2.setText(" |  Browse replays saved locally\n |\n |");
+                                    }
+                                };
+
+                                Button online = new SFXButton("Online", sfx, () -> {
+                                }) {
+                                    @Override
+                                    protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
+                                        super.afterEnterFocus(direction, previouslyInFocus);
+                                        text2.setText(" | \n |  Browse replays shared by others\n |");
+                                    }
+                                };
+                                Button back = new SFXButton("Back", sfx, true, win2::close) {
+                                    @Override
+                                    protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
+                                        super.afterEnterFocus(direction, previouslyInFocus);
+                                        text2.setText(" | \n |\n |  Go back");
+                                    }
+                                };
+
+
+                                win2.setComponent(Panels.grid(2, Panels.vertical(local, online, back), text2));
+                                gui.addWindowAndWait(win2);
+                            }) {
+                                @Override
+                                protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
+                                    super.afterEnterFocus(direction, previouslyInFocus);
+                                    text.setText(" | \n" + " |  Browse and play replays \n" + " |  \n" + " | \n" + " | \n" + " |");
                                 }
                             };
 
                             win.setComponent(Panels.grid(2,
-                                                         Panels.vertical(game, theme, options, leaderboards, done),
+                                                         Panels.vertical(game,
+                                                                         replays,
+                                                                         theme,
+                                                                         options,
+                                                                         leaderboards,
+                                                                         done),
                                                          text));
-                            this.gui.addWindow(win);
+                            this.gui.addWindowAndWait(win);
                             break;
                         }
                         case 'q': {
@@ -536,6 +585,121 @@ public class TUISweeper {
                 updateBoard();
             }
         }, 250, 250);
+    }
+
+    private void openLocalReplayBrowser() {
+        Window win = new SimpleWindow("Replay viewer");
+        List<File> replayFiles = new ArrayList<>();
+        List<Replay> replays = new ArrayList<>();
+        if (Preferences.getReplaysDir().isDirectory())
+            try {
+                File[] list = Preferences.getReplaysDir().listFiles();
+
+                for (File f : list)
+                    if (f.getName().endsWith(".jbcfrt"))
+                        replayFiles.add(f);
+                replayFiles.sort((o1, o2) -> {
+                    int l1 = (int) (o1.lastModified() / 1000);
+                    int l2 = (int) (o2.lastModified() / 1000);
+                    return l2 - l1;
+                });
+
+                for (File f : replayFiles) {
+                    try {
+                        replays.add(ReplayIO.read(f));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        List<String> difList = new ArrayList<>();
+        difList.add("All");
+        difList.addAll(Arrays.stream(Difficulty.values())
+                             .map(TUISweeper::capitalize)
+                             .collect(Collectors.toList()));
+        ComboBox<String> difs = new SFXComboBox<>(sfx, difList.toArray(new String[0]));
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd kk:mm");
+        SimpleDateFormat sFormat = new SimpleDateFormat("mm:ss");
+        Table<Object> table = new Table<Object>("#", "ID", "Created", "Time", "Difficulty") {
+            @Override
+            public Result handleKeyStroke(KeyStroke keyStroke) {
+                Result res = super.handleKeyStroke(keyStroke);
+                if (res == Result.HANDLED && keyStroke.getKeyType() == KeyType.Enter) {
+                    Object index = getTableModel().getRow(getSelectedRow()).get(0);
+                    if (index instanceof Integer) {
+                        int sel = (int) index - 1;
+                        if (sel < replays.size()) {
+                            Replay repl = replays.get(sel);
+                            Window win2 = new SimpleWindow("Replay");
+
+                            win2.setComponent(Panels.vertical(
+                                    new Label("Identifier: " + repl.getMetadata().getIdentifier()),
+                                    new Label("Date created: " + format.format(new Date(repl.getMetadata()
+                                                                                            .getCreatedDate()))),
+                                    new Label(String.format("Size: %sx%s (%s bombs)",
+                                                            repl.getWidth(),
+                                                            repl.getHeight(),
+                                                            repl.getBombs().size())),
+                                    new Label("Difficulty: " + repl.getMetadata().getDifficulty()),
+                                    new Label("Time: " + sFormat.format(new Date(repl.getTime()))),
+                                    new EmptySpace(),
+                                    Panels.horizontal(new SFXButton("Back", sfx, true, win2::close),
+                                                      new SFXButton("Play", sfx, () -> {
+                                                          win2.close();
+                                                          win.close();
+                                                          startReplay(repl);
+                                                      }))
+                            ));
+                            gui.addWindowAndWait(win2);
+                        }
+                    }
+                }
+                return res;
+            }
+        };
+        table.setPreferredSize(new TerminalSize(50, 10));
+
+
+        difs.addListener((i, i1, b) -> {
+            table.getTableModel().clear();
+
+            String dif = difs.getItem(i);
+            int index = 0;
+            Difficulty difE = dif.equalsIgnoreCase("all") ? null : Difficulty.valueOf(dif.toUpperCase());
+            int addedN = 0;
+            for (Replay rpl : replays) {
+                if (difE == null || rpl.getMetadata().getDifficulty() == difE) {
+                    table.getTableModel().addRow(index + 1,
+                                                 rpl.getMetadata().getIdentifier(),
+                                                 format.format(new Date(rpl.getMetadata().getCreatedDate())),
+                                                 sFormat.format(new Date(rpl.getTime())),
+                                                 capitalize(rpl.getMetadata().getDifficulty())
+                    );
+                    addedN++;
+                }
+                index++;
+            }
+            if (addedN == 0) {
+                table.getTableModel().addRow("", "<No replays>", "", "", "");
+            }
+        });
+
+        difs.setSelectedIndex(0);
+
+
+        win.setComponent(Panels.vertical(
+                new Label("Filter by difficulty"),
+                difs,
+                new EmptySpace(),
+                table.withBorder(Borders.singleLine()),
+                new SFXButton("Back", sfx, true, win::close)
+        ));
+        table.takeFocus();
+        gui.addWindowAndWait(win);
     }
 
     private void showThemeDetails(RemoteTheme theme, Window themes) {
@@ -625,6 +789,10 @@ public class TUISweeper {
                 }
             }, 10, 10);
         }
+    }
+
+    public Difficulty getLocalDifficulty() {
+        return localDifficulty;
     }
 
     public String getCurrentPlayingTime() {
@@ -864,8 +1032,8 @@ public class TUISweeper {
 
                 if (!isReplay) {
                     ctl.addComponent(new SFXButton("Save replay", sfx, () -> {
-                        String name = new TextInputDialogBuilder()
-                                .setValidator(s -> s.length()<=10 ? null : "The name must be less than 10 characters long!")
+                        String name = new SFXTextInputDialogBuilder(sfx)
+                                .setValidator(s -> s.length() <= 10 ? null : "The name must be less than 10 characters long!")
                                 .setTextBoxSize(new TerminalSize(10, 1))
                                 .setTitle("Enter replay name")
                                 .setDescription("Enter replay name in the field below.\n" +
@@ -875,16 +1043,16 @@ public class TUISweeper {
                             replay.getMetadata().setIdentifier(name);
                             File dir = Preferences.getReplaysDir();
                             dir.mkdirs();
-                            String rpn = new SimpleDateFormat("yyyy_MM_dd kk_ss").format(new Date()) + ".mpy";
+                            String rpn = new SimpleDateFormat("yyyy_MM_dd kk_ss").format(new Date()) + ".jbcfrt";
                             MessageDialogBuilder bd = new SFXMessageDialogBuilder(sfx).addButton(MessageDialogButton.OK);
                             try {
                                 ReplayIO.write(replay, new File(dir, rpn));
                                 bd.setText("Replay saved!")
-                                        .setTitle("Success");
-                            }catch (Exception e) {
+                                  .setTitle("Success");
+                            } catch (Exception e) {
                                 e.printStackTrace();
                                 bd.setText("An error occured while saving the replay")
-                                        .setTitle("Error");
+                                  .setTitle("Error");
                             }
                             bd.build().showDialog(gui);
                         }
@@ -960,9 +1128,8 @@ public class TUISweeper {
             builder.append("\n");
         }
 
-        if (isReplay) {
-            builder.append("\n    ")
-                   .append(gameOver == 0 ? "" : gameOver == 2 ? "You won!" : "GAME OVER")
+        if (isReplay && gameOver == 0) {
+            builder.append("\n")
                    .append("\n")
                    .append("    ")
                    .append("\n")

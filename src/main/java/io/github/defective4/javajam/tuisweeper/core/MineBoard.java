@@ -13,7 +13,7 @@ public class MineBoard {
 
     static {
         CHAR_MAP.put(10, '-'); // - Revealed field
-        CHAR_MAP.put(11, '*'); // - Bomb field
+        CHAR_MAP.put(11, ' '); // - Bomb field
         CHAR_MAP.put(12, 'F'); // - Flagged safe field
         CHAR_MAP.put(13, 'F'); // - Flagged bomb field
         CHAR_MAP.put(20, 'x'); // - Active mine
