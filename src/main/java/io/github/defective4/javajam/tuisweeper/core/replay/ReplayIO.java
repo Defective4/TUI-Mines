@@ -25,6 +25,8 @@ public final class ReplayIO {
             os.write(Arrays.copyOf(replay.getMetadata().getIdentifier().getBytes(StandardCharsets.UTF_8),
                                    10)); // Write identifier
             os.writeLong(replay.getStartTime()); // Write start time
+            replay.getMetadata().setCreatedDate(System.currentTimeMillis()); // Update and write creation date
+            os.writeLong(replay.getMetadata().getCreatedDate());
             os.writeByte(replay.getMetadata().getDifficulty().getId()); // Write difficulty
 
             os.writeInt(replay.getWidth());
@@ -59,6 +61,7 @@ public final class ReplayIO {
             is.read(id);
             String identifier = new String(id, StandardCharsets.UTF_8).trim();
             long startTime = is.readLong();
+            long createTime = is.readLong();
             Difficulty diff = Difficulty.getByID(is.readByte());
             int width = is.readInt();
             int height = is.readInt();
@@ -80,6 +83,7 @@ public final class ReplayIO {
             rp.setWidth(width);
             rp.getMetadata().setIdentifier(identifier);
             rp.getMetadata().setDifficulty(diff);
+            rp.getMetadata().setCreatedDate(createTime);
 
             return rp;
         }

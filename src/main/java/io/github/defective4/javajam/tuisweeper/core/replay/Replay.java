@@ -94,6 +94,15 @@ public class Replay {
     public static class Metadata {
         private Difficulty difficulty = Difficulty.CUSTOM;
         private String identifier = "";
+        private long createdDate = System.currentTimeMillis();
+
+        public long getCreatedDate() {
+            return createdDate;
+        }
+
+        public void setCreatedDate(long createdDate) {
+            this.createdDate = createdDate;
+        }
 
         public Difficulty getDifficulty() {
             return difficulty;
@@ -110,6 +119,15 @@ public class Replay {
         public void setIdentifier(String identifier) {
             this.identifier = identifier;
         }
+
+        @Override
+        public String toString() {
+            return "Metadata{" +
+                   "difficulty=" + difficulty +
+                   ", identifier='" + identifier + '\'' +
+                   ", createdDate=" + createdDate +
+                   '}';
+        }
     }
 
     // Board info
@@ -120,6 +138,18 @@ public class Replay {
     private final List<Action> actions = new ArrayList<>();
     private final long startTime;
     private final Metadata metadata = new Metadata();
+    private long time = -1;
+
+    private void calculateTime() {
+        for (Action act : actions)
+            time = Math.max(time, act.getTimestamp());
+    }
+
+    public long getTime() {
+        if (time < 0)
+            calculateTime();
+        return time;
+    }
 
     public Metadata getMetadata() {
         return metadata;
@@ -169,6 +199,8 @@ public class Replay {
                ", height=" + height +
                ", actions=" + actions +
                ", startTime=" + startTime +
+               ", metadata=" + metadata +
+               ", time=" + time +
                '}';
     }
 }
