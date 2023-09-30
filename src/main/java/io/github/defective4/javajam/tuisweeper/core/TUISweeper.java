@@ -801,6 +801,8 @@ public class TUISweeper {
     }
 
     public void flag(int x, int y) {
+        if (gameOver > 0)
+            return;
         int[] fields = board.countAllFields(11, 12);
         byte current = board.getFieldAt(x, y);
         byte c = -1;
@@ -844,6 +846,8 @@ public class TUISweeper {
     }
 
     public int reveal(int x, int y, boolean revealFlags, boolean user) {
+        if (gameOver > 0)
+            return 0;
         startTimer();
         recorder.start();
         int count = 0;
