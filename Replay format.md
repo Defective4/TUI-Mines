@@ -1,4 +1,4 @@
-Replay format used by TUI Sweeper
+Replay format used by TUI Sweeper  
 Revision 1
 
 General format:

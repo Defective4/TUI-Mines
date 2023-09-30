@@ -1,5 +1,7 @@
 package io.github.defective4.javajam.tuisweeper.core.replay;
 
+import io.github.defective4.javajam.tuisweeper.core.Difficulty;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,6 +84,27 @@ public class Replay {
         }
     }
 
+    public static class Metadata {
+        private Difficulty difficulty = Difficulty.CUSTOM;
+        private String identifier = "";
+
+        public Difficulty getDifficulty() {
+            return difficulty;
+        }
+
+        public void setDifficulty(Difficulty difficulty) {
+            this.difficulty = difficulty;
+        }
+
+        public String getIdentifier() {
+            return identifier;
+        }
+
+        public void setIdentifier(String identifier) {
+            this.identifier = identifier;
+        }
+    }
+
     // Board info
     private final List<CoordPair> bombs = new ArrayList<>();
     private int width, height;
@@ -89,6 +112,11 @@ public class Replay {
     // Replay data
     private final List<Action> actions = new ArrayList<>();
     private final long startTime;
+    private final Metadata metadata = new Metadata();
+
+    public Metadata getMetadata() {
+        return metadata;
+    }
 
     public Replay(long startTime) {
         this.startTime = startTime;

@@ -55,7 +55,7 @@ public class TUISweeper {
 
     private final Timer boardUpdater = new Timer(true);
     private final Preferences prefs;
-    private final ReplayRecorder recorder = new ReplayRecorder(board);
+    private final ReplayRecorder recorder = new ReplayRecorder(board, prefs);
     private final ReplayPlayer player;
     private final Leaderboards leaders = new Leaderboards();
     private final Repository remoteRepo = new Repository();
