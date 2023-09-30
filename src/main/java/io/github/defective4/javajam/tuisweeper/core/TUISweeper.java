@@ -121,6 +121,21 @@ public class TUISweeper {
                         }
 
                     switch (keyStroke.getCharacter()) {
+                        case 'u': {
+                            byte[][] matrix = board.getMatrix();
+                            int ox = board.getXOffset();
+                            int oy = MineBoard.Y_OFFSET;
+                            for (int x = 0; x < matrix.length; x++)
+                                for (int y = 0; y < matrix[x].length; y++) {
+                                    byte type = matrix[x][y];
+                                    if (type == 0 || type == 11) {
+                                        boardBox.setCaretPosition(y + oy, x + ox);
+                                        recorder.action(Replay.ActionType.CARET, y + oy, x + ox);
+                                        break;
+                                    }
+                                }
+                            break;
+                        }
                         case 'g': {
                             Window win = new SimpleWindow("Go to field...");
 
@@ -1021,7 +1036,7 @@ public class TUISweeper {
             int[] fields = board.countAllFields(11, 12, 0, 13);
             if (fields[0] == 0 && fields[1] == 0 && fields[2] == 0) {
                 gameOver = 2;
-                Replay replay = recorder.getReplay(); // TODO
+                Replay replay = recorder.getReplay();
                 recorder.stop();
                 sfx.play("win");
                 endTime = System.currentTimeMillis();
@@ -1042,7 +1057,7 @@ public class TUISweeper {
                                 .setTitle("Enter replay name")
                                 .setDescription("Enter replay name in the field below.\n" +
                                                 "You can leave the field empty.")
-                                .build().showDialog(gui); // TODO SFX input
+                                .build().showDialog(gui);
                         if (name != null) {
                             replay.getMetadata().setIdentifier(name);
                             File dir = Preferences.getReplaysDir();
@@ -1145,7 +1160,7 @@ public class TUISweeper {
                    .append("    ")
                    .append("\n")
                    .append("    n - New Game     g - Go to field...\n")
-                   .append("    m - Game Menu\n")
+                   .append("    m - Game Menu    u - Find next empty field\n")
                    .append("    q - Quit");
         }
 
