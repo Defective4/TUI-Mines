@@ -9,11 +9,15 @@ import com.googlecode.lanterna.gui2.dialogs.ListSelectDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.gui2.table.Table;
+import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import io.github.defective4.javajam.tuisweeper.core.network.NullTheme;
 import io.github.defective4.javajam.tuisweeper.core.network.RemoteTheme;
 import io.github.defective4.javajam.tuisweeper.core.network.Repository;
+import io.github.defective4.javajam.tuisweeper.core.replay.Replay;
+import io.github.defective4.javajam.tuisweeper.core.replay.ReplayPlayer;
+import io.github.defective4.javajam.tuisweeper.core.replay.ReplayRecorder;
 import io.github.defective4.javajam.tuisweeper.core.sfx.*;
 import io.github.defective4.javajam.tuisweeper.core.storage.Leaderboards;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
@@ -51,6 +55,8 @@ public class TUISweeper {
 
     private final Timer boardUpdater = new Timer(true);
     private final Preferences prefs;
+    private final ReplayRecorder recorder = new ReplayRecorder(board);
+    private final ReplayPlayer player;
     private final Leaderboards leaders = new Leaderboards();
     private final Repository remoteRepo = new Repository();
     private final Label infoLabel;
@@ -68,6 +74,7 @@ public class TUISweeper {
         this.prefs = prefs;
         this.sfx.setEnabled(this.prefs.getOptions().isSounds());
         this.infoLabel = new Label("");
+        this.player = new ReplayPlayer(this, boardBox, sfx);
         updateTheme(this.prefs.getTheme());
 
         boardBox.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill,
@@ -75,6 +82,12 @@ public class TUISweeper {
         mainWindow.setComponent(Panels.vertical(infoLabel, boardBox));
 
         boardBox.setInputFilter((interactable, keyStroke) -> {
+            if (isReplay) {
+                if (keyStroke.getKeyType() == KeyType.Character && keyStroke.getCharacter() == 'n') {
+                    start();
+                }
+                return false;
+            }
             boolean allowed = false;
             TerminalPosition pos = boardBox.getCaretPosition();
 
@@ -83,6 +96,8 @@ public class TUISweeper {
 
             int absX = cx - board.getXOffset();
             int absY = cy - MineBoard.Y_OFFSET;
+
+            boolean arrow = false;
 
             switch (keyStroke.getKeyType()) {
                 case Character: {
@@ -479,25 +494,33 @@ public class TUISweeper {
                 case ArrowLeft: {
                     cx--;
                     allowed = true;
+                    arrow = true;
                     break;
                 }
                 case ArrowRight: {
                     cx++;
                     allowed = true;
+                    arrow = true;
                     break;
                 }
                 case ArrowUp: {
                     cy--;
                     allowed = true;
+                    arrow = true;
                     break;
                 }
                 case ArrowDown: {
                     cy++;
                     allowed = true;
+                    arrow = true;
                     break;
                 }
                 default:
                     break;
+            }
+
+            if (arrow) {
+                recorder.action(Replay.ActionType.CARET, cx, cy);
             }
 
             if (allowed) updateBoard(cx, cy);
@@ -545,7 +568,7 @@ public class TUISweeper {
                         new Label("Name: " + theme.getName()),
                         new Label("Author: " + theme.getAuthor()),
                         new Label("Version: " + theme.getVersion()),
-                        new Label("Added: "+RemoteTheme.DATE_FORMAT.format(new Date(theme.getAddedDate()))),
+                        new Label("Added: " + RemoteTheme.DATE_FORMAT.format(new Date(theme.getAddedDate()))),
                         new EmptySpace(),
                         new Label(theme.getDescription()).withBorder(Borders.singleLine()),
                         Panels.grid(2, b1, b2, b3, b4, b5, b6).withBorder(Borders.singleLine()),
@@ -639,16 +662,19 @@ public class TUISweeper {
         }
         if (c > -1) {
             startTimer();
+            recorder.start();
+            recorder.action(Replay.ActionType.FLAG, x, y);
             board.setFieldAt(x, y, c);
         }
     }
 
     public int reveal(int x, int y) {
-        return reveal(x, y, false);
+        return reveal(x, y, false, true);
     }
 
-    public int reveal(int x, int y, boolean revealFlags) {
+    public int reveal(int x, int y, boolean revealFlags, boolean user) {
         startTimer();
+        recorder.start();
         int count = 0;
         byte current = board.getFieldAt(x, y);
         if (!placed) {
@@ -688,12 +714,14 @@ public class TUISweeper {
                     for (int j = y - 1; j <= y + 1; j++) {
                         if (i >= 0 && j >= 0 && i < board.getSizeX() && j < board.getSizeY()) {
                             byte c = board.getFieldAt(i, j);
-                            if (c == 0 || c == 12) count += reveal(i, j, true);
+                            if (c == 0 || c == 12) count += reveal(i, j, true, false);
                         }
                     }
             } else {
                 board.setFieldAt(x, y, bombs);
             }
+            if (user)
+                recorder.action(Replay.ActionType.REVEAL, x, y);
             count++;
         } else if (current > 0 && current < 10) {
             int flags = board.countFlags(x, y);
@@ -702,13 +730,16 @@ public class TUISweeper {
                     for (int j = y - 1; j <= y + 1; j++) {
                         if (i >= 0 && j >= 0 && i < board.getSizeX() && j < board.getSizeY()) {
                             byte c = board.getFieldAt(i, j);
-                            if (c == 0 || c == 11) count += reveal(i, j, true);
+                            if (c == 0 || c == 11) count += reveal(i, j, true, false);
                         }
                     }
             }
+            if (user)
+                recorder.action(Replay.ActionType.REVEAL, x, y);
         } else if (current == 11) {
             board.revealMines();
             gameOver = 1;
+            recorder.stop();
             endTime = System.currentTimeMillis();
             sfx.play("bomb");
             shake();
@@ -754,11 +785,29 @@ public class TUISweeper {
         gui.addWindow(win);
     }
 
+    private boolean isReplay;
+
     public void start() {
+        isReplay = false;
+        player.stop();
+        recorder.setEnabled(true);
         board.initialize(prefs.getWidth(), prefs.getHeight(), prefs.getBombs());
         resetVariables();
         updateBoard();
         boardBox.setCaretPosition(MineBoard.Y_OFFSET, board.getXOffset());
+    }
+
+    public void startReplay(Replay replay) {
+        isReplay = true;
+        player.stop();
+        recorder.setEnabled(false);
+        board.initialize(replay.getWidth(), replay.getHeight(), 0);
+        for (Replay.CoordPair bomb : replay.getBombs())
+            board.setFieldAt(bomb.getX(), bomb.getY(), 11);
+        resetVariables();
+        updateBoard();
+        boardBox.setCaretPosition(0, 0);
+        player.play(replay);
     }
 
     private void startTimer() {
@@ -797,18 +846,20 @@ public class TUISweeper {
             int[] fields = board.countAllFields(11, 12, 0, 13);
             if (fields[0] == 0 && fields[1] == 0 && fields[2] == 0) {
                 gameOver = 2;
+                Replay replay = recorder.getReplay(); // TODO
+                recorder.stop();
                 sfx.play("win");
                 endTime = System.currentTimeMillis();
                 Difficulty diff = prefs.getDifficulty();
-                if (diff != Difficulty.CUSTOM) {
+                if (diff != Difficulty.CUSTOM && !isReplay) {
                     leaders.addEntry(diff, endTime - startTime);
                 }
-                Window win = new SimpleWindow("Game won");
+                Window win = new SimpleWindow(isReplay ? "Replay ended" : "Game won");
                 Panel ctl = Panels.horizontal(new Button("Close", win::close));
-                if (diff != Difficulty.CUSTOM)
+                if (diff != Difficulty.CUSTOM && !isReplay)
                     ctl.addComponent(new SFXButton("Leaderboards", sfx, this::displayLeaderboards));
 
-                win.setComponent(Panels.vertical(new Label("You won!\n" + "Your time is " + getCurrentPlayingTime()),
+                win.setComponent(Panels.vertical(new Label(isReplay ? "Replay ended" : "You won!\nYour time is " + getCurrentPlayingTime()),
                                                  new EmptySpace(),
                                                  ctl
 
@@ -877,14 +928,23 @@ public class TUISweeper {
             builder.append("\n");
         }
 
-        builder.append("\n    ")
-               .append(gameOver == 0 ? "" : gameOver == 2 ? "You won!" : "GAME OVER")
-               .append("\n")
-               .append("    ")
-               .append("\n")
-               .append("    n - New Game     g - Go to field...\n")
-               .append("    m - Game Menu\n")
-               .append("    q - Quit");
+        if (isReplay) {
+            builder.append("\n    ")
+                   .append(gameOver == 0 ? "" : gameOver == 2 ? "You won!" : "GAME OVER")
+                   .append("\n")
+                   .append("    ")
+                   .append("\n")
+                   .append("    n - End replay");
+        } else {
+            builder.append("\n    ")
+                   .append(gameOver == 0 ? "" : gameOver == 2 ? "You won!" : "GAME OVER")
+                   .append("\n")
+                   .append("    ")
+                   .append("\n")
+                   .append("    n - New Game     g - Go to field...\n")
+                   .append("    m - Game Menu\n")
+                   .append("    q - Quit");
+        }
 
         boardBox.setText(builder.toString());
 
