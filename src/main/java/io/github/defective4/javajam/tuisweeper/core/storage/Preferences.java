@@ -171,6 +171,10 @@ public class Preferences {
         return new File(getConfigDirectory(), "storage.db");
     }
 
+    public static File getReplaysDir() {
+        return new File(getConfigDirectory(), "replays");
+    }
+
     public static Preferences load() {
         File in = getConfigFile();
         if (in.isFile()) try (InputStreamReader reader = new FileReader(in)) {

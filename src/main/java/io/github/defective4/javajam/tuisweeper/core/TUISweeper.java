@@ -8,6 +8,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.ListSelectDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
+import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
@@ -16,6 +17,7 @@ import io.github.defective4.javajam.tuisweeper.core.network.NullTheme;
 import io.github.defective4.javajam.tuisweeper.core.network.RemoteTheme;
 import io.github.defective4.javajam.tuisweeper.core.network.Repository;
 import io.github.defective4.javajam.tuisweeper.core.replay.Replay;
+import io.github.defective4.javajam.tuisweeper.core.replay.ReplayIO;
 import io.github.defective4.javajam.tuisweeper.core.replay.ReplayPlayer;
 import io.github.defective4.javajam.tuisweeper.core.replay.ReplayRecorder;
 import io.github.defective4.javajam.tuisweeper.core.sfx.*;
@@ -55,7 +57,7 @@ public class TUISweeper {
 
     private final Timer boardUpdater = new Timer(true);
     private final Preferences prefs;
-    private final ReplayRecorder recorder = new ReplayRecorder(board, prefs);
+    private final ReplayRecorder recorder;
     private final ReplayPlayer player;
     private final Leaderboards leaders = new Leaderboards();
     private final Repository remoteRepo = new Repository();
@@ -72,6 +74,7 @@ public class TUISweeper {
         this.term = term;
         this.sfx = sfx;
         this.prefs = prefs;
+        this.recorder = new ReplayRecorder(board, prefs);
         this.sfx.setEnabled(this.prefs.getOptions().isSounds());
         this.infoLabel = new Label("");
         this.player = new ReplayPlayer(this, boardBox, sfx);
@@ -859,6 +862,35 @@ public class TUISweeper {
                 if (diff != Difficulty.CUSTOM && !isReplay)
                     ctl.addComponent(new SFXButton("Leaderboards", sfx, this::displayLeaderboards));
 
+                if (!isReplay) {
+                    ctl.addComponent(new SFXButton("Save replay", sfx, () -> {
+                        String name = new TextInputDialogBuilder()
+                                .setValidator(s -> s.length()<=10 ? null : "The name must be less than 10 characters long!")
+                                .setTextBoxSize(new TerminalSize(10, 1))
+                                .setTitle("Enter replay name")
+                                .setDescription("Enter replay name in the field below.\n" +
+                                                "You can leave the field empty.")
+                                .build().showDialog(gui); // TODO SFX input
+                        if (name != null) {
+                            replay.getMetadata().setIdentifier(name);
+                            File dir = Preferences.getReplaysDir();
+                            dir.mkdirs();
+                            String rpn = new SimpleDateFormat("yyyy_MM_dd kk_ss").format(new Date()) + ".mpy";
+                            MessageDialogBuilder bd = new SFXMessageDialogBuilder(sfx).addButton(MessageDialogButton.OK);
+                            try {
+                                ReplayIO.write(replay, new File(dir, rpn));
+                                bd.setText("Replay saved!")
+                                        .setTitle("Success");
+                            }catch (Exception e) {
+                                e.printStackTrace();
+                                bd.setText("An error occured while saving the replay")
+                                        .setTitle("Error");
+                            }
+                            bd.build().showDialog(gui);
+                        }
+                    }));
+                }
+
                 win.setComponent(Panels.vertical(new Label(isReplay ? "Replay ended" : "You won!\nYour time is " + getCurrentPlayingTime()),
                                                  new EmptySpace(),
                                                  ctl
@@ -951,7 +983,7 @@ public class TUISweeper {
         StringBuilder labelText = new StringBuilder();
 
         String emote = gameOver == 0 ? ":)" : gameOver == 1 ? "X(" : "B)";
-        labelText.append("  ").append(emote).append("   TUI-Sweeper    Difficulty: ").append(localDifficulty);
+        labelText.append("  ").append(emote).append("   TUI-Sweeper    Difficulty: ").append(localDifficulty); // TODO
         int wh = screen.getTerminalSize().getColumns();
         for (int x = labelText.length(); x < wh; x++)
             labelText.append(" ");

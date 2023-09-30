@@ -18,6 +18,13 @@ public class Replay {
         public int getId() {
             return id;
         }
+
+        public static ActionType getByID(int id) {
+            for (ActionType type : values())
+                if (type.getId() == id)
+                    return type;
+            return null;
+        }
     }
 
     public static class Action {
