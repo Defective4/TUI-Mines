@@ -35,7 +35,8 @@ public class SFXEngine {
                             });
                             c.start();
                         }
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }
             }
         }, 0, 10, TimeUnit.MILLISECONDS);

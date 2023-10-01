@@ -11,7 +11,6 @@ import io.github.defective4.javajam.tuisweeper.core.sfx.SFXMessageDialogBuilder;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;

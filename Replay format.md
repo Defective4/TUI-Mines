@@ -1,6 +1,8 @@
 Replay format used by TUI Sweeper  
 Revision 3
 
+The whole file is compressed using ZLIB
+
 General format:
 
 | Field name    | Type          | Ex. Value |

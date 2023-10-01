@@ -16,7 +16,6 @@ import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal;
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
-import io.github.defective4.javajam.tuisweeper.core.ui.ErrorDialog;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
 
 import javax.imageio.ImageIO;
