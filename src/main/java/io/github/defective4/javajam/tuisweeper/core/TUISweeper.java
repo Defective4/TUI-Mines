@@ -622,17 +622,57 @@ public class TUISweeper {
         Table<Object> table = new Table<>("#", "ID", "Author", "Time", "Difficulty");
         table.setPreferredSize(new TerminalSize(50, 10));
 
+        table.setSelectAction(() -> {
+            Object selected = table.getTableModel().getRow(table.getSelectedRow()).get(0);
+            if (selected instanceof Integer) {
+                int index = (int) selected - 1;
+                if (index < replays.length) {
+                    RemoteReplay replay = replays[index];
+                    Window win2 = new SimpleWindow("Replay info");
+
+                    String id = replay.getIdentifier();
+
+                    win2.setComponent(Panels.vertical(
+                            Panels.vertical(new Label("Identifier: " + (id.isEmpty() ? "<None>" : id)),
+                                            new Label("Author: " + replay.getAuthor()),
+                                            new Label("Play time: " + TIME_FORMAT.format(new Date(replay.getPlayTime()))))
+                                  .withBorder(Borders.singleLine("Info")),
+                            Panels.vertical(new Label("Difficulty: " + capitalize(replay.getDifficulty())),
+                                            new Label(String.format("Size: %sx%s (%s bombs)",
+                                                                    replay.getWidth(),
+                                                                    replay.getHeight(),
+                                                                    replay.getBombs())))
+                                  .withBorder(Borders.singleLine("Difficulty")),
+                            Panels.vertical(new Label("Added: " + DATE_FORMAT.format(new Date(replay.getAddedTime()))),
+                                            new Label("Created: " + DATE_FORMAT.format(new Date(replay.getCreatedTime()))))
+                                  .withBorder(Borders.singleLine("Times")),
+                            new EmptySpace(),
+                            Panels.horizontal(new SFXButton("Back", sfx, true, win2::close),
+                                              new SFXButton("Play", sfx, false, () -> {}),
+                                              new SFXButton("Download", sfx, false, () -> {}))
+                    ));
+                    gui.addWindowAndWait(win2);
+                }
+            }
+        });
+
         diffs.addListener((i, i1, b) -> {
+            table.getTableModel().clear();
             String dif = diffs.getItem(i);
             int index = 0;
+            int added = 0;
             for (RemoteReplay replay : replays) {
                 if ("all".equalsIgnoreCase(dif) || replay.getDifficulty().name().equalsIgnoreCase(dif)) {
-                    table.getTableModel().addRow(index, replay.getIdentifier(),
+                    table.getTableModel().addRow(index + 1, replay.getIdentifier(),
                                                  replay.getAuthor(),
                                                  TIME_FORMAT.format(new Date(replay.getPlayTime())),
                                                  capitalize(replay.getDifficulty()));
+                    added++;
                 }
                 index++;
+            }
+            if (added == 0) {
+                table.getTableModel().addRow("", "<No replays>", "", "", "");
             }
         });
         diffs.setSelectedIndex(0);
@@ -700,12 +740,13 @@ public class TUISweeper {
                             new Label("Identifier: " + repl.getMetadata().getIdentifier()),
                             new Label("Date created: " + DATE_FORMAT.format(new Date(repl.getMetadata()
                                                                                          .getCreatedDate()))),
+                            new EmptySpace(),
+                            new Label("Time: " + TIME_FORMAT.format(new Date(repl.getTime()))),
+                            new Label("Difficulty: " + repl.getMetadata().getDifficulty()),
                             new Label(String.format("Size: %sx%s (%s bombs)",
                                                     repl.getWidth(),
                                                     repl.getHeight(),
                                                     repl.getBombs().size())),
-                            new Label("Difficulty: " + repl.getMetadata().getDifficulty()),
-                            new Label("Time: " + TIME_FORMAT.format(new Date(repl.getTime()))),
                             new EmptySpace(),
                             Panels.horizontal(new SFXButton("Back", sfx, true, win2::close),
                                               new SFXButton("Play", sfx, () -> {
