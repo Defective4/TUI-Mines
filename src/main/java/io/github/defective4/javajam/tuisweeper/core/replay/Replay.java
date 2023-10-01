@@ -8,30 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Replay {
-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd kk:mm");
-    public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("mm:ss");
-    public static final SimpleDateFormat FILE_FORMAT = new SimpleDateFormat("yyyy_MM_dd kk_ss");
-
-    public enum ActionType {
-        CARET(0), REVEAL(1), FLAG(2);
-        private final int id;
-
-        ActionType(int id) {
-            this.id = id;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public static ActionType getByID(int id) {
-            for (ActionType type : values())
-                if (type.getId() == id)
-                    return type;
-            return null;
-        }
-    }
-
     public static class Action {
         private final ActionType action;
         private final int x, y;
@@ -144,15 +120,44 @@ public class Replay {
         }
     }
 
+    public enum ActionType {
+        CARET(0), REVEAL(1), FLAG(2);
+        private final int id;
+
+        ActionType(int id) {
+            this.id = id;
+        }
+
+        public static ActionType getByID(int id) {
+            for (ActionType type : values())
+                if (type.getId() == id)
+                    return type;
+            return null;
+        }
+
+        public int getId() {
+            return id;
+        }
+    }
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd kk:mm");
+    public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("mm:ss");
+    public static final SimpleDateFormat FILE_FORMAT = new SimpleDateFormat("yyyy_MM_dd kk_ss");
     // Board info
     private final List<CoordPair> bombs = new ArrayList<>();
-    private int width, height;
-
     // Replay data
     private final List<Action> actions = new ArrayList<>();
     private final long startTime;
     private final Metadata metadata = new Metadata();
+    private int width, height;
     private long time = -1;
+
+    public Replay(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public Replay() {
+        startTime = System.currentTimeMillis();
+    }
 
     private void calculateTime() {
         for (Action act : actions)
@@ -169,32 +174,24 @@ public class Replay {
         return metadata;
     }
 
-    public Replay(long startTime) {
-        this.startTime = startTime;
-    }
-
-    public Replay() {
-        startTime = System.currentTimeMillis();
-    }
-
     public List<CoordPair> getBombs() {
         return bombs;
-    }
-
-    protected void setWidth(int width) {
-        this.width = width;
-    }
-
-    protected void setHeight(int height) {
-        this.height = height;
     }
 
     public int getWidth() {
         return width;
     }
 
+    protected void setWidth(int width) {
+        this.width = width;
+    }
+
     public int getHeight() {
         return height;
+    }
+
+    protected void setHeight(int height) {
+        this.height = height;
     }
 
     public List<Action> getActions() {

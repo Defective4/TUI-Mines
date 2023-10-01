@@ -66,6 +66,7 @@ public class TUISweeper {
     private boolean placed;
     private byte gameOver;
     private Difficulty localDifficulty = Difficulty.EASY;
+    private boolean isReplay;
 
     public TUISweeper(Screen screen, WindowBasedTextGUI gui, Terminal term, SFXEngine sfx, Preferences prefs) {
         this.screen = screen;
@@ -606,6 +607,13 @@ public class TUISweeper {
         }, 250, 250);
     }
 
+    public static String capitalize(Enum<?> en) {
+        String[] split = en.name().split("_");
+        for (int x = 0; x < split.length; x++)
+            split[x] = split[x].substring(0, 1).toUpperCase() + split[x].substring(1).toLowerCase();
+        return String.join(" ", split);
+    }
+
     private void openRemoteReplayBrowser() {
         remoteRepo.fetch();
         Window win = new SimpleWindow("Replay browser");
@@ -926,13 +934,6 @@ public class TUISweeper {
         gui.addWindowAndWait(win);
     }
 
-    public static String capitalize(Enum<?> en) {
-        String[] split = en.name().split("_");
-        for (int x = 0; x < split.length; x++)
-            split[x] = split[x].substring(0, 1).toUpperCase() + split[x].substring(1).toLowerCase();
-        return String.join(" ", split);
-    }
-
     private void updateTheme(Preferences.UserTheme theme) {
         gui.setTheme(theme.toTUITheme());
         prefs.save();
@@ -1128,8 +1129,6 @@ public class TUISweeper {
                                          new SFXButton("Close", sfx, true, win::close)));
         gui.addWindow(win);
     }
-
-    private boolean isReplay;
 
     public void start() {
         isReplay = false;
