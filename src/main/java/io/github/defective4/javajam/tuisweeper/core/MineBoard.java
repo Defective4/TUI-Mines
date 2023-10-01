@@ -20,7 +20,8 @@ public class MineBoard {
         CHAR_MAP.put(21, 'P'); // - "False" flag
     }
 
-    private final Random rand = new Random();
+    private Random rand;
+    private long seed;
     private byte[][] matrix = new byte[0][0];
     private int sizeX, sizeY, bombs;
 
@@ -67,7 +68,37 @@ public class MineBoard {
         return bombs;
     }
 
+
+    public long getSeed() {
+        return seed;
+    }
+
+    public void initializeReplay(int sizeX, int sizeY, int bombs, long seed) {
+        this.seed = seed;
+        rand = new Random(this.seed);
+        matrix = new byte[sizeX][sizeY];
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
+        bombs = Math.min(bombs, sizeX * sizeY);
+        this.bombs = bombs;
+
+        // Emulate bomb generation to adjust the Random
+        byte[][] emulated = new byte[sizeX][sizeY];
+        for (int x = 0; x < bombs; x++) {
+            byte current;
+            int lx, ly;
+            do {
+                lx = rand.nextInt(sizeX);
+                ly = rand.nextInt(sizeY);
+                current = emulated[lx][ly];
+            } while (current != 0);
+            emulated[lx][ly] = 11;
+        }
+    }
+
     public void initialize(int sizeX, int sizeY, int bombs) {
+        this.seed = System.currentTimeMillis();
+        rand = new Random(this.seed);
         matrix = new byte[sizeX][sizeY];
         this.sizeX = sizeX;
         this.sizeY = sizeY;

@@ -1167,7 +1167,7 @@ public class TUISweeper {
         isReplay = true;
         player.stop();
         recorder.setEnabled(false);
-        board.initialize(replay.getWidth(), replay.getHeight(), 0);
+        board.initializeReplay(replay.getWidth(), replay.getHeight(), replay.getBombs().size(), replay.getSeed());
         for (Replay.CoordPair bomb : replay.getBombs())
             board.setFieldAt(bomb.getX(), bomb.getY(), 11);
         resetVariables();

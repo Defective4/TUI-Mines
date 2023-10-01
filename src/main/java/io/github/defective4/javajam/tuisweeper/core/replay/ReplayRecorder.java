@@ -29,6 +29,7 @@ public class ReplayRecorder {
                 for (int y = 0; y < matrix[x].length; y++)
                     if (matrix[x][y] == 11)
                         replay.getBombs().add(new Replay.CoordPair(x, y));
+            replay.setSeed(board.getSeed());
             replay.setWidth(matrix.length);
             replay.setHeight(matrix.length > 0 ? matrix[0].length : 0);
             replay.getMetadata().setDifficulty(game.getLocalDifficulty());

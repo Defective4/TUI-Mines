@@ -139,17 +139,17 @@ public class Replay {
             return id;
         }
     }
+
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd kk:mm");
     public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("mm:ss");
     public static final SimpleDateFormat FILE_FORMAT = new SimpleDateFormat("yyyy_MM_dd kk_ss");
-    // Board info
     private final List<CoordPair> bombs = new ArrayList<>();
-    // Replay data
     private final List<Action> actions = new ArrayList<>();
     private final long startTime;
     private final Metadata metadata = new Metadata();
     private int width, height;
     private long time = -1;
+    private long seed = System.currentTimeMillis();
 
     public Replay(long startTime) {
         this.startTime = startTime;
@@ -168,6 +168,14 @@ public class Replay {
         if (time < 0)
             calculateTime();
         return time;
+    }
+
+    public long getSeed() {
+        return seed;
+    }
+
+    public void setSeed(long seed) {
+        this.seed = seed;
     }
 
     public Metadata getMetadata() {

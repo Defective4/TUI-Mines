@@ -19,6 +19,7 @@ public final class ReplayIO {
             byte[] header = "TUIRPL1".getBytes();
             os.writeInt(header.length);
             os.write(header); // Write header
+            os.writeLong(replay.getSeed()); // Write seed
             os.write(Arrays.copyOf(replay.getMetadata().getIdentifier().getBytes(StandardCharsets.UTF_8),
                                    10)); // Write identifier
             os.writeLong(replay.getStartTime()); // Write start time
@@ -62,6 +63,7 @@ public final class ReplayIO {
             if (!"TUIRPL1".equals(new String(header))) {
                 throw new IOException("Invalid file header!");
             }
+            long seed = is.readLong();
             byte[] id = new byte[10];
             is.read(id);
             String identifier = new String(id, StandardCharsets.UTF_8).trim();
@@ -84,6 +86,7 @@ public final class ReplayIO {
                     actions.add(new Replay.Action(type, is.readInt(), is.readInt(), is.readLong()));
             }
 
+            rp.setSeed(seed);
             rp.setHeight(height);
             rp.setWidth(width);
             rp.getMetadata().setIdentifier(identifier);

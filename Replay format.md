@@ -1,5 +1,5 @@
 Replay format used by TUI Sweeper  
-Revision 2
+Revision 3
 
 General format:
 
@@ -7,6 +7,7 @@ General format:
 |---------------|---------------|-----------|
 | Header length | int           | 7         |
 | Header        | byte\[\]      | TUIRPL1   |
+| Seed          | long          | *n/a*     |
 | Identifier    | byte\[10\]    | TEST      |
 | Start time    | long          | *n/a*     |
 | Create time   | long          | *n/a*     |
