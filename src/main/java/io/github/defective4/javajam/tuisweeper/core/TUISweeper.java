@@ -14,6 +14,7 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import io.github.defective4.javajam.tuisweeper.core.network.NullTheme;
+import io.github.defective4.javajam.tuisweeper.core.network.RemoteReplay;
 import io.github.defective4.javajam.tuisweeper.core.network.RemoteTheme;
 import io.github.defective4.javajam.tuisweeper.core.network.Repository;
 import io.github.defective4.javajam.tuisweeper.core.replay.Replay;
@@ -38,6 +39,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static io.github.defective4.javajam.tuisweeper.core.replay.Replay.DATE_FORMAT;
+import static io.github.defective4.javajam.tuisweeper.core.replay.Replay.TIME_FORMAT;
 import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.applyBackground;
 
 public class TUISweeper {
@@ -504,6 +507,9 @@ public class TUISweeper {
                                 };
 
                                 Button online = new SFXButton("Online", sfx, () -> {
+                                    win2.close();
+                                    win.close();
+                                    openRemoteReplayBrowser();
                                 }) {
                                     @Override
                                     protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
@@ -602,6 +608,50 @@ public class TUISweeper {
         }, 250, 250);
     }
 
+    private void openRemoteReplayBrowser() {
+        remoteRepo.fetch();
+        Window win = new SimpleWindow("Replay browser");
+        RemoteReplay[] replays = remoteRepo.getReplays();
+
+
+        List<String> dl = new ArrayList<>();
+        dl.add("All");
+        dl.addAll(Arrays.stream(Difficulty.values()).map(TUISweeper::capitalize).collect(Collectors.toList()));
+        ComboBox<String> diffs = new SFXComboBox<>(sfx, dl.toArray(new String[0]));
+        ComboBox<RemoteReplay.Sorting> sort = new SFXComboBox<>(sfx, RemoteReplay.Sorting.values());
+
+        Table<Object> table = new Table<>("#", "ID", "Author", "Time", "Difficulty");
+        table.setPreferredSize(new TerminalSize(50, 10));
+
+        diffs.addListener((i, i1, b) -> {
+            String dif = diffs.getItem(i);
+            int index = 0;
+            for (RemoteReplay replay : replays) {
+                if ("all".equalsIgnoreCase(dif) || replay.getDifficulty().name().equalsIgnoreCase(dif)) {
+                    table.getTableModel().addRow(index, replay.getIdentifier(),
+                                                 replay.getAuthor(),
+                                                 TIME_FORMAT.format(new Date(replay.getPlayTime())),
+                                                 capitalize(replay.getDifficulty()));
+                }
+                index++;
+            }
+        });
+        diffs.setSelectedIndex(0);
+
+
+        win.setComponent(Panels.vertical(
+                Panels.grid(2, new Label("Filter by    "),
+                            new Label("Sort by"),
+                            diffs,
+                            sort),
+                new EmptySpace(),
+                table.withBorder(Borders.singleLine()),
+                new SFXButton("Close", sfx, true, win::close)
+        ));
+        table.takeFocus();
+        gui.addWindowAndWait(win);
+    }
+
     private void openLocalReplayBrowser() {
         Window win = new SimpleWindow("Replay viewer");
         List<File> replayFiles = new ArrayList<>();
@@ -637,8 +687,7 @@ public class TUISweeper {
                              .collect(Collectors.toList()));
         ComboBox<String> difs = new SFXComboBox<>(sfx, difList.toArray(new String[0]));
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd kk:mm");
-        SimpleDateFormat sFormat = new SimpleDateFormat("mm:ss");
+
         Table<Object> table = new Table<Object>("#", "ID", "Created", "Time", "Difficulty") {
             @Override
             public Result handleKeyStroke(KeyStroke keyStroke) {
@@ -653,14 +702,14 @@ public class TUISweeper {
 
                             win2.setComponent(Panels.vertical(
                                     new Label("Identifier: " + repl.getMetadata().getIdentifier()),
-                                    new Label("Date created: " + format.format(new Date(repl.getMetadata()
-                                                                                            .getCreatedDate()))),
+                                    new Label("Date created: " + DATE_FORMAT.format(new Date(repl.getMetadata()
+                                                                                                 .getCreatedDate()))),
                                     new Label(String.format("Size: %sx%s (%s bombs)",
                                                             repl.getWidth(),
                                                             repl.getHeight(),
                                                             repl.getBombs().size())),
                                     new Label("Difficulty: " + repl.getMetadata().getDifficulty()),
-                                    new Label("Time: " + sFormat.format(new Date(repl.getTime()))),
+                                    new Label("Time: " + TIME_FORMAT.format(new Date(repl.getTime()))),
                                     new EmptySpace(),
                                     Panels.horizontal(new SFXButton("Back", sfx, true, win2::close),
                                                       new SFXButton("Play", sfx, () -> {
@@ -716,8 +765,8 @@ public class TUISweeper {
                 if (difE == null || rpl.getMetadata().getDifficulty() == difE) {
                     table.getTableModel().addRow(index + 1,
                                                  rpl.getMetadata().getIdentifier(),
-                                                 format.format(new Date(rpl.getMetadata().getCreatedDate())),
-                                                 sFormat.format(new Date(rpl.getTime())),
+                                                 DATE_FORMAT.format(new Date(rpl.getMetadata().getCreatedDate())),
+                                                 TIME_FORMAT.format(new Date(rpl.getTime())),
                                                  capitalize(rpl.getMetadata().getDifficulty())
                     );
                     addedN++;

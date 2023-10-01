@@ -3,10 +3,13 @@ package io.github.defective4.javajam.tuisweeper.core.replay;
 import io.github.defective4.javajam.tuisweeper.core.Difficulty;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Replay {
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd kk:mm");
+    public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("mm:ss");
 
     public enum ActionType {
         CARET(0), REVEAL(1), FLAG(2);
