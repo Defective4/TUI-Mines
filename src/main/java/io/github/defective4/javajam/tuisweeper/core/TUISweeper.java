@@ -9,7 +9,6 @@ import com.googlecode.lanterna.gui2.dialogs.ListSelectDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.gui2.table.Table;
-import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
@@ -688,69 +687,63 @@ public class TUISweeper {
         ComboBox<String> difs = new SFXComboBox<>(sfx, difList.toArray(new String[0]));
 
 
-        Table<Object> table = new Table<Object>("#", "ID", "Created", "Time", "Difficulty") {
-            @Override
-            public Result handleKeyStroke(KeyStroke keyStroke) {
-                Result res = super.handleKeyStroke(keyStroke);
-                if (res == Result.HANDLED && keyStroke.getKeyType() == KeyType.Enter) {
-                    Object index = getTableModel().getRow(getSelectedRow()).get(0);
-                    if (index instanceof Integer) {
-                        int sel = (int) index - 1;
-                        if (sel < replays.size()) {
-                            Replay repl = replays.get(sel);
-                            Window win2 = new SimpleWindow("Replay");
+        Table<Object> table = new Table<>("#", "ID", "Created", "Time", "Difficulty");
+        table.setSelectAction(() -> {
+            Object index = table.getTableModel().getRow(table.getSelectedRow()).get(0);
+            if (index instanceof Integer) {
+                int sel = (int) index - 1;
+                if (sel < replays.size()) {
+                    Replay repl = replays.get(sel);
+                    Window win2 = new SimpleWindow("Replay");
 
-                            win2.setComponent(Panels.vertical(
-                                    new Label("Identifier: " + repl.getMetadata().getIdentifier()),
-                                    new Label("Date created: " + DATE_FORMAT.format(new Date(repl.getMetadata()
-                                                                                                 .getCreatedDate()))),
-                                    new Label(String.format("Size: %sx%s (%s bombs)",
-                                                            repl.getWidth(),
-                                                            repl.getHeight(),
-                                                            repl.getBombs().size())),
-                                    new Label("Difficulty: " + repl.getMetadata().getDifficulty()),
-                                    new Label("Time: " + TIME_FORMAT.format(new Date(repl.getTime()))),
-                                    new EmptySpace(),
-                                    Panels.horizontal(new SFXButton("Back", sfx, true, win2::close),
-                                                      new SFXButton("Play", sfx, () -> {
-                                                          if (new SFXMessageDialogBuilder(sfx)
-                                                                      .addButton(MessageDialogButton.No)
-                                                                      .addButton(MessageDialogButton.Yes)
-                                                                      .setText(
-                                                                              "Playing a replay will discard your current game.\n" +
-                                                                              "Do you want to continue?")
-                                                                      .setTitle("Warning")
-                                                                      .build()
-                                                                      .showDialog(gui) == MessageDialogButton.Yes) {
-                                                              win2.close();
-                                                              win.close();
-                                                              startReplay(repl);
-                                                          }
-                                                      }),
-                                                      new SFXButton("Delete", sfx, () -> {
-                                                          if (new SFXMessageDialogBuilder(sfx)
-                                                                      .setTitle("Deleting a replay")
-                                                                      .setText("Are you sure you want to delete\n" +
-                                                                               "this replay?\n" +
-                                                                               "This action is permanent")
-                                                                      .addButton(MessageDialogButton.No)
-                                                                      .addButton(MessageDialogButton.Yes)
-                                                                      .build()
-                                                                      .showDialog(gui) == MessageDialogButton.Yes) {
-                                                              repl.getMetadata().getOrigin().delete();
-                                                              win2.close();
-                                                              replays.remove(repl);
-                                                              difs.setSelectedIndex(difs.getSelectedIndex());
-                                                          }
-                                                      }))
-                            ));
-                            gui.addWindowAndWait(win2);
-                        }
-                    }
+                    win2.setComponent(Panels.vertical(
+                            new Label("Identifier: " + repl.getMetadata().getIdentifier()),
+                            new Label("Date created: " + DATE_FORMAT.format(new Date(repl.getMetadata()
+                                                                                         .getCreatedDate()))),
+                            new Label(String.format("Size: %sx%s (%s bombs)",
+                                                    repl.getWidth(),
+                                                    repl.getHeight(),
+                                                    repl.getBombs().size())),
+                            new Label("Difficulty: " + repl.getMetadata().getDifficulty()),
+                            new Label("Time: " + TIME_FORMAT.format(new Date(repl.getTime()))),
+                            new EmptySpace(),
+                            Panels.horizontal(new SFXButton("Back", sfx, true, win2::close),
+                                              new SFXButton("Play", sfx, () -> {
+                                                  if (new SFXMessageDialogBuilder(sfx)
+                                                              .addButton(MessageDialogButton.No)
+                                                              .addButton(MessageDialogButton.Yes)
+                                                              .setText(
+                                                                      "Playing a replay will discard your current game.\n" +
+                                                                      "Do you want to continue?")
+                                                              .setTitle("Warning")
+                                                              .build()
+                                                              .showDialog(gui) == MessageDialogButton.Yes) {
+                                                      win2.close();
+                                                      win.close();
+                                                      startReplay(repl);
+                                                  }
+                                              }),
+                                              new SFXButton("Delete", sfx, () -> {
+                                                  if (new SFXMessageDialogBuilder(sfx)
+                                                              .setTitle("Deleting a replay")
+                                                              .setText("Are you sure you want to delete\n" +
+                                                                       "this replay?\n" +
+                                                                       "This action is permanent")
+                                                              .addButton(MessageDialogButton.No)
+                                                              .addButton(MessageDialogButton.Yes)
+                                                              .build()
+                                                              .showDialog(gui) == MessageDialogButton.Yes) {
+                                                      repl.getMetadata().getOrigin().delete();
+                                                      win2.close();
+                                                      replays.remove(repl);
+                                                      difs.setSelectedIndex(difs.getSelectedIndex());
+                                                  }
+                                              }))
+                    ));
+                    gui.addWindowAndWait(win2);
                 }
-                return res;
             }
-        };
+        });
         table.setPreferredSize(new TerminalSize(50, 10));
 
 

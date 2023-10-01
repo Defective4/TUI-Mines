@@ -28,6 +28,7 @@ public class Repository {
 
     public void fetch() { // TODO add erro reporting
         themes.clear();
+        replays.clear();
         try (InputStreamReader reader = new InputStreamReader(new URL(REPO).openStream())) {
             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
             for (JsonElement el : json.getAsJsonArray("themes")) {
