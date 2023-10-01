@@ -664,9 +664,19 @@ public class TUISweeper {
                                     new EmptySpace(),
                                     Panels.horizontal(new SFXButton("Back", sfx, true, win2::close),
                                                       new SFXButton("Play", sfx, () -> {
-                                                          win2.close();
-                                                          win.close();
-                                                          startReplay(repl);
+                                                          if (new SFXMessageDialogBuilder(sfx)
+                                                                      .addButton(MessageDialogButton.No)
+                                                                      .addButton(MessageDialogButton.Yes)
+                                                                      .setText(
+                                                                              "Playing a replay will discard your current game.\n" +
+                                                                              "Do you want to continue?")
+                                                                      .setTitle("Warning")
+                                                                      .build()
+                                                                      .showDialog(gui) == MessageDialogButton.Yes) {
+                                                              win2.close();
+                                                              win.close();
+                                                              startReplay(repl);
+                                                          }
                                                       }),
                                                       new SFXButton("Delete", sfx, () -> {
                                                           if (new SFXMessageDialogBuilder(sfx)
