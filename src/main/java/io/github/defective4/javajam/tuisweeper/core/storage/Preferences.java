@@ -38,7 +38,6 @@ public class Preferences {
             try {
                 return new Gson().fromJson(reader, UserTheme.class);
             } catch (Exception e) {
-                e.printStackTrace();
                 return null;
             }
         }
@@ -153,7 +152,13 @@ public class Preferences {
     private int bombs = difficulty.getBombs();
 
     public Preferences() {
-        Runtime.getRuntime().addShutdownHook(new Thread(this::save));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
     }
 
     public static File getConfigDirectory() {
@@ -175,27 +180,23 @@ public class Preferences {
         return new File(getConfigDirectory(), "replays");
     }
 
-    public static Preferences load() {
+    public static Preferences load() throws IOException {
         File in = getConfigFile();
         if (in.isFile()) try (InputStreamReader reader = new FileReader(in)) {
             Preferences prefs = new Gson().fromJson(reader, Preferences.class);
             if (!prefs.getTheme().isValid()) prefs.getTheme().fromTheme(ThemePreset.PITCH_BLACK.toTheme());
             return prefs;
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         Preferences clean = new Preferences();
         clean.save();
         return clean;
     }
 
-    public void save() {
+    public void save() throws IOException {
         File out = getConfigFile();
         out.getParentFile().mkdirs();
         try (OutputStream os = Files.newOutputStream(out.toPath())) {
             os.write(new Gson().toJson(this).getBytes(StandardCharsets.UTF_8));
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

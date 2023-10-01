@@ -36,8 +36,7 @@ public class SFXMessageDialogBuilder extends MessageDialogBuilder {
                     for (Button.Listener ls : (List<Button.Listener>) field.get(old))
                         nw.addListener(ls);
                     buttonPanel.addComponent(nw);
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    e.printStackTrace();
+                } catch (Exception ignored) {
                 }
 
             }

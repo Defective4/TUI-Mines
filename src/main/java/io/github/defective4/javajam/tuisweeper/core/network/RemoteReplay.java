@@ -45,7 +45,6 @@ public class RemoteReplay {
         try (InputStream is = new URL(url).openStream()) {
             return ReplayIO.read(is);
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }

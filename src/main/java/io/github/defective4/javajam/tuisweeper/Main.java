@@ -16,6 +16,7 @@ import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal;
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
+import io.github.defective4.javajam.tuisweeper.core.ui.ErrorDialog;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
 
 import javax.imageio.ImageIO;
@@ -27,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static io.github.defective4.javajam.tuisweeper.core.ui.ErrorDialog.showErrorDialog;
 
 public final class Main {
     private Main() {
@@ -60,7 +63,7 @@ public final class Main {
                 String line;
                 while ((line = reader.readLine()) != null) brandBuilder.append(line).append("\n");
             } catch (Exception e) {
-                e.printStackTrace();
+                showErrorDialog(gui, e, sfx, "Couldn't load title screen ASCII art!");
             }
             String brand = brandBuilder.toString();
 
@@ -110,7 +113,7 @@ public final class Main {
                 try {
                     frame.setIconImage(ImageIO.read(Main.class.getResourceAsStream("/logo.png")));
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    showErrorDialog(gui, e, sfx, "Couldn't load logo image!");
                 }
             }
 

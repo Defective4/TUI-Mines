@@ -35,9 +35,7 @@ public class SFXEngine {
                             });
                             c.start();
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    } catch (Exception ignored) {}
                 }
             }
         }, 0, 10, TimeUnit.MILLISECONDS);
@@ -81,12 +79,10 @@ public class SFXEngine {
                         while ((read = ais.read(tmp)) > 0) buffer.write(tmp, 0, read);
 
                         loadedSounds.put(line.toLowerCase(), buffer.toByteArray());
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (Exception ignored) {
                     }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ignored) {
             }
     }
 }

@@ -41,8 +41,7 @@ public class SFXTextInputDialogBuilder extends TextInputDialogBuilder {
 
             box.takeFocus();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
 
         return dial;

@@ -39,6 +39,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.github.defective4.javajam.tuisweeper.core.replay.Replay.*;
+import static io.github.defective4.javajam.tuisweeper.core.ui.ErrorDialog.showErrorDialog;
 import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.applyBackground;
 
 public class TUISweeper {
@@ -214,7 +215,11 @@ public class TUISweeper {
                                     TUISweeper.this.prefs.setWidth(wBox.getValue());
                                     TUISweeper.this.prefs.setHeight(hBox.getValue());
                                     TUISweeper.this.prefs.setBombs(bBox.getValue());
-                                    prefs.save();
+                                    try {
+                                        prefs.save();
+                                    } catch (IOException e) {
+                                        ErrorDialog.showErrorDialog(gui, e, sfx, "Couldn't save preferences!");
+                                    }
 
                                     win.close();
                                     win2.close();
@@ -310,12 +315,9 @@ public class TUISweeper {
                                     ThemePreset preset = presets.getItem(i);
                                     if (preset == ThemePreset.ONLINE) {
                                         presets.setSelectedIndex(0);
-                                        if (!remoteRepo.fetch()) {
-                                            new SFXMessageDialogBuilder(sfx)
-                                                    .addButton(MessageDialogButton.OK)
-                                                    .setTitle("Error")
-                                                    .setText("Couldn't download from remote repository!")
-                                                    .build().showDialog(gui);
+                                        Exception ex = remoteRepo.fetch();
+                                        if (ex != null) {
+                                            showErrorDialog(gui, ex, sfx, "Couldn't download from remote repository!");
                                             return;
                                         }
                                         ListSelectDialogBuilder<RemoteTheme> builder = new SFXListSelectDialogBuilder<>(
@@ -371,7 +373,11 @@ public class TUISweeper {
                                             builder.setText("Theme exported to " + file);
                                             builder.build().showDialog(gui);
                                         } catch (Exception e) {
-                                            e.printStackTrace();
+                                            showErrorDialog(gui,
+                                                            e,
+                                                            sfx,
+                                                            "An exception was catched",
+                                                            "when trying to save your theme!");
                                         }
                                     }
                                 });
@@ -399,8 +405,12 @@ public class TUISweeper {
                                                 md.setText("Theme imported!");
                                                 win2.close();
                                             } catch (IOException e) {
-                                                e.printStackTrace();
-                                                md.setText("There was an error while importing the theme");
+                                                showErrorDialog(gui,
+                                                                e,
+                                                                sfx,
+                                                                "An exception was catched",
+                                                                "when trying to import your theme!");
+                                                return;
                                             }
                                         } else {
                                             md.setText("This file does not exist!");
@@ -478,7 +488,14 @@ public class TUISweeper {
                                                                             ops.setSounds(
                                                                                     sounds.isChecked());
                                                                             sfx.setEnabled(ops.isSounds());
-                                                                            prefs.save();
+                                                                            try {
+                                                                                prefs.save();
+                                                                            } catch (IOException e) {
+                                                                                ErrorDialog.showErrorDialog(gui,
+                                                                                                            e,
+                                                                                                            sfx,
+                                                                                                            "Couldn't save preferences!");
+                                                                            }
                                                                             win2.close();
                                                                         }),
                                                           new SFXButton("Cancel",
@@ -622,12 +639,9 @@ public class TUISweeper {
     }
 
     private void openRemoteReplayBrowser() {
-        if (!remoteRepo.fetch()) {
-            new SFXMessageDialogBuilder(sfx)
-                    .addButton(MessageDialogButton.OK)
-                    .setTitle("Error")
-                    .setText("Couldn't download from remote repository!")
-                    .build().showDialog(gui);
+        Exception ex = remoteRepo.fetch();
+        if (ex != null) {
+            showErrorDialog(gui, ex, sfx, "Couldn't download from remote repository!");
             return;
         }
         Window win = new SimpleWindow("Replay browser");
@@ -715,13 +729,7 @@ public class TUISweeper {
                                                                                           .build().showDialog(gui);
                                                           win2.close();
                                                       } catch (Exception e) {
-                                                          // TODO error dialogs
-                                                          new SFXMessageDialogBuilder(sfx).setText(
-                                                                                                  "Couldn't save the replay!")
-                                                                                          .setTitle("Error")
-                                                                                          .addButton(MessageDialogButton.OK)
-                                                                                          .build().showDialog(gui);
-                                                          e.printStackTrace();
+                                                          showErrorDialog(gui, e, sfx, "Couldn't save the replay!");
                                                       }
                                                   }
                                               }))
@@ -787,11 +795,11 @@ public class TUISweeper {
                     try {
                         replays.add(ReplayIO.read(f));
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        showErrorDialog(gui, e, sfx, "Corrupted replay:", f.getAbsolutePath());
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                showErrorDialog(gui, e, sfx, "Couldn't list files in replay dir");
             }
 
         List<String> difList = new ArrayList<>();
@@ -958,7 +966,11 @@ public class TUISweeper {
 
     private void updateTheme(Preferences.UserTheme theme) {
         gui.setTheme(theme.toTUITheme());
-        prefs.save();
+        try {
+            prefs.save();
+        } catch (IOException e) {
+            ErrorDialog.showErrorDialog(gui, e, sfx, "Couldn't save preferences!");
+        }
         infoLabel.setTheme(new SimpleTheme(TextColor.ANSI.BLACK, TextColor.ANSI.WHITE_BRIGHT));
     }
 
@@ -1153,26 +1165,34 @@ public class TUISweeper {
     }
 
     public void start() {
-        isReplay = false;
-        player.stop();
-        recorder.setEnabled(true);
-        board.initialize(prefs.getWidth(), prefs.getHeight(), prefs.getBombs());
-        resetVariables();
-        updateBoard();
-        boardBox.setCaretPosition(MineBoard.Y_OFFSET, board.getXOffset());
+        try {
+            isReplay = false;
+            player.stop();
+            recorder.setEnabled(true);
+            board.initialize(prefs.getWidth(), prefs.getHeight(), prefs.getBombs());
+            resetVariables();
+            updateBoard();
+            boardBox.setCaretPosition(MineBoard.Y_OFFSET, board.getXOffset());
+        } catch (Exception e) {
+            showErrorDialog(gui, e, sfx, "Error initializing the field!");
+        }
     }
 
     public void startReplay(Replay replay) {
-        isReplay = true;
-        player.stop();
-        recorder.setEnabled(false);
-        board.initializeReplay(replay.getWidth(), replay.getHeight(), replay.getBombs().size(), replay.getSeed());
-        for (Replay.CoordPair bomb : replay.getBombs())
-            board.setFieldAt(bomb.getX(), bomb.getY(), 11);
-        resetVariables();
-        updateBoard();
-        boardBox.setCaretPosition(0, 0);
-        player.play(replay);
+        try {
+            isReplay = true;
+            player.stop();
+            recorder.setEnabled(false);
+            board.initializeReplay(replay.getWidth(), replay.getHeight(), replay.getBombs().size(), replay.getSeed());
+            for (Replay.CoordPair bomb : replay.getBombs())
+                board.setFieldAt(bomb.getX(), bomb.getY(), 11);
+            resetVariables();
+            updateBoard();
+            boardBox.setCaretPosition(0, 0);
+            player.play(replay);
+        } catch (Exception e) {
+            showErrorDialog(gui, e, sfx, "Error initializing replay field!", "The replay might be corrupted.");
+        }
     }
 
     private void startTimer() {
@@ -1238,17 +1258,16 @@ public class TUISweeper {
                             File dir = Preferences.getReplaysDir();
                             dir.mkdirs();
                             String rpn = FILE_FORMAT.format(new Date()) + ".jbcfrt";
-                            MessageDialogBuilder bd = new SFXMessageDialogBuilder(sfx).addButton(MessageDialogButton.OK);
                             try {
                                 ReplayIO.write(replay, new File(dir, rpn));
-                                bd.setText("Replay saved!")
-                                  .setTitle("Success");
+                                new SFXMessageDialogBuilder(sfx).addButton(MessageDialogButton.OK)
+                                                                .setText("Replay saved!")
+                                                                .setTitle("Success")
+                                                                .build()
+                                                                .showDialog(gui);
                             } catch (Exception e) {
-                                e.printStackTrace();
-                                bd.setText("An error occured while saving the replay")
-                                  .setTitle("Error");
+                                showErrorDialog(gui, e, sfx, "An error occured while saving", "the replay!");
                             }
-                            bd.build().showDialog(gui);
                         }
                     }));
                 }

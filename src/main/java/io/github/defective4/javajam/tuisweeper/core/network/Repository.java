@@ -26,7 +26,7 @@ public class Repository {
         return replays.toArray(new RemoteReplay[0]);
     }
 
-    public boolean fetch() { // TODO add erro reporting
+    public Exception fetch() { // TODO add erro reporting
         themes.clear();
         replays.clear();
         try (InputStreamReader reader = new InputStreamReader(new URL(REPO).openStream())) {
@@ -60,7 +60,6 @@ public class Repository {
                         createdTime = Replay.DATE_FORMAT.parse(replayO.get("createdTime").getAsString()).getTime();
                         playTime = Long.parseLong(replayO.get("playTime").getAsString());
                     } catch (Exception e) {
-                        e.printStackTrace();
                         addedTime = 0;
                         createdTime = 0;
                         playTime = 0;
@@ -78,10 +77,9 @@ public class Repository {
                                                  replayO.get("author").getAsString()));
                 }
             }
-            return true;
+            return null;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            return e;
         }
     }
 }

@@ -37,8 +37,7 @@ public class SFXListSelectDialogBuilder<T> extends ListSelectDialogBuilder<T> {
             cpts.remove(cpts.size() - 1);
             replacement.takeFocus();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
 
         return dial;

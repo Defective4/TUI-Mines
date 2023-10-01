@@ -42,8 +42,7 @@ public class Leaderboards {
             }
             isAvailable = true;
         } catch (Exception e) {
-            e.printStackTrace();
-            // TODO
+            isAvailable = false;
         }
     }
 
@@ -73,8 +72,7 @@ public class Leaderboards {
                                        diff.getId(),
                                        time,
                                        System.currentTimeMillis()));
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -90,7 +88,6 @@ public class Leaderboards {
                 return entries.toArray(new Entry[0]);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             return new Entry[0];
         }
     }

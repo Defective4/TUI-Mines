@@ -93,8 +93,7 @@ public class CustomFileDialogBuilder extends FileDialogBuilder {
 
                 }
             }
-        } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
         return dial;
     }

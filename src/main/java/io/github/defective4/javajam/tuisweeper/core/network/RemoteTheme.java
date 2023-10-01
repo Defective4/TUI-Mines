@@ -26,7 +26,6 @@ public class RemoteTheme {
         try (InputStreamReader reader = new InputStreamReader(new URL(url).openStream())) {
             return Preferences.UserTheme.fromJSON(reader);
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }
