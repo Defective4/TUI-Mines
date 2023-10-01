@@ -26,7 +26,7 @@ public class Repository {
         return replays.toArray(new RemoteReplay[0]);
     }
 
-    public void fetch() { // TODO add erro reporting
+    public boolean fetch() { // TODO add erro reporting
         themes.clear();
         replays.clear();
         try (InputStreamReader reader = new InputStreamReader(new URL(REPO).openStream())) {
@@ -78,8 +78,10 @@ public class Repository {
                                                  replayO.get("author").getAsString()));
                 }
             }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 }

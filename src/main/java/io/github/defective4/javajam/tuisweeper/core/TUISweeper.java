@@ -309,7 +309,15 @@ public class TUISweeper {
                                 presets.addListener((i, i1, b) -> {
                                     ThemePreset preset = presets.getItem(i);
                                     if (preset == ThemePreset.ONLINE) {
-                                        remoteRepo.fetch();
+                                        presets.setSelectedIndex(0);
+                                        if (!remoteRepo.fetch()) {
+                                            new SFXMessageDialogBuilder(sfx)
+                                                    .addButton(MessageDialogButton.OK)
+                                                    .setTitle("Error")
+                                                    .setText("Couldn't download from remote repository!")
+                                                    .build().showDialog(gui);
+                                            return;
+                                        }
                                         ListSelectDialogBuilder<RemoteTheme> builder = new SFXListSelectDialogBuilder<>(
                                                 sfx);
                                         builder.setTitle("Theme repository");
@@ -615,7 +623,14 @@ public class TUISweeper {
     }
 
     private void openRemoteReplayBrowser() {
-        remoteRepo.fetch();
+        if (!remoteRepo.fetch()) {
+            new SFXMessageDialogBuilder(sfx)
+                    .addButton(MessageDialogButton.OK)
+                    .setTitle("Error")
+                    .setText("Couldn't download from remote repository!")
+                    .build().showDialog(gui);
+            return;
+        }
         Window win = new SimpleWindow("Replay browser");
         RemoteReplay[] replays = remoteRepo.getReplays();
 
@@ -663,7 +678,15 @@ public class TUISweeper {
                                                                                       .setTitle("Error")
                                                                                       .addButton(MessageDialogButton.OK)
                                                                                       .build().showDialog(gui);
-                                                  } else {
+                                                  } else if (new SFXMessageDialogBuilder(sfx)
+                                                                     .addButton(MessageDialogButton.No)
+                                                                     .addButton(MessageDialogButton.Yes)
+                                                                     .setText(
+                                                                             "Playing a replay will discard your current game.\n" +
+                                                                             "Do you want to continue?")
+                                                                     .setTitle("Warning")
+                                                                     .build()
+                                                                     .showDialog(gui) == MessageDialogButton.Yes) {
                                                       win2.close();
                                                       win.close();
                                                       startReplay(rpl);
