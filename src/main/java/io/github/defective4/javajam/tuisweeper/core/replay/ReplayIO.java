@@ -84,6 +84,7 @@ public final class ReplayIO {
             rp.getMetadata().setIdentifier(identifier);
             rp.getMetadata().setDifficulty(diff);
             rp.getMetadata().setCreatedDate(createTime);
+            rp.getMetadata().setOrigin(in);
 
             return rp;
         }

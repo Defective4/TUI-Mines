@@ -2,6 +2,7 @@ package io.github.defective4.javajam.tuisweeper.core.replay;
 
 import io.github.defective4.javajam.tuisweeper.core.Difficulty;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,6 +96,15 @@ public class Replay {
         private Difficulty difficulty = Difficulty.CUSTOM;
         private String identifier = "";
         private long createdDate = System.currentTimeMillis();
+        private File origin;
+
+        public File getOrigin() {
+            return origin;
+        }
+
+        public void setOrigin(File origin) {
+            this.origin = origin;
+        }
 
         public long getCreatedDate() {
             return createdDate;

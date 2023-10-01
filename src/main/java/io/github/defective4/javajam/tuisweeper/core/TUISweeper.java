@@ -667,6 +667,22 @@ public class TUISweeper {
                                                           win2.close();
                                                           win.close();
                                                           startReplay(repl);
+                                                      }),
+                                                      new SFXButton("Delete", sfx, () -> {
+                                                          if (new SFXMessageDialogBuilder(sfx)
+                                                                      .setTitle("Deleting a replay")
+                                                                      .setText("Are you sure you want to delete\n" +
+                                                                               "this replay?\n" +
+                                                                               "This action is permanent")
+                                                                      .addButton(MessageDialogButton.No)
+                                                                      .addButton(MessageDialogButton.Yes)
+                                                                      .build()
+                                                                      .showDialog(gui) == MessageDialogButton.Yes) {
+                                                              repl.getMetadata().getOrigin().delete();
+                                                              win2.close();
+                                                              replays.remove(repl);
+                                                              difs.setSelectedIndex(difs.getSelectedIndex());
+                                                          }
                                                       }))
                             ));
                             gui.addWindowAndWait(win2);
