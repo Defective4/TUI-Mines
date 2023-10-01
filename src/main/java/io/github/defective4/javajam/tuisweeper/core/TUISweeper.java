@@ -362,18 +362,17 @@ public class TUISweeper {
                                     bd.setForcedExtension("json");
                                     File file = bd.buildAndShow(gui);
                                     if (file != null) {
-                                        MessageDialogBuilder builder = new SFXMessageDialogBuilder(sfx);
-                                        builder.setTitle("Exporting theme");
-                                        builder.addButton(MessageDialogButton.OK);
                                         try (OutputStream os = Files.newOutputStream(file.toPath())) {
+                                            MessageDialogBuilder builder = new SFXMessageDialogBuilder(sfx);
+                                            builder.setTitle("Exporting theme");
+                                            builder.addButton(MessageDialogButton.OK);
                                             save.run();
                                             os.write(prefs.getTheme().toJSON().getBytes(StandardCharsets.UTF_8));
                                             builder.setText("Theme exported to " + file);
+                                            builder.build().showDialog(gui);
                                         } catch (Exception e) {
-                                            builder.setText("An error occured while exporting theme");
                                             e.printStackTrace();
                                         }
-                                        builder.build().showDialog(gui);
                                     }
                                 });
 
