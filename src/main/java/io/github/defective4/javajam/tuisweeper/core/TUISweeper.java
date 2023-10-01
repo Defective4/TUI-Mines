@@ -38,8 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static io.github.defective4.javajam.tuisweeper.core.replay.Replay.DATE_FORMAT;
-import static io.github.defective4.javajam.tuisweeper.core.replay.Replay.TIME_FORMAT;
+import static io.github.defective4.javajam.tuisweeper.core.replay.Replay.*;
 import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.applyBackground;
 
 public class TUISweeper {
@@ -648,8 +647,54 @@ public class TUISweeper {
                                   .withBorder(Borders.singleLine("Times")),
                             new EmptySpace(),
                             Panels.horizontal(new SFXButton("Back", sfx, true, win2::close),
-                                              new SFXButton("Play", sfx, false, () -> {}),
-                                              new SFXButton("Download", sfx, false, () -> {}))
+                                              new SFXButton("Play", sfx, false, () -> {
+                                                  Replay rpl = replay.fetch();
+                                                  if (rpl == null) {
+                                                      new SFXMessageDialogBuilder(sfx).setText(
+                                                                                              "Couldn't download this replay!")
+                                                                                      .setTitle("Error")
+                                                                                      .addButton(MessageDialogButton.OK)
+                                                                                      .build().showDialog(gui);
+                                                  } else {
+                                                      win2.close();
+                                                      win.close();
+                                                      startReplay(rpl);
+                                                  }
+                                              }),
+                                              new SFXButton("Download", sfx, false, () -> {
+                                                  Replay rpl = replay.fetch();
+                                                  if (rpl == null) {
+                                                      new SFXMessageDialogBuilder(sfx).setText(
+                                                                                              "Couldn't download this replay!")
+                                                                                      .setTitle("Error")
+                                                                                      .addButton(MessageDialogButton.OK)
+                                                                                      .build().showDialog(gui);
+                                                  } else {
+                                                      try {
+                                                          File dir = Preferences.getReplaysDir();
+                                                          dir.mkdirs();
+                                                          File out = new File(dir,
+                                                                              FILE_FORMAT.format(new Date()) + ".jbcfrt");
+                                                          ReplayIO.write(rpl, out);
+
+                                                          new SFXMessageDialogBuilder(sfx).setText(
+                                                                                                  "Replay saved!\n" +
+                                                                                                  "You can now access it in your local replays.")
+                                                                                          .setTitle("Success")
+                                                                                          .addButton(MessageDialogButton.OK)
+                                                                                          .build().showDialog(gui);
+                                                          win2.close();
+                                                      } catch (Exception e) {
+                                                          // TODO error dialogs
+                                                          new SFXMessageDialogBuilder(sfx).setText(
+                                                                                                  "Couldn't save the replay!")
+                                                                                          .setTitle("Error")
+                                                                                          .addButton(MessageDialogButton.OK)
+                                                                                          .build().showDialog(gui);
+                                                          e.printStackTrace();
+                                                      }
+                                                  }
+                                              }))
                     ));
                     gui.addWindowAndWait(win2);
                 }
@@ -1171,7 +1216,7 @@ public class TUISweeper {
                             replay.getMetadata().setIdentifier(name);
                             File dir = Preferences.getReplaysDir();
                             dir.mkdirs();
-                            String rpn = new SimpleDateFormat("yyyy_MM_dd kk_ss").format(new Date()) + ".jbcfrt";
+                            String rpn = FILE_FORMAT.format(new Date()) + ".jbcfrt";
                             MessageDialogBuilder bd = new SFXMessageDialogBuilder(sfx).addButton(MessageDialogButton.OK);
                             try {
                                 ReplayIO.write(replay, new File(dir, rpn));

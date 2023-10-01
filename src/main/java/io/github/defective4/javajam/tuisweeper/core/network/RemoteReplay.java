@@ -1,6 +1,11 @@
 package io.github.defective4.javajam.tuisweeper.core.network;
 
 import io.github.defective4.javajam.tuisweeper.core.Difficulty;
+import io.github.defective4.javajam.tuisweeper.core.replay.Replay;
+import io.github.defective4.javajam.tuisweeper.core.replay.ReplayIO;
+
+import java.io.InputStream;
+import java.net.URL;
 
 public class RemoteReplay {
 
@@ -34,6 +39,15 @@ public class RemoteReplay {
         this.url = url;
         this.identifier = identifier;
         this.author = author;
+    }
+
+    public Replay fetch() {
+        try (InputStream is = new URL(url).openStream()) {
+            return ReplayIO.read(is);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public String getUrl() {

@@ -2,10 +2,7 @@ package io.github.defective4.javajam.tuisweeper.core.replay;
 
 import io.github.defective4.javajam.tuisweeper.core.Difficulty;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
@@ -51,7 +48,15 @@ public final class ReplayIO {
     }
 
     public static Replay read(File in) throws IOException {
-        try (DataInputStream is = new DataInputStream(new InflaterInputStream(Files.newInputStream(in.toPath())))) {
+        try (InputStream is = Files.newInputStream(in.toPath())) {
+            Replay rpl = read(is);
+            rpl.getMetadata().setOrigin(in);
+            return rpl;
+        }
+    }
+
+    public static Replay read(InputStream input) throws IOException {
+        try (DataInputStream is = new DataInputStream(new InflaterInputStream(input))) {
             byte[] header = new byte[is.readInt()];
             is.read(header);
             if (!"TUIRPL1".equals(new String(header))) {
@@ -84,7 +89,6 @@ public final class ReplayIO {
             rp.getMetadata().setIdentifier(identifier);
             rp.getMetadata().setDifficulty(diff);
             rp.getMetadata().setCreatedDate(createTime);
-            rp.getMetadata().setOrigin(in);
 
             return rp;
         }

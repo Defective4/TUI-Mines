@@ -10,6 +10,7 @@ import java.util.List;
 public class Replay {
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd kk:mm");
     public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("mm:ss");
+    public static final SimpleDateFormat FILE_FORMAT = new SimpleDateFormat("yyyy_MM_dd kk_ss");
 
     public enum ActionType {
         CARET(0), REVEAL(1), FLAG(2);
