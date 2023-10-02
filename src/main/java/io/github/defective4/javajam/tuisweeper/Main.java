@@ -40,6 +40,8 @@ public final class Main {
             Timer timer = new Timer(true);
             Preferences prefs = Preferences.load();
             DiscordIntegr.init();
+            DiscordIntegr.setEnabled(prefs.getOptions().isDiscordIntegrationEnabled(), null);
+            DiscordIntegr.title();
             SFXEngine sfx = new SFXEngine();
             TextBox box = new TextBox();
             box.setReadOnly(true);

@@ -12,6 +12,7 @@ import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import io.github.defective4.javajam.tuisweeper.core.network.NullTheme;
 import io.github.defective4.javajam.tuisweeper.core.network.RemoteReplay;
 import io.github.defective4.javajam.tuisweeper.core.network.RemoteTheme;
@@ -25,7 +26,6 @@ import io.github.defective4.javajam.tuisweeper.core.storage.Leaderboards;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.*;
 
-import javax.swing.JFrame;
 import java.awt.Point;
 import java.io.File;
 import java.io.FileReader;
@@ -470,14 +470,22 @@ public class TUISweeper {
                                 Window win2 = new SimpleWindow("Options");
                                 Preferences.Options ops = TUISweeper.this.prefs.getOptions();
                                 boolean sndAvailable = sfx.isAvailable();
+                                boolean guiAvailable = term
+                                        instanceof SwingTerminalFrame;
 
-                                CheckBox shaking = new SFXCheckBox("Enable screen shaking", ops.isScreenShaking(), sfx);
+                                CheckBox shaking = new SFXCheckBox("Enable screen shaking",
+                                                                   ops.isScreenShaking() && guiAvailable,
+                                                                   sfx);
                                 CheckBox sounds = new SFXCheckBox("Enable sounds", ops.isSounds() && sndAvailable, sfx);
+                                CheckBox discord = new SFXCheckBox("Discord integration",
+                                                                   ops.isDiscordIntegrationEnabled(),
+                                                                   sfx);
                                 sounds.setEnabled(sndAvailable);
+                                shaking.setEnabled(guiAvailable);
 
                                 win2.setComponent(Panels.vertical(
                                         Panels.vertical(shaking,
-                                                        sounds).withBorder(Borders.singleLine())
+                                                        sounds, discord).withBorder(Borders.singleLine())
                                         ,
                                         new EmptySpace(),
                                         Panels.horizontal(new SFXButton("Confirm",
@@ -487,7 +495,9 @@ public class TUISweeper {
                                                                                     shaking.isChecked());
                                                                             ops.setSounds(
                                                                                     sounds.isChecked());
+                                                                            ops.setDiscordIntegration(discord.isChecked());
                                                                             sfx.setEnabled(ops.isSounds());
+                                                                            DiscordIntegr.setEnabled(discord.isChecked(), this);
                                                                             try {
                                                                                 prefs.save();
                                                                             } catch (IOException e) {
@@ -988,8 +998,8 @@ public class TUISweeper {
 
     public void shake() {
         if (!prefs.getOptions().isScreenShaking()) return;
-        if (term instanceof JFrame) {
-            JFrame frame = (JFrame) term;
+        if (term instanceof SwingTerminalFrame) {
+            SwingTerminalFrame frame = (SwingTerminalFrame) term;
             Point original = frame.getLocation();
             boardUpdater.scheduleAtFixedRate(new TimerTask() {
                 int x = 50;

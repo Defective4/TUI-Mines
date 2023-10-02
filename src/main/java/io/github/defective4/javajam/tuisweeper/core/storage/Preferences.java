@@ -124,6 +124,15 @@ public class Preferences {
     public static class Options {
         private boolean screenShaking = true;
         private boolean sounds = true;
+        private boolean discordIntegration = true;
+
+        public boolean isDiscordIntegrationEnabled() {
+            return discordIntegration;
+        }
+
+        public void setDiscordIntegration(boolean discordIntegration) {
+            this.discordIntegration = discordIntegration;
+        }
 
         public boolean isSounds() {
             return sounds;

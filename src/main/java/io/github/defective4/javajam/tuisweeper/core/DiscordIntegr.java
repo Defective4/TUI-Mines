@@ -14,15 +14,39 @@ public final class DiscordIntegr {
 
     public static void init() {
         DiscordRPC.discordInitialize("1158412076516114472", new DiscordEventHandlers(), true);
-        DiscordRPC.discordUpdatePresence(new DiscordRichPresence.Builder("In title screen")
-                                                 .setBigImage("sweeper-logo", "TUI Sweeper")
-                                                 .build());
     }
 
     private static long LAST_UPDATE = System.currentTimeMillis();
     private static long START_DATE = System.currentTimeMillis();
 
+    private static boolean enabled = false;
+
+    public static boolean isEnabled() {
+        return enabled;
+    }
+
+    public static void setEnabled(boolean enabled, TUISweeper game) {
+        DiscordIntegr.enabled = enabled;
+        if (!enabled)
+            DiscordRPC.discordClearPresence();
+        else {
+            if (game == null)
+                title();
+            else
+                update(game);
+        }
+    }
+
+    public static void title() {
+        if (enabled)
+            DiscordRPC.discordUpdatePresence(new DiscordRichPresence.Builder("In title screen")
+                                                     .setBigImage("sweeper-logo", "TUI Sweeper")
+                                                     .build());
+    }
+
     public static void update(TUISweeper game) {
+        if (!enabled)
+            return;
         if (System.currentTimeMillis() - LAST_UPDATE < 2000) {
             return;
         }
