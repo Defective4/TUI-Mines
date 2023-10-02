@@ -26,7 +26,7 @@ public class Repository {
         return replays.toArray(new RemoteReplay[0]);
     }
 
-    public Exception fetch() { // TODO add erro reporting
+    public Exception fetch() {
         themes.clear();
         replays.clear();
         try (InputStreamReader reader = new InputStreamReader(new URL(REPO).openStream())) {

@@ -5,15 +5,14 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.gui2.dialogs.ListSelectDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.gui2.table.Table;
+import com.googlecode.lanterna.gui2.table.TableModel;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
-import io.github.defective4.javajam.tuisweeper.core.network.NullTheme;
 import io.github.defective4.javajam.tuisweeper.core.network.RemoteReplay;
 import io.github.defective4.javajam.tuisweeper.core.network.RemoteTheme;
 import io.github.defective4.javajam.tuisweeper.core.network.Repository;
@@ -320,25 +319,44 @@ public class TUISweeper {
                                             showErrorDialog(gui, ex, sfx, "Couldn't download from remote repository!");
                                             return;
                                         }
-                                        ListSelectDialogBuilder<RemoteTheme> builder = new SFXListSelectDialogBuilder<>(
-                                                sfx);
-                                        builder.setTitle("Theme repository");
-                                        builder.setDescription("Browse themes made by others!");
-                                        int width = 6;
-                                        RemoteTheme[] ths = remoteRepo.getThemes();
-                                        if (ths.length > 0)
-                                            for (RemoteTheme th : ths) {
-                                                width = Math.max(width, th.toString().length());
-                                                builder.addListItem(th);
-                                            }
-                                        else
-                                            builder.addListItem(new NullTheme());
 
-                                        builder.setListBoxSize(new TerminalSize(width + 4, 10));
-                                        RemoteTheme selected = builder.build().showDialog(gui);
-                                        sfx.play(selected == null ? "back" : "confirm");
-                                        if (selected != null && !(selected instanceof NullTheme))
-                                            showThemeDetails(selected, win2);
+                                        Window themes = new SimpleWindow("Theme repository");
+
+                                        Table<Object> table = new Table<>("Name", "Version", "Author");
+                                        TableModel<Object> model = table.getTableModel();
+                                        RemoteTheme[] ths = remoteRepo.getThemes();
+                                        int width = 40;
+                                        if (ths.length > 0) {
+                                            int index = 0;
+                                            for (RemoteTheme th : ths) {
+                                                model.addRow(th.getName(), th.getVersion(), th.getAuthor());
+                                                width = Math.max(width,
+                                                                 th.getName().length() + th.getVersion()
+                                                                                           .length() + th.getAuthor()
+                                                                                                         .length() + 6);
+                                                index++;
+                                            }
+                                        } else {
+                                            model.addRow("", "<Empty>", "");
+                                        }
+                                        table.setPreferredSize(new TerminalSize(width, 10));
+                                        table.setSelectAction(() -> {
+                                            int index = table.getSelectedRow();
+                                            if (index < ths.length) {
+                                                RemoteTheme sel = ths[index];
+                                                showThemeDetails(sel, win2, themes);
+                                            }
+                                        });
+
+                                        themes.setComponent(Panels.vertical(
+                                                new Label("Browse themes made by others!"),
+                                                new EmptySpace(),
+                                                table.withBorder(Borders.singleLine()),
+                                                new EmptySpace(),
+                                                new SFXButton("Close", sfx, true, themes::close)
+                                        ));
+                                        gui.addWindowAndWait(themes);
+
                                     } else if (preset != ThemePreset.NONE) {
                                         if (preset == ThemePreset.SEPARATOR) {
                                             presets.setSelectedIndex(0);
@@ -497,7 +515,8 @@ public class TUISweeper {
                                                                                     sounds.isChecked());
                                                                             ops.setDiscordIntegration(discord.isChecked());
                                                                             sfx.setEnabled(ops.isSounds());
-                                                                            DiscordIntegr.setEnabled(discord.isChecked(), this);
+                                                                            DiscordIntegr.setEnabled(discord.isChecked(),
+                                                                                                     this);
                                                                             try {
                                                                                 prefs.save();
                                                                             } catch (IOException e) {
@@ -923,7 +942,7 @@ public class TUISweeper {
         gui.addWindowAndWait(win);
     }
 
-    private void showThemeDetails(RemoteTheme theme, Window themes) {
+    private void showThemeDetails(RemoteTheme theme, Window themes, Window themes2) {
         Preferences.UserTheme local = theme.fetch();
         if (local == null || !local.isValid()) {
             new SFXMessageDialogBuilder(sfx)
@@ -967,6 +986,7 @@ public class TUISweeper {
                                     updateTheme(local);
                                     prefs.getTheme().fromTheme(local);
                                     themes.close();
+                                    themes2.close();
                                     new SFXMessageDialogBuilder(sfx)
                                             .setTitle("Success!")
                                             .setText("Theme applied!")
