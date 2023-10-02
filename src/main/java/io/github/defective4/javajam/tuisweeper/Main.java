@@ -94,9 +94,7 @@ public final class Main {
                                 new EmptySpace(),
                                 Panels.horizontal(
                                         new SFXButton("Continue", sfx, true, twin::close),
-                                        new SFXButton("View controls", sfx, false, () -> {
-                                            TUISweeper.showCtls(gui, sfx);
-                                        })
+                                        new SFXButton("View controls", sfx, false, () -> TUISweeper.showCtls(gui, sfx))
                                 )
                         ));
                         gui.addWindowAndWait(twin);
