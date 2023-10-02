@@ -968,6 +968,14 @@ public class TUISweeper {
         gui.addWindowAndWait(win);
     }
 
+    public boolean isReplay() {
+        return isReplay;
+    }
+
+    public byte getGameOver() {
+        return gameOver;
+    }
+
     private void updateTheme(Preferences.UserTheme theme) {
         gui.setTheme(theme.toTUITheme());
         try {
@@ -1006,6 +1014,18 @@ public class TUISweeper {
     public String getCurrentPlayingTime() {
         long diff = startTime == -1 ? 0 : endTime == -1 ? System.currentTimeMillis() - startTime : endTime - startTime;
         return new SimpleDateFormat("mm:ss").format(new Date(diff));
+    }
+
+    public int getWidth() {
+        return board.getSizeX();
+    }
+
+    public int getHeight() {
+        return board.getSizeY();
+    }
+
+    public int getBombs() {
+        return board.getBombs();
     }
 
     public void flag(int x, int y) {
@@ -1177,6 +1197,7 @@ public class TUISweeper {
             resetVariables();
             updateBoard();
             boardBox.setCaretPosition(MineBoard.Y_OFFSET, board.getXOffset());
+            DiscordIntegr.updateStartDate();
         } catch (Exception e) {
             showErrorDialog(gui, e, sfx, "Error initializing the field!");
         }
@@ -1194,6 +1215,7 @@ public class TUISweeper {
             updateBoard();
             boardBox.setCaretPosition(0, 0);
             player.play(replay);
+            DiscordIntegr.updateStartDate();
         } catch (Exception e) {
             showErrorDialog(gui, e, sfx, "Error initializing replay field!", "The replay might be corrupted.");
         }
@@ -1235,6 +1257,17 @@ public class TUISweeper {
     private void updateBoard() {
         TerminalPosition caret = boardBox.getCaretPosition();
         updateBoard(caret.getColumn(), caret.getRow());
+    }
+
+    public String getPercentDone() {
+        if (gameOver > 0) {
+            return gameOver == 2 ? "100" : "0";
+        } else {
+            int[] fields = board.countAllFields(11, 12, 0, 13);
+            double percent = (double) (fields[2] + fields[0]) / (board.getSizeX() * board.getSizeY());
+            percent = 1 - percent;
+            return doubleFormat.format(percent * 100);
+        }
     }
 
     private void updateBoard(int cx, int cy) {
@@ -1389,5 +1422,6 @@ public class TUISweeper {
         for (int x = labelText.length(); x < wh; x++)
             labelText.append(" ");
         infoLabel.setText(labelText.toString());
+        DiscordIntegr.update(this);
     }
 }

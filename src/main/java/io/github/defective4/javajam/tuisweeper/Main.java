@@ -11,6 +11,7 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
+import io.github.defective4.javajam.tuisweeper.core.DiscordIntegr;
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
@@ -38,6 +39,7 @@ public final class Main {
             DefaultTerminalFactory factory = new DefaultTerminalFactory();
             Timer timer = new Timer(true);
             Preferences prefs = Preferences.load();
+            DiscordIntegr.init();
             SFXEngine sfx = new SFXEngine();
             TextBox box = new TextBox();
             box.setReadOnly(true);
