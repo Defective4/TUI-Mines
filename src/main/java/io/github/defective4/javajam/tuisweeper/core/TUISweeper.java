@@ -777,7 +777,7 @@ public class TUISweeper {
 
         win.setComponent(Panels.vertical(
                 Panels.grid(2, new Label("Filter by    "),
-                            new Label("Sort by"),
+                            new Label("Sort by"), // TODO
                             diffs,
                             sort),
                 new EmptySpace(),

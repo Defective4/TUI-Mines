@@ -109,6 +109,7 @@ public final class ErrorDialog {
                         })
                 )
         ));
+        sfx.play("error");
         gui.addWindowAndWait(win);
     }
 }
