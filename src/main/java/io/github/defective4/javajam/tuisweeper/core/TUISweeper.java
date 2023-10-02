@@ -581,6 +581,10 @@ public class TUISweeper {
                             }
                             break;
                         }
+                        case 'h': {
+                            showCtls(gui, sfx);
+                            break;
+                        }
                         default:
                             break;
                     }
@@ -1211,6 +1215,23 @@ public class TUISweeper {
         localDifficulty = prefs.getDifficulty();
     }
 
+    public static void showCtls(WindowBasedTextGUI gui, SFXEngine sfx) {
+        Window win = new SimpleWindow("Game controls");
+
+        win.setComponent(Panels.vertical(
+                new Label("Arrow keys - Navigate on the board\n" +
+                          "<Space> - Reveal a field\n" +
+                          "F - Place/Remove a flag").withBorder(Borders.singleLine()),
+                new EmptySpace(),
+                new Label("If a revealed field has equal number of\n" +
+                          "surrounding flags and bombs, you can\n" +
+                          "use <Space> on it to chord"),
+                new EmptySpace(),
+                new SFXButton("OK", sfx, true, win::close)
+        ));
+        gui.addWindowAndWait(win);
+    }
+
     private void updateBoard() {
         TerminalPosition caret = boardBox.getCaretPosition();
         updateBoard(caret.getColumn(), caret.getRow());
@@ -1355,7 +1376,7 @@ public class TUISweeper {
                    .append("\n")
                    .append("    n - New Game     g - Go to field...\n")
                    .append("    m - Game Menu    u - Find next empty field\n")
-                   .append("    q - Quit");
+                   .append("    q - Quit         h - Show controls");
         }
 
         boardBox.setText(builder.toString());

@@ -1,10 +1,7 @@
 package io.github.defective4.javajam.tuisweeper;
 
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
-import com.googlecode.lanterna.gui2.TextBox;
-import com.googlecode.lanterna.gui2.Window;
-import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyType;
@@ -13,7 +10,9 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal;
+import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
+import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
@@ -88,6 +87,19 @@ public final class Main {
                                                                 .addButton(MessageDialogButton.Yes)
                                                                 .addButton(MessageDialogButton.No)
                                                                 .build().showDialog(gui) == MessageDialogButton.Yes);
+
+                        Window twin = new SimpleWindow("First time");
+                        twin.setComponent(Panels.vertical(
+                                new Label("It looks like it's your first time playing TUI Sweeper!"),
+                                new EmptySpace(),
+                                Panels.horizontal(
+                                        new SFXButton("Continue", sfx, true, twin::close),
+                                        new SFXButton("View controls", sfx, false, () -> {
+                                            TUISweeper.showCtls(gui, sfx);
+                                        })
+                                )
+                        ));
+                        gui.addWindowAndWait(twin);
                     }
                     win.setVisible(false);
                     timer.cancel();
@@ -102,8 +114,8 @@ public final class Main {
             win.setComponent(box);
 
 
-            if (term instanceof JFrame) {
-                JFrame frame = (JFrame) term;
+            if (term instanceof SwingTerminalFrame) {
+                SwingTerminalFrame frame = (SwingTerminalFrame) term;
                 Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setSize((int) (dim.getWidth() - 4), (int) dim.getHeight());
