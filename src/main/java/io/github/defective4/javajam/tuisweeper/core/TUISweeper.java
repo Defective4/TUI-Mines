@@ -1244,8 +1244,11 @@ public class TUISweeper {
         gui.addWindow(win);
     }
 
+    private Replay currentReplay;
+
     public void start() {
         try {
+            currentReplay = null;
             isReplay = false;
             player.stop();
             recorder.setEnabled(true);
@@ -1271,6 +1274,7 @@ public class TUISweeper {
             updateBoard();
             boardBox.setCaretPosition(0, 0);
             player.play(replay);
+            currentReplay = replay;
             DiscordIntegr.updateStartDate();
         } catch (Exception e) {
             showErrorDialog(gui, e, sfx, "Error initializing replay field!", "The replay might be corrupted.");
@@ -1473,7 +1477,11 @@ public class TUISweeper {
         StringBuilder labelText = new StringBuilder();
 
         String emote = gameOver == 0 ? ":)" : gameOver == 1 ? "X(" : "B)";
-        labelText.append("  ").append(emote).append("   TUI-Sweeper    Difficulty: ").append(localDifficulty); // TODO
+        labelText.append("  ")
+                 .append(emote)
+                 .append("   TUI-Sweeper    Difficulty: ")
+                 .append(currentReplay != null && isReplay ? currentReplay.getMetadata()
+                                                                          .getDifficulty() : localDifficulty);
         int wh = screen.getTerminalSize().getColumns();
         for (int x = labelText.length(); x < wh; x++)
             labelText.append(" ");

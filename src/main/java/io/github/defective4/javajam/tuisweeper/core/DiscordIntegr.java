@@ -19,7 +19,7 @@ public final class DiscordIntegr {
     private static long LAST_UPDATE = System.currentTimeMillis();
     private static long START_DATE = System.currentTimeMillis();
 
-    private static boolean enabled = false;
+    private static boolean enabled;
 
     public static boolean isEnabled() {
         return enabled;
