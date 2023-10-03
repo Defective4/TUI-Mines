@@ -678,7 +678,8 @@ public class TUISweeper {
             return;
         }
         Window win = new SimpleWindow("Replay browser");
-        RemoteReplay[] replays = remoteRepo.getReplays();
+        List<RemoteReplay> replays = new ArrayList<>();
+        Collections.addAll(replays, remoteRepo.getReplays());
 
 
         List<String> dl = new ArrayList<>();
@@ -694,8 +695,8 @@ public class TUISweeper {
             Object selected = table.getTableModel().getRow(table.getSelectedRow()).get(0);
             if (selected instanceof Integer) {
                 int index = (int) selected - 1;
-                if (index < replays.length) {
-                    RemoteReplay replay = replays[index];
+                if (index < replays.size()) {
+                    RemoteReplay replay = replays.get(index);
                     Window win2 = new SimpleWindow("Replay info");
 
                     String id = replay.getIdentifier();
@@ -791,12 +792,37 @@ public class TUISweeper {
                 table.getTableModel().addRow("", "<No replays>", "", "", "");
             }
         });
-        diffs.setSelectedIndex(0);
+
+        sort.addListener((i, i1, b) -> {
+            RemoteReplay.Sorting s = sort.getItem(i);
+            if (s != null) {
+                Comparator<RemoteReplay> comparator;
+                switch (s) {
+                    default:
+                    case DATE: {
+                        comparator = (o1, o2) -> (int) (o1.getAddedTime() / 1000 - o2.getAddedTime() / 1000);
+                        break;
+                    }
+                    case TIME: {
+                        comparator = (o1, o2) -> (int) (o1.getPlayTime() - o2.getPlayTime());
+                        break;
+                    }
+                    case CREATED: {
+                        comparator = (o1, o2) -> (int) (o1.getCreatedTime() / 1000 - o2.getCreatedTime() / 1000);
+                        break;
+                    }
+                }
+                replays.sort(comparator);
+            }
+            diffs.setSelectedIndex(diffs.getSelectedIndex());
+        });
+
+        sort.setSelectedIndex(0);
 
 
         win.setComponent(Panels.vertical(
                 Panels.grid(2, new Label("Filter by    "),
-                            new Label("Sort by"), // TODO
+                            new Label("Sort by"),
                             diffs,
                             sort),
                 new EmptySpace(),
