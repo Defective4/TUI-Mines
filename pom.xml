@@ -7,6 +7,12 @@
     <groupId>io.github.defective4.javajam.tuisweeper</groupId>
     <artifactId>tui-sweeper-game</artifactId>
     <version>1.0</version>
+    <description>Terminal base Minesweeper game</description>
+    <inceptionYear>2023</inceptionYear>
+
+    <organization>
+        <name>Defective</name>
+    </organization>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -28,6 +34,11 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.6.0</version>
                 <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>io.github.defective4.javajam.tuisweeper.Main</mainClass>
+                        </manifest>
+                    </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
@@ -41,6 +52,59 @@
                         <phase>
                             package
                         </phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>2.4.1</version>
+                <executions>
+                    <execution>
+                        <id>exe</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <jar>target/tui-sweeper-game-1.0-jar-with-dependencies.jar
+                            </jar>
+                            <outfile>target/TUI-Sweeper-1.0.exe</outfile>
+                            <chdir>.</chdir>
+                            <priority>normal</priority>
+                            <stayAlive>false</stayAlive>
+                            <restartOnCrash>false</restartOnCrash>
+                            <icon>img/logo.ico</icon>
+                            <jre>
+                                <path>%JAVA_HOME%;%PATH%</path>
+                                <requiresJdk>false</requiresJdk>
+                                <requires64Bit>false</requires64Bit>
+                                <minVersion>1.8</minVersion>
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>1.0.0.0</fileVersion>
+                                <txtFileVersion>1.0</txtFileVersion>
+                                <fileDescription>The TUI Sweeper game</fileDescription>
+                                <copyright>Defective</copyright>
+                                <productVersion>1.0.0.0</productVersion>
+                                <txtProductVersion>1.0</txtProductVersion>
+                                <productName>TUI-Sweeper</productName>
+                                <internalName>TUISweeper</internalName>
+                                <originalFilename>TUI-Sweeper.exe</originalFilename>
+                                <language>ENGLISH_US</language>
+                            </versionInfo>
+                            <messages>
+                                <startupErr>An error occurred while starting the application.</startupErr>
+                                <jreNotFoundErr>TUI Sweeper requires Java Runtime Environment 1.8</jreNotFoundErr>
+                                <jreVersionErr>TUI Sweeper requires Java Runtime Environment 1.8</jreVersionErr>
+                                <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation
+                                    or the runtime is corrupted.
+                                </launcherErr>
+                                <instanceAlreadyExistsMsg>An application instance is already running.
+                                </instanceAlreadyExistsMsg>
+                            </messages>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
