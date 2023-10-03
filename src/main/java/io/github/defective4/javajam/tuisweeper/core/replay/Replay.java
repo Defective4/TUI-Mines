@@ -6,6 +6,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Stores all data required to replay a full game.
@@ -162,9 +163,9 @@ public class Replay {
         }
     }
 
-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd kk:mm");
-    public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("mm:ss");
-    public static final SimpleDateFormat FILE_FORMAT = new SimpleDateFormat("yyyy_MM_dd kk_ss");
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd kk:mm", Locale.ENGLISH);
+    public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("mm:ss", Locale.ENGLISH);
+    public static final SimpleDateFormat FILE_FORMAT = new SimpleDateFormat("yyyy_MM_dd kk_ss", Locale.ENGLISH);
     private final List<CoordPair> bombs = new ArrayList<>();
     private final List<Action> actions = new ArrayList<>();
     private final long startTime;

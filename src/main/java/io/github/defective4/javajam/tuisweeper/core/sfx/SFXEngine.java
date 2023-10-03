@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Defective
  */
-public class SFXEngine {
+public final class SFXEngine {
     private final AudioFormat FORMAT = new AudioFormat(44100, 16, 1, true, false);
 
     private final ScheduledExecutorService service = Executors.newScheduledThreadPool(10);

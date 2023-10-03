@@ -17,7 +17,7 @@ import static com.googlecode.lanterna.TextColor.ANSI;
  *
  * @author Defective
  */
-public class ColorChooserButton extends SFXButton {
+public final class ColorChooserButton extends SFXButton {
 
     private TextColor color;
 

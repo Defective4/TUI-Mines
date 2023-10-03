@@ -15,10 +15,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -43,7 +40,7 @@ public final class ErrorDialog {
                 Panels.horizontal(
                         new SFXButton("Ok", sfx, true, win::close),
                         new SFXButton("Show stack trace", sfx, false, () -> {
-                            Window trace = new SimpleWindow("Exception stack trace");
+                            Window trace = new SimpleWindow("Exception stack trace", Locale.ENGLISH);
                             List<String> stackTrace = new ArrayList<>();
                             stackTrace.add(e.toString());
                             stackTrace.addAll(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(

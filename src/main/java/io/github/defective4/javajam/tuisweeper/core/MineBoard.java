@@ -10,7 +10,7 @@ import java.util.Random;
  *
  * @author Defective
  */
-public class MineBoard {
+public final class MineBoard {
 
     public static final int X_OFFSET = 2;
     public static final int Y_OFFSET = 3;
