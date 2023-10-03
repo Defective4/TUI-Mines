@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * A {@link BasicWindow} extension with predefined hints
+ *
+ * @author Defective
+ */
 public class SimpleWindow extends BasicWindow {
     public SimpleWindow(String title, Hint... hints) {
         super(title);

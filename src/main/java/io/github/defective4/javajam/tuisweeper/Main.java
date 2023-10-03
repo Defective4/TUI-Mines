@@ -30,6 +30,11 @@ import java.util.TimerTask;
 
 import static io.github.defective4.javajam.tuisweeper.core.ui.ErrorDialog.showErrorDialog;
 
+/**
+ * Main entry point of the game
+ *
+ * @author Defective
+ */
 public final class Main {
     private Main() {
     }

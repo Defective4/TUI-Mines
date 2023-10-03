@@ -8,6 +8,9 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * @author Defective
+ */
 public class SFXListSelectDialogBuilder<T> extends ListSelectDialogBuilder<T> {
 
     private final SFXEngine sfx;

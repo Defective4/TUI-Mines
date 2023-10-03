@@ -10,6 +10,11 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Used to play replays.
+ *
+ * @author Defective
+ */
 public class ReplayPlayer {
 
     private final TUISweeper game;

@@ -10,6 +10,13 @@ import io.github.defective4.javajam.tuisweeper.core.util.ColorConverter;
 
 import static com.googlecode.lanterna.TextColor.ANSI;
 
+/**
+ * A special button used to choose colors.
+ * It can be used to choose predefined {@link ANSI} colors
+ * and custom {@link com.googlecode.lanterna.TextColor.RGB}
+ *
+ * @author Defective
+ */
 public class ColorChooserButton extends SFXButton {
 
     private TextColor color;

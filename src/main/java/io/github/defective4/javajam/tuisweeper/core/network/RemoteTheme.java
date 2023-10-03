@@ -6,6 +6,11 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 
+/**
+ * Contains information about a theme stored in the remote repository.
+ *
+ * @author Defective
+ */
 public class RemoteTheme {
 
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd kk:mm");

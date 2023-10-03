@@ -4,6 +4,9 @@ import com.googlecode.lanterna.gui2.Interactable;
 import com.googlecode.lanterna.gui2.TextBox;
 import com.googlecode.lanterna.input.KeyType;
 
+/**
+ * @author Defective
+ */
 public class SFXTextBox extends TextBox {
 
     private final SFXEngine sfx;

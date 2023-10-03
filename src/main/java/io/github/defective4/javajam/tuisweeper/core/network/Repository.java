@@ -11,6 +11,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A remote repository.
+ * This can be used to retrieve information about user submitted themes and replays.
+ *
+ * @author Defective
+ */
 public class Repository {
     private static final String REPO = "http://10.0.0.1:3000/Defective4/TUI-Sweeper-Repo/raw/branch/master/repo.json";
 

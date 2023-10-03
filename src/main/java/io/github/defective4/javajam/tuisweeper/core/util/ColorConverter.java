@@ -5,6 +5,11 @@ import com.googlecode.lanterna.TextColor.ANSI;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.gui2.Component;
 
+/**
+ * Utility class to convert and optimize {@link ANSI} and {@link com.googlecode.lanterna.TextColor.RGB} color codes.
+ *
+ * @author Defective
+ */
 public final class ColorConverter {
     private ColorConverter() {
     }

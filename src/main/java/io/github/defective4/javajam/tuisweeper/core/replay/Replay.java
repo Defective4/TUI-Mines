@@ -7,7 +7,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Stores all data required to replay a full game.
+ * Can be played in {@link ReplayPlayer}
+ *
+ * @author Defective
+ * @see ReplayRecorder
+ * @see ReplayIO
+ */
 public class Replay {
+    /**
+     * Stores a single user action.
+     */
     public static class Action {
         private final ActionType action;
         private final int x, y;
@@ -47,6 +58,9 @@ public class Replay {
         }
     }
 
+    /**
+     * A 2D coordinate pair.
+     */
     public static class CoordPair {
         private final int x, y;
 
@@ -72,6 +86,11 @@ public class Replay {
         }
     }
 
+    /**
+     * Used to store replay metadata.
+     * Metadata is information that is not required to reproduce a game session,
+     * but helps to identify the replay.
+     */
     public static class Metadata {
         private Difficulty difficulty = Difficulty.CUSTOM;
         private String identifier = "";
@@ -120,6 +139,9 @@ public class Replay {
         }
     }
 
+    /**
+     * Action types used in {@link Action}
+     */
     public enum ActionType {
         CARET(0), REVEAL(1), FLAG(2);
         private final int id;

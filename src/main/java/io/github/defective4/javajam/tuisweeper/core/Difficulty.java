@@ -1,5 +1,10 @@
 package io.github.defective4.javajam.tuisweeper.core;
 
+/**
+ * An enum containing all difficulties the player can choose
+ *
+ * @author Defective
+ */
 public enum Difficulty {
     EASY(1, 10, 10, 10),
     NORMAL(2, 18, 18, 40),

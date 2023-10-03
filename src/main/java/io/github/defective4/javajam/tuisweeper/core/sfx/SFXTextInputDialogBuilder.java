@@ -9,6 +9,9 @@ import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
 import java.lang.reflect.Field;
 import java.util.List;
 
+/**
+ * @author Defective
+ */
 public class SFXTextInputDialogBuilder extends TextInputDialogBuilder {
 
     private final SFXEngine sfx;

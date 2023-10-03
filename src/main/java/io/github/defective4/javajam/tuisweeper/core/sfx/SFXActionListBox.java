@@ -4,6 +4,9 @@ import com.googlecode.lanterna.gui2.ActionListBox;
 import com.googlecode.lanterna.gui2.Interactable;
 import com.googlecode.lanterna.input.KeyStroke;
 
+/**
+ * @author Defective
+ */
 public class SFXActionListBox extends ActionListBox {
     private final SFXEngine sfx;
 

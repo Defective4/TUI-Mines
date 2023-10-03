@@ -4,6 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * The game board.
+ * Contains all fields and parameters.
+ *
+ * @author Defective
+ */
 public class MineBoard {
 
     public static final int X_OFFSET = 2;

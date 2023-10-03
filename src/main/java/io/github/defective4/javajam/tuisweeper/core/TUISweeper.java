@@ -41,6 +41,10 @@ import static io.github.defective4.javajam.tuisweeper.core.replay.Replay.*;
 import static io.github.defective4.javajam.tuisweeper.core.ui.ErrorDialog.showErrorDialog;
 import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.applyBackground;
 
+/**
+ * The main game class.
+ * Most of the game and application logic happens here.
+ */
 public class TUISweeper {
 
     private static final DecimalFormat doubleFormat = new DecimalFormat("#.##");
@@ -67,6 +71,7 @@ public class TUISweeper {
     private byte gameOver;
     private Difficulty localDifficulty = Difficulty.EASY;
     private boolean isReplay;
+    private Replay currentReplay;
 
     public TUISweeper(Screen screen, WindowBasedTextGUI gui, Terminal term, SFXEngine sfx, Preferences prefs) {
         this.screen = screen;
@@ -671,6 +676,23 @@ public class TUISweeper {
         return String.join(" ", split);
     }
 
+    public static void showCtls(WindowBasedTextGUI gui, SFXEngine sfx) {
+        Window win = new SimpleWindow("Game controls");
+
+        win.setComponent(Panels.vertical(
+                new Label("Arrow keys - Navigate on the board\n" +
+                          "<Space> - Reveal a field\n" +
+                          "F - Place/Remove a flag").withBorder(Borders.singleLine()),
+                new EmptySpace(),
+                new Label("If a revealed field has equal number of\n" +
+                          "surrounding flags and bombs, you can\n" +
+                          "use <Space> on it to chord"),
+                new EmptySpace(),
+                new SFXButton("OK", sfx, true, win::close)
+        ));
+        gui.addWindowAndWait(win);
+    }
+
     private void openRemoteReplayBrowser() {
         Exception ex = remoteRepo.fetch();
         if (ex != null) {
@@ -1244,8 +1266,6 @@ public class TUISweeper {
         gui.addWindow(win);
     }
 
-    private Replay currentReplay;
-
     public void start() {
         try {
             currentReplay = null;
@@ -1295,23 +1315,6 @@ public class TUISweeper {
         placed = false;
         gameOver = 0;
         localDifficulty = prefs.getDifficulty();
-    }
-
-    public static void showCtls(WindowBasedTextGUI gui, SFXEngine sfx) {
-        Window win = new SimpleWindow("Game controls");
-
-        win.setComponent(Panels.vertical(
-                new Label("Arrow keys - Navigate on the board\n" +
-                          "<Space> - Reveal a field\n" +
-                          "F - Place/Remove a flag").withBorder(Borders.singleLine()),
-                new EmptySpace(),
-                new Label("If a revealed field has equal number of\n" +
-                          "surrounding flags and bombs, you can\n" +
-                          "use <Space> on it to chord"),
-                new EmptySpace(),
-                new SFXButton("OK", sfx, true, win::close)
-        ));
-        gui.addWindowAndWait(win);
     }
 
     private void updateBoard() {

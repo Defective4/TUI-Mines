@@ -7,8 +7,16 @@ import io.github.defective4.javajam.tuisweeper.core.replay.ReplayIO;
 import java.io.InputStream;
 import java.net.URL;
 
+/**
+ * Stores information about a replay stored in remote repository.
+ *
+ * @author Defective
+ */
 public class RemoteReplay {
 
+    /**
+     * Replay sorting options
+     */
     public enum Sorting {
         DATE("Date added"), TIME("Replay time"), CREATED("Date created");
         private final String name;

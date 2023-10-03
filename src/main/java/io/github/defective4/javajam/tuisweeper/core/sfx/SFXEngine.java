@@ -7,6 +7,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * SFX engine loads, stores and plays WAVE sound files
+ * associated with certaing events in the application.
+ * <p>
+ * It's mainly used in separate SFX components.
+ *
+ * @author Defective
+ */
 public class SFXEngine {
     private final AudioFormat FORMAT = new AudioFormat(44100, 16, 1, true, false);
 

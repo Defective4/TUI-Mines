@@ -5,6 +5,9 @@ import com.googlecode.lanterna.gui2.Interactable;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 
+/**
+ * @author Defective
+ */
 public class SFXComboBox<T> extends ComboBox<T> {
 
     private final SFXEngine sfx;

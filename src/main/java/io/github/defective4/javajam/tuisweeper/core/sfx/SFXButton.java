@@ -3,6 +3,9 @@ package io.github.defective4.javajam.tuisweeper.core.sfx;
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.Interactable;
 
+/**
+ * @author Defective
+ */
 public class SFXButton extends Button {
 
     private final SFXEngine sfx;

@@ -7,8 +7,16 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Leaderboards use SQLite database to store user's highscores.
+ *
+ * @author Defective
+ */
 public class Leaderboards {
 
+    /**
+     * A leaderboard entry
+     */
     public static class Entry {
         private final long date, time;
 

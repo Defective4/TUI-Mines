@@ -4,6 +4,9 @@ package io.github.defective4.javajam.tuisweeper.core.sfx;
 import com.googlecode.lanterna.gui2.CheckBox;
 import com.googlecode.lanterna.gui2.Interactable;
 
+/**
+ * @author Defective
+ */
 public class SFXCheckBox extends CheckBox {
 
     private final SFXEngine sfx;

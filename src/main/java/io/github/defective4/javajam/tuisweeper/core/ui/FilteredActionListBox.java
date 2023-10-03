@@ -3,6 +3,9 @@ package io.github.defective4.javajam.tuisweeper.core.ui;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.ActionListBox;
 
+/**
+ * @author Defective
+ */
 public class FilteredActionListBox extends ActionListBox {
 
     private final String filterExtension;

@@ -4,22 +4,25 @@ import net.arikia.dev.drpc.DiscordEventHandlers;
 import net.arikia.dev.drpc.DiscordRPC;
 import net.arikia.dev.drpc.DiscordRichPresence;
 
+/**
+ * Provides methods to easily init and update Discord Rich Presence
+ *
+ * @author Defective
+ */
 public final class DiscordIntegr {
-    private DiscordIntegr() {
-    }
+    private static long LAST_UPDATE = System.currentTimeMillis();
+    private static long START_DATE = System.currentTimeMillis();
+    private static boolean enabled;
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::discordShutdown));
+    }
+    private DiscordIntegr() {
     }
 
     public static void init() {
         DiscordRPC.discordInitialize("1158412076516114472", new DiscordEventHandlers(), true);
     }
-
-    private static long LAST_UPDATE = System.currentTimeMillis();
-    private static long START_DATE = System.currentTimeMillis();
-
-    private static boolean enabled;
 
     public static boolean isEnabled() {
         return enabled;

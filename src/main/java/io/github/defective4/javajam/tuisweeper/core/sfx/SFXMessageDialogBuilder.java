@@ -11,6 +11,9 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * @author Defective
+ */
 public class SFXMessageDialogBuilder extends MessageDialogBuilder {
     private final SFXEngine sfx;
 

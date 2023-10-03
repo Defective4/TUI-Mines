@@ -6,6 +6,11 @@ import io.github.defective4.javajam.tuisweeper.core.sfx.SFXTextBox;
 
 import java.util.regex.Pattern;
 
+/**
+ * A special text box accepting only numbers in specified range.
+ *
+ * @author Defective
+ */
 public class NumberBox extends SFXTextBox {
 
     private int min = 1;

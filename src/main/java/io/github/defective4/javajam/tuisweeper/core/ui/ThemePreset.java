@@ -5,6 +5,11 @@ import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 
 import static com.googlecode.lanterna.TextColor.ANSI;
 
+/**
+ * Contains built-in theme presets
+ *
+ * @author Defective
+ */
 public enum ThemePreset {
     NONE,
     SEPARATOR,

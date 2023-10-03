@@ -3,6 +3,11 @@ package io.github.defective4.javajam.tuisweeper.core.replay;
 import io.github.defective4.javajam.tuisweeper.core.MineBoard;
 import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
 
+/**
+ * Records a game session to {@link Replay} instance
+ *
+ * @author Defective
+ */
 public class ReplayRecorder {
     private final MineBoard board;
     private final TUISweeper game;

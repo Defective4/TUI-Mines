@@ -16,6 +16,9 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * @author Defective
+ */
 public class CustomFileDialogBuilder extends FileDialogBuilder {
 
     private final boolean save;

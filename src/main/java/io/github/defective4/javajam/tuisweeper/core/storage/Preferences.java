@@ -19,8 +19,16 @@ import static com.googlecode.lanterna.TextColor.RGB;
 import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.optimize;
 import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.toRGB;
 
+/**
+ * Stores user's game preferences, theme and options
+ *
+ * @author Defective
+ */
 public class Preferences {
 
+    /**
+     * A user-defined theme entry
+     */
     public static class UserTheme {
 
         private RGB baseForeground, baseBackground, editableForeground, editableBackground, selectedForeground, selectedBackground;
@@ -121,6 +129,9 @@ public class Preferences {
         }
     }
 
+    /**
+     * Stores user's options
+     */
     public static class Options {
         private boolean screenShaking = true;
         private boolean sounds = true;

@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
+/**
+ * Utility class to read and write replays to file.
+ *
+ * @author Defective
+ */
 public final class ReplayIO {
     private ReplayIO() {
     }

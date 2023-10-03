@@ -21,6 +21,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Utility class used to show exception dialogs to user.
+ *
+ * @author Defective
+ */
 public final class ErrorDialog {
     private ErrorDialog() {
     }

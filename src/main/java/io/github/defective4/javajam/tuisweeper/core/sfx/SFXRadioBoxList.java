@@ -5,6 +5,9 @@ import com.googlecode.lanterna.gui2.RadioBoxList;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 
+/**
+ * @author Defective
+ */
 public class SFXRadioBoxList<T> extends RadioBoxList<T> {
     private final SFXEngine sfx;
 
