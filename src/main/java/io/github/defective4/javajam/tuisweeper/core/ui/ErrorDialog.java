@@ -40,7 +40,7 @@ public final class ErrorDialog {
                 Panels.horizontal(
                         new SFXButton("Ok", sfx, true, win::close),
                         new SFXButton("Show stack trace", sfx, false, () -> {
-                            Window trace = new SimpleWindow("Exception stack trace", Locale.ENGLISH);
+                            Window trace = new SimpleWindow("Exception stack trace");
                             List<String> stackTrace = new ArrayList<>();
                             stackTrace.add(e.toString());
                             stackTrace.addAll(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(
