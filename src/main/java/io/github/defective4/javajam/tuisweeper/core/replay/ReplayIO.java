@@ -22,7 +22,7 @@ public final class ReplayIO {
     public static void write(Replay replay, File output) throws IOException {
         try (DataOutputStream os = new DataOutputStream(new DeflaterOutputStream(Files.newOutputStream(output.toPath())))) {
             byte[] header = "TUIRPL1".getBytes();
-            os.writeInt(header.length);
+            os.writeByte(header.length);
             os.write(header); // Write header
             os.writeLong(replay.getSeed()); // Write seed
             os.write(Arrays.copyOf(replay.getMetadata().getIdentifier().getBytes(StandardCharsets.UTF_8),
@@ -32,23 +32,23 @@ public final class ReplayIO {
             os.writeLong(replay.getMetadata().getCreatedDate());
             os.writeByte(replay.getMetadata().getDifficulty().getId()); // Write difficulty
 
-            os.writeInt(replay.getWidth());
-            os.writeInt(replay.getHeight()); // Write WidthxHeight
+            os.writeByte(replay.getWidth());
+            os.writeByte(replay.getHeight()); // Write WidthxHeight
 
             List<Replay.CoordPair> bombs = replay.getBombs(); // Write bombs
             os.writeInt(bombs.size());
             for (Replay.CoordPair bomb : bombs) {
-                os.writeInt(bomb.getX());
-                os.writeInt(bomb.getY());
+                os.writeByte(bomb.getX());
+                os.writeByte(bomb.getY());
             }
 
             List<Replay.Action> actions = replay.getActions(); // Write actions
             os.writeInt(actions.size());
             for (Replay.Action act : actions) {
                 os.writeByte(act.getAction().getId());
-                os.writeInt(act.getX());
-                os.writeInt(act.getY());
-                os.writeLong(act.getTimestamp());
+                os.writeByte(act.getX());
+                os.writeByte(act.getY());
+                os.writeInt((int) act.getTimestamp());
             }
         }
     }
@@ -63,7 +63,7 @@ public final class ReplayIO {
 
     public static Replay read(InputStream input) throws IOException {
         try (DataInputStream is = new DataInputStream(new InflaterInputStream(input))) {
-            byte[] header = new byte[is.readInt()];
+            byte[] header = new byte[is.readByte()];
             is.read(header);
             if (!"TUIRPL1".equals(new String(header))) {
                 throw new IOException("Invalid file header!");
@@ -75,20 +75,20 @@ public final class ReplayIO {
             long startTime = is.readLong();
             long createTime = is.readLong();
             Difficulty diff = Difficulty.getByID(is.readByte());
-            int width = is.readInt();
-            int height = is.readInt();
+            int width = is.readByte();
+            int height = is.readByte();
             int count;
             count = is.readInt();
             Replay rp = new Replay(startTime);
             List<Replay.CoordPair> bombs = rp.getBombs();
             for (int x = 0; x < count; x++)
-                bombs.add(new Replay.CoordPair(is.readInt(), is.readInt()));
+                bombs.add(new Replay.CoordPair(is.readByte(), is.readByte()));
             count = is.readInt();
             List<Replay.Action> actions = rp.getActions();
             for (int x = 0; x < count; x++) {
                 Replay.ActionType type = Replay.ActionType.getByID(is.readByte());
                 if (type != null)
-                    actions.add(new Replay.Action(type, is.readInt(), is.readInt(), is.readLong()));
+                    actions.add(new Replay.Action(type, is.readByte(), is.readByte(), is.readInt()));
             }
 
             rp.setSeed(seed);
