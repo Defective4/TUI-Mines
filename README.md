@@ -1,7 +1,6 @@
 <img alt="logo" height="128" src="img/logo.png" width="128"/>
 
-[Releases](https://github.com/Defective4/TUI-Mines/releases) | **[Installation](#installation)
-** | [Share your theme/replay](#-share-your-theme-or-replay)
+[Releases](https://github.com/Defective4/TUI-Mines/releases) | [**Installation**](#-installation) | [Share your theme/replay](#-share-your-theme-or-replay)
 
 # ![info](img/info.png) Description
 
