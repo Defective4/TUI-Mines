@@ -1,6 +1,6 @@
 <img alt="logo" height="128" src="img/logo.png" width="128"/>
 
-[Releases](https://github.com/Defective4/TUI-Mines/releases) | **[Installation](https://github.com/Defective4/TUI-Mines#-installation)** | [Share your theme/replay](https://github.com/Defective4/TUI-Mines#-share-your-theme-or-replay)
+[Releases](https://github.com/Defective4/TUI-Mines/releases) | **[Installation](#installation)** | [Share your theme/replay](#-share-your-theme-or-replay)
 
 # ![info](img/info.png) Description
 TUI Mines is a game created for the Java Jam hosted at [Java Community](https://discord.com/invite/X3NmMgzFKF) Discord server.  
@@ -8,12 +8,12 @@ It's a Minesweeper clone designed to run entirely in terminal.
 The game also has its own terminal emulator that can be used as an alternative.
 
 # ![installation](img/install.png) Installation
-|                               Contents                                |
-|:---------------------------------------------------------------------:|
-| [Requirements](https://github.com/Defective4/TUI-Mines#requirements)  |
-|      [Windows](https://github.com/Defective4/TUI-Mines#windows)       |
-|        [Linux](https://github.com/Defective4/TUI-Mines#linux)         |
-|        [Other](https://github.com/Defective4/TUI-Mines#Other)         |
+|           Contents            |
+|:-----------------------------:|
+| [Requirements](#requirements) |
+|      [Windows](#windows)      |
+|        [Linux](#linux)        |
+|        [Other](#other)        |
 
 ## Requirements
 On all platforms the Java Runtime Environment is required to run the TUI Mines.  
