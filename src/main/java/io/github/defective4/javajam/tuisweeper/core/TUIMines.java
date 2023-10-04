@@ -49,7 +49,7 @@ import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.a
  *
  * @author Defective
  */
-public class TUISweeper {
+public class TUIMines {
 
     private static final DecimalFormat doubleFormat = new DecimalFormat("#.##");
     private static final char[] CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
@@ -77,7 +77,7 @@ public class TUISweeper {
     private boolean isReplay;
     private Replay currentReplay;
 
-    public TUISweeper(Screen screen, WindowBasedTextGUI gui, Terminal term, SFXEngine sfx, Preferences prefs) {
+    public TUIMines(Screen screen, WindowBasedTextGUI gui, Terminal term, SFXEngine sfx, Preferences prefs) {
         this.screen = screen;
         this.gui = gui;
         this.term = term;
@@ -219,10 +219,10 @@ public class TUISweeper {
                                 bBox.setTextChangeListener(listener);
 
                                 Button confirm = new SFXButton("Confirm", sfx, () -> {
-                                    TUISweeper.this.prefs.setDifficulty(radio.getCheckedItem());
-                                    TUISweeper.this.prefs.setWidth(wBox.getValue());
-                                    TUISweeper.this.prefs.setHeight(hBox.getValue());
-                                    TUISweeper.this.prefs.setBombs(bBox.getValue());
+                                    TUIMines.this.prefs.setDifficulty(radio.getCheckedItem());
+                                    TUIMines.this.prefs.setWidth(wBox.getValue());
+                                    TUIMines.this.prefs.setHeight(hBox.getValue());
+                                    TUIMines.this.prefs.setBombs(bBox.getValue());
                                     try {
                                         prefs.save();
                                     } catch (IOException e) {
@@ -251,7 +251,7 @@ public class TUISweeper {
                                         if (radio.isFocused()) confirm.takeFocus();
                                     } else if (radio.isFocused()) wBox.takeFocus();
                                 });
-                                radio.setCheckedItem(TUISweeper.this.prefs.getDifficulty());
+                                radio.setCheckedItem(TUIMines.this.prefs.getDifficulty());
                                 win2.setComponent(Panels.grid(2,
                                                               Panels.vertical(radio.withBorder(Borders.singleLine())),
                                                               Panels.vertical(new Label("Width"),
@@ -276,23 +276,23 @@ public class TUISweeper {
                             Button theme = new SFXButton("Theme", sfx, () -> {
                                 Window win2 = new SimpleWindow("Theming");
 
-                                Preferences.UserTheme ut = TUISweeper.this.prefs.getTheme();
-                                ColorChooserButton bfColor = new ColorChooserButton(TUISweeper.this.gui,
+                                Preferences.UserTheme ut = TUIMines.this.prefs.getTheme();
+                                ColorChooserButton bfColor = new ColorChooserButton(TUIMines.this.gui,
                                                                                     ut.getBaseForeground(),
                                                                                     sfx);
-                                ColorChooserButton bbColor = new ColorChooserButton(TUISweeper.this.gui,
+                                ColorChooserButton bbColor = new ColorChooserButton(TUIMines.this.gui,
                                                                                     ut.getBaseBackground(),
                                                                                     sfx);
-                                ColorChooserButton efColor = new ColorChooserButton(TUISweeper.this.gui,
+                                ColorChooserButton efColor = new ColorChooserButton(TUIMines.this.gui,
                                                                                     ut.getEditableForeground(),
                                                                                     sfx);
-                                ColorChooserButton ebColor = new ColorChooserButton(TUISweeper.this.gui,
+                                ColorChooserButton ebColor = new ColorChooserButton(TUIMines.this.gui,
                                                                                     ut.getEditableBackground(),
                                                                                     sfx);
-                                ColorChooserButton sfColor = new ColorChooserButton(TUISweeper.this.gui,
+                                ColorChooserButton sfColor = new ColorChooserButton(TUIMines.this.gui,
                                                                                     ut.getSelectedForeground(),
                                                                                     sfx);
-                                ColorChooserButton sbColor = new ColorChooserButton(TUISweeper.this.gui,
+                                ColorChooserButton sbColor = new ColorChooserButton(TUIMines.this.gui,
                                                                                     ut.getSelectedBackground(),
                                                                                     sfx);
 
@@ -515,7 +515,7 @@ public class TUISweeper {
                             };
                             Button options = new SFXButton("Options", sfx, () -> {
                                 Window win2 = new SimpleWindow("Options");
-                                Preferences.Options ops = TUISweeper.this.prefs.getOptions();
+                                Preferences.Options ops = TUIMines.this.prefs.getOptions();
                                 boolean sndAvailable = sfx.isAvailable();
                                 boolean guiAvailable = term
                                         instanceof SwingTerminalFrame;
@@ -732,7 +732,7 @@ public class TUISweeper {
 
             List<String> dl = new ArrayList<>();
             dl.add("All");
-            dl.addAll(Arrays.stream(Difficulty.values()).map(TUISweeper::capitalize).collect(Collectors.toList()));
+            dl.addAll(Arrays.stream(Difficulty.values()).map(TUIMines::capitalize).collect(Collectors.toList()));
             ComboBox<String> diffs = new SFXComboBox<>(sfx, dl.toArray(new String[0]));
             ComboBox<RemoteReplay.Sorting> sort = new SFXComboBox<>(sfx, RemoteReplay.Sorting.values());
 
@@ -921,7 +921,7 @@ public class TUISweeper {
         List<String> difList = new ArrayList<>();
         difList.add("All");
         difList.addAll(Arrays.stream(Difficulty.values())
-                             .map(TUISweeper::capitalize)
+                             .map(TUIMines::capitalize)
                              .collect(Collectors.toList()));
         ComboBox<String> difs = new SFXComboBox<>(sfx, difList.toArray(new String[0]));
 
@@ -1516,7 +1516,7 @@ public class TUISweeper {
         String emote = gameOver == 0 ? ":)" : gameOver == 1 ? "X(" : "B)";
         labelText.append("  ")
                  .append(emote)
-                 .append("   TUI-Sweeper    Difficulty: ")
+                 .append("   TUI-Mines    Difficulty: ")
                  .append(currentReplay != null && isReplay ? currentReplay.getMetadata()
                                                                           .getDifficulty() : localDifficulty);
         int wh = screen.getTerminalSize().getColumns();

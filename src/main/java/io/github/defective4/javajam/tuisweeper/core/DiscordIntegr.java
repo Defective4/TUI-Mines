@@ -28,7 +28,7 @@ public final class DiscordIntegr {
         return enabled;
     }
 
-    public static void setEnabled(boolean enabled, TUISweeper game) {
+    public static void setEnabled(boolean enabled, TUIMines game) {
         DiscordIntegr.enabled = enabled;
         if (!enabled)
             DiscordRPC.discordClearPresence();
@@ -43,11 +43,11 @@ public final class DiscordIntegr {
     public static void title() {
         if (enabled)
             DiscordRPC.discordUpdatePresence(new DiscordRichPresence.Builder("In title screen")
-                                                     .setBigImage("sweeper-logo", "TUI Sweeper")
+                                                     .setBigImage("sweeper-logo", "TUI Mines")
                                                      .build());
     }
 
-    public static void update(TUISweeper game) {
+    public static void update(TUIMines game) {
         if (!enabled)
             return;
         if (System.currentTimeMillis() - LAST_UPDATE < 2000) {
@@ -55,11 +55,11 @@ public final class DiscordIntegr {
         }
         LAST_UPDATE = System.currentTimeMillis();
         String state = game.isReplay() ? "Watching a replay" : game.getGameOver() == 2 ? "Game won! (in " + game.getCurrentPlayingTime() + ")" : game.getGameOver() == 1 ? "Game Over" : "Playing";
-        DiscordRPC.discordUpdatePresence(new DiscordRichPresence.Builder(TUISweeper.capitalize(game.getLocalDifficulty()) + " (" + game.getPercentDone() + "%)")
-                                                 .setBigImage("sweeper-logo", "TUI Sweeper")
+        DiscordRPC.discordUpdatePresence(new DiscordRichPresence.Builder(TUIMines.capitalize(game.getLocalDifficulty()) + " (" + game.getPercentDone() + "%)")
+                                                 .setBigImage("sweeper-logo", "TUI Mines")
                                                  .setSmallImage(game.getLocalDifficulty().name().toLowerCase(),
                                                                 String.format("%s (%sx%s - %s bombs)",
-                                                                              TUISweeper.capitalize(game.getLocalDifficulty()),
+                                                                              TUIMines.capitalize(game.getLocalDifficulty()),
                                                                               game.getWidth(),
                                                                               game.getHeight(),
                                                                               game.getBombs()))

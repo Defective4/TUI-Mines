@@ -44,6 +44,6 @@ public enum Difficulty {
 
     @Override
     public String toString() {
-        return TUISweeper.capitalize(this);
+        return TUIMines.capitalize(this);
     }
 }

@@ -12,7 +12,7 @@ import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import io.github.defective4.javajam.tuisweeper.core.DiscordIntegr;
-import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
+import io.github.defective4.javajam.tuisweeper.core.TUIMines;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
@@ -99,11 +99,11 @@ public final class Main {
 
                         Window twin = new SimpleWindow("First time");
                         twin.setComponent(Panels.vertical(
-                                new Label("It looks like it's your first time playing TUI Sweeper!"),
+                                new Label("It looks like it's your first time playing TUI Mines!"),
                                 new EmptySpace(),
                                 Panels.horizontal(
                                         new SFXButton("Continue", sfx, true, twin::close),
-                                        new SFXButton("View controls", sfx, false, () -> TUISweeper.showCtls(gui, sfx))
+                                        new SFXButton("View controls", sfx, false, () -> TUIMines.showCtls(gui, sfx))
                                 )
                         ));
                         gui.addWindowAndWait(twin);
@@ -111,7 +111,7 @@ public final class Main {
                     win.setVisible(false);
                     timer.cancel();
                     prefs.setFirstBoot(false);
-                    TUISweeper game = new TUISweeper(screen, gui, term, sfx, prefs);
+                    TUIMines game = new TUIMines(screen, gui, term, sfx, prefs);
                     game.start();
                     game.show();
                 }
@@ -127,7 +127,7 @@ public final class Main {
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setSize((int) (dim.getWidth() - 4), (int) dim.getHeight());
                 frame.setLocation(2, 0);
-                frame.setTitle("TUI-Sweeper");
+                frame.setTitle("TUI-Mines");
                 try {
                     frame.setIconImage(ImageIO.read(Main.class.getResourceAsStream("/logo.png")));
                 } catch (Exception e) {
@@ -142,7 +142,7 @@ public final class Main {
                         new MessageDialogBuilder()
                                 .setTitle("Native warning")
                                 .addButton(MessageDialogButton.Continue)
-                                .setText("It looks like you are running TUI-Sweeper\n" + "in a native terminal.\n" + "If you run into any issues try launching\n" + "this app with argument \"-gui\",\n" + "for example:\n" + "java -jar tui-sweeper.jar -gui")
+                                .setText("It looks like you are running TUI-Mines\n" + "in a native terminal.\n" + "If you run into any issues try launching\n" + "this app with argument \"-gui\",\n" + "for example:\n" + "java -jar tui-mines.jar -gui")
                                 .build().showDialog(gui);
                     }
                 }, 1);

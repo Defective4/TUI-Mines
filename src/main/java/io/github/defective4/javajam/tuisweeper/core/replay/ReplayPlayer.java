@@ -1,7 +1,7 @@
 package io.github.defective4.javajam.tuisweeper.core.replay;
 
 import com.googlecode.lanterna.gui2.TextBox;
-import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
+import io.github.defective4.javajam.tuisweeper.core.TUIMines;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ReplayPlayer {
 
-    private final TUISweeper game;
+    private final TUIMines game;
     private final TextBox box;
     private final SFXEngine sfx;
 
@@ -25,7 +25,7 @@ public class ReplayPlayer {
     private final List<ScheduledFuture<?>> tasks = new ArrayList<>();
     private boolean stopped = true;
 
-    public ReplayPlayer(TUISweeper game, TextBox box, SFXEngine sfx) {
+    public ReplayPlayer(TUIMines game, TextBox box, SFXEngine sfx) {
         this.game = game;
         this.box = box;
         this.sfx = sfx;

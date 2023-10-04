@@ -1,6 +1,6 @@
 package io.github.defective4.javajam.tuisweeper.core.ui;
 
-import io.github.defective4.javajam.tuisweeper.core.TUISweeper;
+import io.github.defective4.javajam.tuisweeper.core.TUIMines;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 
 import static com.googlecode.lanterna.TextColor.ANSI;
@@ -76,7 +76,7 @@ public enum ThemePreset {
             case NONE:
                 return "<Choose>";
             default:
-                return TUISweeper.capitalize(this);
+                return TUIMines.capitalize(this);
         }
     }
 }
