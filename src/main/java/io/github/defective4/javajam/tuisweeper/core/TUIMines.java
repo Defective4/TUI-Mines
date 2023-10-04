@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -977,6 +978,37 @@ public class TUIMines {
                                                       win2.close();
                                                       replays.remove(repl);
                                                       difs.setSelectedIndex(difs.getSelectedIndex());
+                                                  }
+                                              }),
+                                              new SFXButton("Share", sfx, () -> {
+                                                  CustomFileDialogBuilder builder = (CustomFileDialogBuilder)
+                                                          new CustomFileDialogBuilder(true, sfx)
+                                                                  .setForcedExtension("jbcfrt")
+                                                                  .setTitle("Exporting a replay")
+                                                                  .setActionLabel("Save")
+                                                                  .setSelectedFile(new File("replay.jbcfrt"))
+                                                                  .setDescription("Choose where to save the replay");
+                                                  File target = builder.buildAndShow(gui);
+                                                  if (target != null) {
+                                                      File orig = repl.getMetadata().getOrigin();
+                                                      if (orig.isFile()) {
+                                                          try {
+                                                              Files.copy(orig.toPath(),
+                                                                         target.toPath(),
+                                                                         StandardCopyOption.COPY_ATTRIBUTES,
+                                                                         StandardCopyOption.REPLACE_EXISTING);
+                                                              new SFXMessageDialogBuilder(sfx)
+                                                                      .setTitle("Success")
+                                                                      .setText("Replay exported!")
+                                                                      .addButton(MessageDialogButton.OK)
+                                                                      .build().showDialog(gui);
+                                                          } catch (Exception e) {
+                                                              showErrorDialog(gui,
+                                                                              e,
+                                                                              sfx,
+                                                                              "Couldn't export your replay!");
+                                                          }
+                                                      }
                                                   }
                                               }))
                     ));

@@ -62,7 +62,7 @@ public class CustomFileDialogBuilder extends FileDialogBuilder {
                 field.setAccessible(true);
                 ((Button) field.get(dial)).takeFocus();
 
-                if (forcedExtension != null && !save) {
+                if (forcedExtension != null) {
                     field = FileDialog.class.getDeclaredField("fileListBox");
                     field.setAccessible(true);
                     Field fin = Field.class.getDeclaredField("modifiers");
