@@ -29,7 +29,7 @@ public class Repository {
         void completed(Exception ex);
     }
 
-    private static final String REPO = "http://10.0.0.1:8080/repo.php";
+    private static final String REPO = "https://raw.githubusercontent.com/Defective4/TUI-Mines-Repo/master/repo.json";
 
     private final List<RemoteTheme> themes = new ArrayList<>();
     private final List<RemoteReplay> replays = new ArrayList<>();

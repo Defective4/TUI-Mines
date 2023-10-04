@@ -44,13 +44,15 @@ public final class Dialogs {
 
     public static void showErrorDialog(WindowBasedTextGUI gui, Exception e, SFXEngine sfx, String... text) {
         Window win = new SimpleWindow("Error");
+        String msg = e.getLocalizedMessage();
+        String cName = e.getClass().getSimpleName();
 
         win.setComponent(Panels.vertical(
                 new Label(String.join("\n", text)),
                 new EmptySpace(), new Label("Exception:"),
-                new Label(e.getClass().getSimpleName() + ": " + e.getMessage()).setPreferredSize(new TerminalSize(40,
-                                                                                                                  1))
-                                                                               .withBorder(Borders.singleLine()),
+                new Label(msg == null ? cName : cName + ": " + msg).setPreferredSize(new TerminalSize(40,
+                                                                                                      1))
+                                                                   .withBorder(Borders.singleLine()),
                 new EmptySpace(),
                 Panels.horizontal(
                         new SFXButton("Ok", sfx, true, win::close),
