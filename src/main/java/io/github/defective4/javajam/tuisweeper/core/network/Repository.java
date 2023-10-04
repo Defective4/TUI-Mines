@@ -35,7 +35,7 @@ public class Repository {
     private final List<RemoteReplay> replays = new ArrayList<>();
 
     private final ExecutorService service = Executors.newFixedThreadPool(1);
-
+    private boolean stopped = true;
 
     public RemoteTheme[] getThemes() {
         return themes.toArray(new RemoteTheme[0]);
@@ -44,8 +44,6 @@ public class Repository {
     public RemoteReplay[] getReplays() {
         return replays.toArray(new RemoteReplay[0]);
     }
-
-    private boolean stopped = true;
 
     public void cancel(Future<?> future) {
         future.cancel(true);

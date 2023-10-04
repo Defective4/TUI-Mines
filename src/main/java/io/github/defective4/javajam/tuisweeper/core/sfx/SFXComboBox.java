@@ -6,6 +6,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 
 /**
+ * @param <T>
  * @author Defective
  */
 public class SFXComboBox<T> extends ComboBox<T> {

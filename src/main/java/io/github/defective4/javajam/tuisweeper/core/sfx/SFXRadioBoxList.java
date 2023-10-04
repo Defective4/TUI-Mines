@@ -6,6 +6,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 
 /**
+ * @param <T>
  * @author Defective
  */
 public class SFXRadioBoxList<T> extends RadioBoxList<T> {

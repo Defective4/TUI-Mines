@@ -58,7 +58,9 @@ public final class DiscordIntegr {
         String state = game.isReplay() ? "Watching a replay" : game.getGameOver() == 2 ? "Game won! (in " + game.getCurrentPlayingTime() + ")" : game.getGameOver() == 1 ? "Game Over" : "Playing";
         DiscordRPC.discordUpdatePresence(new DiscordRichPresence.Builder(TUIMines.capitalize(game.getLocalDifficulty()) + " (" + game.getPercentDone() + "%)")
                                                  .setBigImage("sweeper-logo", "TUI Mines")
-                                                 .setSmallImage(game.isReplay() ? "replay" : game.getLocalDifficulty().name().toLowerCase(),
+                                                 .setSmallImage(game.isReplay() ? "replay" : game.getLocalDifficulty()
+                                                                                                 .name()
+                                                                                                 .toLowerCase(),
                                                                 String.format("%s (%sx%s - %s bombs)" + (game.isReplay() ? "(Replay)" : ""),
                                                                               TUIMines.capitalize(
                                                                                       game.getLocalDifficulty()),

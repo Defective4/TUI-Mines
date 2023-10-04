@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * @param <T>
  * @author Defective
  */
 public class SFXListSelectDialogBuilder<T> extends ListSelectDialogBuilder<T> {
