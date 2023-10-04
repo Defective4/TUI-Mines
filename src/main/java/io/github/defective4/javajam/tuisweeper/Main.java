@@ -28,7 +28,7 @@ import java.io.InputStreamReader;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static io.github.defective4.javajam.tuisweeper.core.ui.ErrorDialog.showErrorDialog;
+import static io.github.defective4.javajam.tuisweeper.core.ui.Dialogs.showErrorDialog;
 
 /**
  * Main entry point of the game

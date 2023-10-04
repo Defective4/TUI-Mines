@@ -35,15 +35,19 @@ import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static io.github.defective4.javajam.tuisweeper.core.replay.Replay.*;
-import static io.github.defective4.javajam.tuisweeper.core.ui.ErrorDialog.showErrorDialog;
+import static io.github.defective4.javajam.tuisweeper.core.ui.Dialogs.showDownloadingWindow;
+import static io.github.defective4.javajam.tuisweeper.core.ui.Dialogs.showErrorDialog;
 import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.applyBackground;
 
 /**
  * The main game class.
  * Most of the game and application logic happens here.
+ *
+ * @author Defective
  */
 public class TUISweeper {
 
@@ -222,7 +226,7 @@ public class TUISweeper {
                                     try {
                                         prefs.save();
                                     } catch (IOException e) {
-                                        ErrorDialog.showErrorDialog(gui, e, sfx, "Couldn't save preferences!");
+                                        Dialogs.showErrorDialog(gui, e, sfx, "Couldn't save preferences!");
                                     }
 
                                     win.close();
@@ -319,48 +323,68 @@ public class TUISweeper {
                                     ThemePreset preset = presets.getItem(i);
                                     if (preset == ThemePreset.ONLINE) {
                                         presets.setSelectedIndex(0);
-                                        Exception ex = remoteRepo.fetch();
-                                        if (ex != null) {
-                                            showErrorDialog(gui, ex, sfx, "Couldn't download from remote repository!");
-                                            return;
-                                        }
-
-                                        Window themes = new SimpleWindow("Theme repository");
-
-                                        Table<Object> table = new Table<>("Name", "Version", "Author");
-                                        TableModel<Object> model = table.getTableModel();
-                                        RemoteTheme[] ths = remoteRepo.getThemes();
-                                        int width = 40;
-                                        if (ths.length > 0) {
-                                            int index = 0;
-                                            for (RemoteTheme th : ths) {
-                                                model.addRow(th.getName(), th.getVersion(), th.getAuthor());
-                                                width = Math.max(width,
-                                                                 th.getName().length() + th.getVersion()
-                                                                                           .length() + th.getAuthor()
-                                                                                                         .length() + 6);
-                                                index++;
+                                        win2.close();
+                                        win.close();
+                                        Window downloading = showDownloadingWindow(gui);
+                                        Future<?> future = remoteRepo.fetch(ex -> {
+                                            downloading.close();
+                                            if (ex != null) {
+                                                showErrorDialog(gui,
+                                                                ex,
+                                                                sfx,
+                                                                "Couldn't download from remote repository!");
+                                                return;
                                             }
-                                        } else {
-                                            model.addRow("", "<Empty>", "");
-                                        }
-                                        table.setPreferredSize(new TerminalSize(width, 10));
-                                        table.setSelectAction(() -> {
-                                            int index = table.getSelectedRow();
-                                            if (index < ths.length) {
-                                                RemoteTheme sel = ths[index];
-                                                showThemeDetails(sel, win2, themes);
+
+                                            Window themes = new SimpleWindow("Theme repository");
+
+                                            Table<Object> table = new Table<>("Name", "Version", "Author");
+                                            TableModel<Object> model = table.getTableModel();
+                                            RemoteTheme[] ths = remoteRepo.getThemes();
+                                            int width = 40;
+                                            if (ths.length > 0) {
+                                                int index = 0;
+                                                for (RemoteTheme th : ths) {
+                                                    model.addRow(th.getName(), th.getVersion(), th.getAuthor());
+                                                    width = Math.max(width,
+                                                                     th.getName().length() + th.getVersion()
+                                                                                               .length() + th.getAuthor()
+                                                                                                             .length() + 6);
+                                                    index++;
+                                                }
+                                            } else {
+                                                model.addRow("", "<Empty>", "");
                                             }
+                                            table.setPreferredSize(new TerminalSize(width, 10));
+                                            table.setSelectAction(() -> {
+                                                int index = table.getSelectedRow();
+                                                if (index < ths.length) {
+                                                    RemoteTheme sel = ths[index];
+                                                    showThemeDetails(sel, win2, themes);
+                                                }
+                                            });
+
+                                            themes.setComponent(Panels.vertical(
+                                                    new Label("Browse themes made by others!"),
+                                                    new EmptySpace(),
+                                                    table.withBorder(Borders.singleLine()),
+                                                    new EmptySpace(),
+                                                    new SFXButton("Close", sfx, true, themes::close)
+                                            ));
+
+                                            gui.addWindowAndWait(themes);
                                         });
 
-                                        themes.setComponent(Panels.vertical(
-                                                new Label("Browse themes made by others!"),
-                                                new EmptySpace(),
-                                                table.withBorder(Borders.singleLine()),
-                                                new EmptySpace(),
-                                                new SFXButton("Close", sfx, true, themes::close)
-                                        ));
-                                        gui.addWindowAndWait(themes);
+                                        Button cancel = new SFXButton("Cancel",
+                                                                      sfx,
+                                                                      true,
+                                                                      () -> {
+                                                                          downloading.close();
+                                                                          remoteRepo.cancel(
+                                                                                  future);
+                                                                      });
+                                        ((Panel) downloading.getComponent()).addComponent(cancel);
+                                        cancel.takeFocus();
 
                                     } else if (preset != ThemePreset.NONE) {
                                         if (preset == ThemePreset.SEPARATOR) {
@@ -525,10 +549,10 @@ public class TUISweeper {
                                                                             try {
                                                                                 prefs.save();
                                                                             } catch (IOException e) {
-                                                                                ErrorDialog.showErrorDialog(gui,
-                                                                                                            e,
-                                                                                                            sfx,
-                                                                                                            "Couldn't save preferences!");
+                                                                                Dialogs.showErrorDialog(gui,
+                                                                                                        e,
+                                                                                                        sfx,
+                                                                                                        "Couldn't save preferences!");
                                                                             }
                                                                             win2.close();
                                                                         }),
@@ -694,165 +718,176 @@ public class TUISweeper {
     }
 
     private void openRemoteReplayBrowser() {
-        Exception ex = remoteRepo.fetch();
-        if (ex != null) {
-            showErrorDialog(gui, ex, sfx, "Couldn't download from remote repository!");
-            return;
-        }
-        Window win = new SimpleWindow("Replay browser");
-        List<RemoteReplay> replays = new ArrayList<>();
-        Collections.addAll(replays, remoteRepo.getReplays());
+        Window downloading = showDownloadingWindow(gui);
+        Future<?> future = remoteRepo.fetch(ex -> {
+            downloading.close();
+            if (ex != null) {
+                showErrorDialog(gui, ex, sfx, "Couldn't download from remote repository!");
+                return;
+            }
+            Window win = new SimpleWindow("Replay browser");
+            List<RemoteReplay> replays = new ArrayList<>();
+            Collections.addAll(replays, remoteRepo.getReplays());
 
 
-        List<String> dl = new ArrayList<>();
-        dl.add("All");
-        dl.addAll(Arrays.stream(Difficulty.values()).map(TUISweeper::capitalize).collect(Collectors.toList()));
-        ComboBox<String> diffs = new SFXComboBox<>(sfx, dl.toArray(new String[0]));
-        ComboBox<RemoteReplay.Sorting> sort = new SFXComboBox<>(sfx, RemoteReplay.Sorting.values());
+            List<String> dl = new ArrayList<>();
+            dl.add("All");
+            dl.addAll(Arrays.stream(Difficulty.values()).map(TUISweeper::capitalize).collect(Collectors.toList()));
+            ComboBox<String> diffs = new SFXComboBox<>(sfx, dl.toArray(new String[0]));
+            ComboBox<RemoteReplay.Sorting> sort = new SFXComboBox<>(sfx, RemoteReplay.Sorting.values());
 
-        Table<Object> table = new Table<>("#", "ID", "Author", "Time", "Difficulty");
-        table.setPreferredSize(new TerminalSize(50, 10));
+            Table<Object> table = new Table<>("#", "ID", "Author", "Time", "Difficulty");
+            table.setPreferredSize(new TerminalSize(50, 10));
 
-        table.setSelectAction(() -> {
-            Object selected = table.getTableModel().getRow(table.getSelectedRow()).get(0);
-            if (selected instanceof Integer) {
-                int index = (int) selected - 1;
-                if (index < replays.size()) {
-                    RemoteReplay replay = replays.get(index);
-                    Window win2 = new SimpleWindow("Replay info");
+            table.setSelectAction(() -> {
+                Object selected = table.getTableModel().getRow(table.getSelectedRow()).get(0);
+                if (selected instanceof Integer) {
+                    int index = (int) selected - 1;
+                    if (index < replays.size()) {
+                        RemoteReplay replay = replays.get(index);
+                        Window win2 = new SimpleWindow("Replay info");
 
-                    String id = replay.getIdentifier();
+                        String id = replay.getIdentifier();
 
-                    win2.setComponent(Panels.vertical(
-                            Panels.vertical(new Label("Identifier: " + (id.isEmpty() ? "<None>" : id)),
-                                            new Label("Author: " + replay.getAuthor()),
-                                            new Label("Play time: " + TIME_FORMAT.format(new Date(replay.getPlayTime()))))
-                                  .withBorder(Borders.singleLine("Info")),
-                            Panels.vertical(new Label("Difficulty: " + capitalize(replay.getDifficulty())),
-                                            new Label(String.format("Size: %sx%s (%s bombs)",
-                                                                    replay.getWidth(),
-                                                                    replay.getHeight(),
-                                                                    replay.getBombs())))
-                                  .withBorder(Borders.singleLine("Difficulty")),
-                            Panels.vertical(new Label("Added: " + DATE_FORMAT.format(new Date(replay.getAddedTime()))),
-                                            new Label("Created: " + DATE_FORMAT.format(new Date(replay.getCreatedTime()))))
-                                  .withBorder(Borders.singleLine("Times")),
-                            new EmptySpace(),
-                            Panels.horizontal(new SFXButton("Back", sfx, true, win2::close),
-                                              new SFXButton("Play", sfx, false, () -> {
-                                                  Replay rpl = replay.fetch();
-                                                  if (rpl == null) {
-                                                      new SFXMessageDialogBuilder(sfx).setText(
-                                                                                              "Couldn't download this replay!")
-                                                                                      .setTitle("Error")
-                                                                                      .addButton(MessageDialogButton.OK)
-                                                                                      .build().showDialog(gui);
-                                                  } else if (new SFXMessageDialogBuilder(sfx)
-                                                                     .addButton(MessageDialogButton.No)
-                                                                     .addButton(MessageDialogButton.Yes)
-                                                                     .setText(
-                                                                             "Playing a replay will discard your current game.\n" +
-                                                                             "Do you want to continue?")
-                                                                     .setTitle("Warning")
-                                                                     .build()
-                                                                     .showDialog(gui) == MessageDialogButton.Yes) {
-                                                      win2.close();
-                                                      win.close();
-                                                      startReplay(rpl);
-                                                  }
-                                              }),
-                                              new SFXButton("Download", sfx, false, () -> {
-                                                  Replay rpl = replay.fetch();
-                                                  if (rpl == null) {
-                                                      new SFXMessageDialogBuilder(sfx).setText(
-                                                                                              "Couldn't download this replay!")
-                                                                                      .setTitle("Error")
-                                                                                      .addButton(MessageDialogButton.OK)
-                                                                                      .build().showDialog(gui);
-                                                  } else {
-                                                      try {
-                                                          File dir = Preferences.getReplaysDir();
-                                                          dir.mkdirs();
-                                                          File out = new File(dir,
-                                                                              FILE_FORMAT.format(new Date()) + ".jbcfrt");
-                                                          ReplayIO.write(rpl, out);
-
+                        win2.setComponent(Panels.vertical(
+                                Panels.vertical(new Label("Identifier: " + (id.isEmpty() ? "<None>" : id)),
+                                                new Label("Author: " + replay.getAuthor()),
+                                                new Label("Play time: " + TIME_FORMAT.format(new Date(replay.getPlayTime()))))
+                                      .withBorder(Borders.singleLine("Info")),
+                                Panels.vertical(new Label("Difficulty: " + capitalize(replay.getDifficulty())),
+                                                new Label(String.format("Size: %sx%s (%s bombs)",
+                                                                        replay.getWidth(),
+                                                                        replay.getHeight(),
+                                                                        replay.getBombs())))
+                                      .withBorder(Borders.singleLine("Difficulty")),
+                                Panels.vertical(new Label("Added: " + DATE_FORMAT.format(new Date(replay.getAddedTime()))),
+                                                new Label("Created: " + DATE_FORMAT.format(new Date(replay.getCreatedTime()))))
+                                      .withBorder(Borders.singleLine("Times")),
+                                new EmptySpace(),
+                                Panels.horizontal(new SFXButton("Back", sfx, true, win2::close),
+                                                  new SFXButton("Play", sfx, false, () -> {
+                                                      Replay rpl = replay.fetch();
+                                                      if (rpl == null) {
                                                           new SFXMessageDialogBuilder(sfx).setText(
-                                                                                                  "Replay saved!\n" +
-                                                                                                  "You can now access it in your local replays.")
-                                                                                          .setTitle("Success")
+                                                                                                  "Couldn't download this replay!")
+                                                                                          .setTitle("Error")
                                                                                           .addButton(MessageDialogButton.OK)
                                                                                           .build().showDialog(gui);
+                                                      } else if (new SFXMessageDialogBuilder(sfx)
+                                                                         .addButton(MessageDialogButton.No)
+                                                                         .addButton(MessageDialogButton.Yes)
+                                                                         .setText(
+                                                                                 "Playing a replay will discard your current game.\n" +
+                                                                                 "Do you want to continue?")
+                                                                         .setTitle("Warning")
+                                                                         .build()
+                                                                         .showDialog(gui) == MessageDialogButton.Yes) {
                                                           win2.close();
-                                                      } catch (Exception e) {
-                                                          showErrorDialog(gui, e, sfx, "Couldn't save the replay!");
+                                                          win.close();
+                                                          startReplay(rpl);
                                                       }
-                                                  }
-                                              }))
-                    ));
-                    gui.addWindowAndWait(win2);
-                }
-            }
-        });
+                                                  }),
+                                                  new SFXButton("Download", sfx, false, () -> {
+                                                      Replay rpl = replay.fetch();
+                                                      if (rpl == null) {
+                                                          new SFXMessageDialogBuilder(sfx).setText(
+                                                                                                  "Couldn't download this replay!")
+                                                                                          .setTitle("Error")
+                                                                                          .addButton(MessageDialogButton.OK)
+                                                                                          .build().showDialog(gui);
+                                                      } else {
+                                                          try {
+                                                              File dir = Preferences.getReplaysDir();
+                                                              dir.mkdirs();
+                                                              File out = new File(dir,
+                                                                                  FILE_FORMAT.format(new Date()) + ".jbcfrt");
+                                                              ReplayIO.write(rpl, out);
 
-        diffs.addListener((i, i1, b) -> {
-            table.getTableModel().clear();
-            String dif = diffs.getItem(i);
-            int index = 0;
-            int added = 0;
-            for (RemoteReplay replay : replays) {
-                if ("all".equalsIgnoreCase(dif) || replay.getDifficulty().name().equalsIgnoreCase(dif)) {
-                    table.getTableModel().addRow(index + 1, replay.getIdentifier(),
-                                                 replay.getAuthor(),
-                                                 TIME_FORMAT.format(new Date(replay.getPlayTime())),
-                                                 capitalize(replay.getDifficulty()));
-                    added++;
-                }
-                index++;
-            }
-            if (added == 0) {
-                table.getTableModel().addRow("", "<No replays>", "", "", "");
-            }
-        });
-
-        sort.addListener((i, i1, b) -> {
-            RemoteReplay.Sorting s = sort.getItem(i);
-            if (s != null) {
-                Comparator<RemoteReplay> comparator;
-                switch (s) {
-                    default:
-                    case DATE: {
-                        comparator = (o1, o2) -> (int) (o1.getAddedTime() / 1000 - o2.getAddedTime() / 1000);
-                        break;
-                    }
-                    case TIME: {
-                        comparator = (o1, o2) -> (int) (o1.getPlayTime() - o2.getPlayTime());
-                        break;
-                    }
-                    case CREATED: {
-                        comparator = (o1, o2) -> (int) (o1.getCreatedTime() / 1000 - o2.getCreatedTime() / 1000);
-                        break;
+                                                              new SFXMessageDialogBuilder(sfx).setText(
+                                                                                                      "Replay saved!\n" +
+                                                                                                      "You can now access it in your local replays.")
+                                                                                              .setTitle("Success")
+                                                                                              .addButton(
+                                                                                                      MessageDialogButton.OK)
+                                                                                              .build().showDialog(gui);
+                                                              win2.close();
+                                                          } catch (Exception e) {
+                                                              showErrorDialog(gui, e, sfx, "Couldn't save the replay!");
+                                                          }
+                                                      }
+                                                  }))
+                        ));
+                        gui.addWindowAndWait(win2);
                     }
                 }
-                replays.sort(comparator);
-            }
-            diffs.setSelectedIndex(diffs.getSelectedIndex());
+            });
+
+            diffs.addListener((i, i1, b) -> {
+                table.getTableModel().clear();
+                String dif = diffs.getItem(i);
+                int index = 0;
+                int added = 0;
+                for (RemoteReplay replay : replays) {
+                    if ("all".equalsIgnoreCase(dif) || replay.getDifficulty().name().equalsIgnoreCase(dif)) {
+                        table.getTableModel().addRow(index + 1, replay.getIdentifier(),
+                                                     replay.getAuthor(),
+                                                     TIME_FORMAT.format(new Date(replay.getPlayTime())),
+                                                     capitalize(replay.getDifficulty()));
+                        added++;
+                    }
+                    index++;
+                }
+                if (added == 0) {
+                    table.getTableModel().addRow("", "<No replays>", "", "", "");
+                }
+            });
+
+            sort.addListener((i, i1, b) -> {
+                RemoteReplay.Sorting s = sort.getItem(i);
+                if (s != null) {
+                    Comparator<RemoteReplay> comparator;
+                    switch (s) {
+                        default:
+                        case DATE: {
+                            comparator = (o1, o2) -> (int) (o1.getAddedTime() / 1000 - o2.getAddedTime() / 1000);
+                            break;
+                        }
+                        case TIME: {
+                            comparator = (o1, o2) -> (int) (o1.getPlayTime() - o2.getPlayTime());
+                            break;
+                        }
+                        case CREATED: {
+                            comparator = (o1, o2) -> (int) (o1.getCreatedTime() / 1000 - o2.getCreatedTime() / 1000);
+                            break;
+                        }
+                    }
+                    replays.sort(comparator);
+                }
+                diffs.setSelectedIndex(diffs.getSelectedIndex());
+            });
+
+            sort.setSelectedIndex(0);
+
+
+            win.setComponent(Panels.vertical(
+                    Panels.grid(2, new Label("Filter by    "),
+                                new Label("Sort by"),
+                                diffs,
+                                sort),
+                    new EmptySpace(),
+                    table.withBorder(Borders.singleLine()),
+                    new SFXButton("Close", sfx, true, win::close)
+            ));
+            table.takeFocus();
+            gui.addWindowAndWait(win);
         });
 
-        sort.setSelectedIndex(0);
-
-
-        win.setComponent(Panels.vertical(
-                Panels.grid(2, new Label("Filter by    "),
-                            new Label("Sort by"),
-                            diffs,
-                            sort),
-                new EmptySpace(),
-                table.withBorder(Borders.singleLine()),
-                new SFXButton("Close", sfx, true, win::close)
-        ));
-        table.takeFocus();
-        gui.addWindowAndWait(win);
+        Button cancel = new SFXButton("Cancel", sfx, true, () -> {
+            downloading.close();
+            remoteRepo.cancel(future);
+        });
+        ((Panel) downloading.getComponent()).addComponent(cancel);
+        cancel.takeFocus();
     }
 
     private void openLocalReplayBrowser() {
@@ -1059,7 +1094,7 @@ public class TUISweeper {
         try {
             prefs.save();
         } catch (IOException e) {
-            ErrorDialog.showErrorDialog(gui, e, sfx, "Couldn't save preferences!");
+            Dialogs.showErrorDialog(gui, e, sfx, "Couldn't save preferences!");
         }
         infoLabel.setTheme(new SimpleTheme(TextColor.ANSI.BLACK, TextColor.ANSI.WHITE_BRIGHT));
     }
@@ -1361,7 +1396,7 @@ public class TUISweeper {
                 if (diff != Difficulty.CUSTOM && !isReplay)
                     ctl.addComponent(new SFXButton("Leaderboards", sfx, this::displayLeaderboards));
 
-                if (!isReplay) {
+                if (!isReplay)
                     ctl.addComponent(new SFXButton("Save replay", sfx, () -> {
                         String name = new SFXTextInputDialogBuilder(sfx)
                                 .setValidator(s -> s.length() <= 10 ? null : "The name must be less than 10 characters long!")
@@ -1387,7 +1422,6 @@ public class TUISweeper {
                             }
                         }
                     }));
-                }
 
                 win.setComponent(Panels.vertical(new Label(isReplay ? "Replay ended" : "You won!\nYour time is " + getCurrentPlayingTime()),
                                                  new EmptySpace(),

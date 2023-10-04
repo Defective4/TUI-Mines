@@ -15,7 +15,10 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -23,8 +26,20 @@ import java.util.stream.Collectors;
  *
  * @author Defective
  */
-public final class ErrorDialog {
-    private ErrorDialog() {
+public final class Dialogs {
+    private Dialogs() {
+    }
+
+    public static Window showDownloadingWindow(WindowBasedTextGUI gui) {
+        Window win = new SimpleWindow("Please wait");
+
+        win.setComponent(Panels.vertical(
+                new Label("Downloading...\n" +
+                          "Please wait"),
+                new EmptySpace()
+        ));
+        gui.addWindow(win);
+        return win;
     }
 
     public static void showErrorDialog(WindowBasedTextGUI gui, Exception e, SFXEngine sfx, String... text) {
