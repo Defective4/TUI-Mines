@@ -418,7 +418,10 @@ public class TUIMines {
                                             builder.addButton(MessageDialogButton.OK);
                                             save.run();
                                             os.write(prefs.getTheme().toJSON().getBytes(StandardCharsets.UTF_8));
-                                            builder.setText("Theme exported to " + file);
+                                            builder.setText("Theme exported to " + file + "!\n\n" +
+                                                            "Refer to\n" +
+                                                            "https://github.com/Defective4/TUI-Mines-Repo#how-to\n" +
+                                                            "if you want to submit your theme to the repository!");
                                             builder.build().showDialog(gui);
                                         } catch (Exception e) {
                                             showErrorDialog(gui,
@@ -999,7 +1002,10 @@ public class TUIMines {
                                                                          StandardCopyOption.REPLACE_EXISTING);
                                                               new SFXMessageDialogBuilder(sfx)
                                                                       .setTitle("Success")
-                                                                      .setText("Replay exported!")
+                                                                      .setText("Replay exported!\n\n" +
+                                                                               "Refer to\n" +
+                                                                               "https://github.com/Defective4/TUI-Mines-Repo#how-to\n" +
+                                                                               "if you want to submit your replay to the repository!")
                                                                       .addButton(MessageDialogButton.OK)
                                                                       .build().showDialog(gui);
                                                           } catch (Exception e) {
