@@ -2,7 +2,7 @@
 
 [Releases]() | **[Installation]()** | [Share your theme/replay]()
 
-# Description
+# ![info](img/info.png) Description
 TUI Sweeper is a game created for the Java Jam hosted at [Java Community](https://discord.com/invite/X3NmMgzFKF) Discord server.  
 It's a Minesweeper clone designed to run entirely in terminal.  
 The game also has its own terminal emulator that can be used as an alternative.
@@ -47,12 +47,12 @@ To install TUI Sweeper without adding any repositories you can download the Debi
 TUI Sweeper should be able to run on any platform that can run Java applications.  
 It was confirmed to run in Termux on Android.
 
-# Share your theme or replay
+# ![share](img/share.png) Share your theme or replay
 ### [User assets repository](https://github.com/Defective4/TUI-Sweeper-Repo)
 You can share your themes and replays in a separate repository (see link above).  
 Instructions on how to share are also included.  
 All shared assets are available for viewing and downloading using **in-game browser**.
 
-# Technical information
+# ![cogs](img/cogs.png) Technical information
 TUI Sweeper uses its own file format for storing replays.  
 It is documented [here](Replay%20format.md)
