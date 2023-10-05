@@ -15,6 +15,7 @@ import io.github.defective4.javajam.tuisweeper.core.DiscordIntegr;
 import io.github.defective4.javajam.tuisweeper.core.TUIMines;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
+import io.github.defective4.javajam.tuisweeper.core.sfx.SFXMessageDialogBuilder;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.Dialogs;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
@@ -53,6 +54,11 @@ public final class Main {
             if (desktop == null)
                 throw new IllegalStateException();
             desktop.browse(new URI(url));
+            new SFXMessageDialogBuilder(sfx)
+                    .setTitle("")
+                    .setText("The link should now open in your default browser.")
+                    .addButton(MessageDialogButton.OK)
+                    .build().showDialog(gui);
         } catch (Exception ignored) {
             try {
                 StringSelection content = new StringSelection(url);

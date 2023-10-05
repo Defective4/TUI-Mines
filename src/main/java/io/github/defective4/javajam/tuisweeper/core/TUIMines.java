@@ -430,13 +430,13 @@ public class TUIMines {
                                                             new SFXButton("Submit your theme",
                                                                           sfx,
                                                                           false,
-                                                                          () -> {
-                                                                              Main.openLink(
-                                                                                      "https://github.com/Defective4/TUI-Mines-Repo/issues/new?assignees=&labels=Theme&projects=&template=theme-submission.yml&title=%5BTheme%5D+",
-                                                                                      sfx,
-                                                                                      gui);
-                                                                              saved.close();
-                                                                          })
+                                                                          () ->
+                                                                                  Main.openLink(
+                                                                                          "https://github.com/Defective4/TUI-Mines-Repo/issues/new?assignees=&labels=Theme&projects=&template=theme-submission.yml&title=%5BTheme%5D+",
+                                                                                          sfx,
+                                                                                          gui)
+                                           
+                                                            )
                                                     )
                                             ));
 
@@ -1071,13 +1071,12 @@ public class TUIMines {
                                                                               new SFXButton("Submit your replay",
                                                                                             sfx,
                                                                                             false,
-                                                                                            () -> {
-                                                                                                Main.openLink(
-                                                                                                        "https://github.com/Defective4/TUI-Mines-Repo/issues/new?assignees=&labels=Replay&projects=&template=replay-submission.yml&title=%5BReplay%5D+",
-                                                                                                        sfx,
-                                                                                                        gui);
-                                                                                                saved.close();
-                                                                                            })
+                                                                                            () ->
+                                                                                                    Main.openLink(
+                                                                                                            "https://github.com/Defective4/TUI-Mines-Repo/issues/new?assignees=&labels=Replay&projects=&template=replay-submission.yml&title=%5BReplay%5D+",
+                                                                                                            sfx,
+                                                                                                            gui)
+                                                                              )
                                                                       )
                                                               ));
 
