@@ -1573,7 +1573,7 @@ public class TUIMines {
                             }
                         }
                     }));
-                ctl.addComponent(new Button("Close", win::close));
+                ctl.addComponent(new SFXButton("Close", sfx, true, win::close));
 
                 win.setComponent(Panels.vertical(new Label(isReplay ? "Replay ended" : "You won!\nYour time is " + getCurrentPlayingTime()),
                                                  new EmptySpace(),
