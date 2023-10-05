@@ -13,6 +13,7 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
+import io.github.defective4.javajam.tuisweeper.Main;
 import io.github.defective4.javajam.tuisweeper.core.network.RemoteReplay;
 import io.github.defective4.javajam.tuisweeper.core.network.RemoteTheme;
 import io.github.defective4.javajam.tuisweeper.core.network.Repository;
@@ -191,7 +192,7 @@ public class TUIMines {
                         case 'm': {
                             Window win = new SimpleWindow("Game Menu");
                             Label text = new Label("");
-                            text.setPreferredSize(new TerminalSize(32, 6));
+                            text.setPreferredSize(new TerminalSize(32, 7));
 
                             Button game = new SFXButton("Game", sfx, () -> {
                                 Window win2 = new SimpleWindow("Game settings");
@@ -271,7 +272,7 @@ public class TUIMines {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" |  Adjust game's difficulty\n" + " | \n" + " | \n" + " | \n" + " | \n" + " |");
+                                    text.setText(" |  Adjust game's difficulty\n" + " | \n" + " | \n" + " | \n" + " | \n" + " | \n" + " |");
                                 }
                             };
                             Button theme = new SFXButton("Theme", sfx, () -> {
@@ -500,21 +501,21 @@ public class TUIMines {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " | \n" + " |  Customize game's appearance\n" + " | \n" + " | \n" + " |");
+                                    text.setText(" | \n" + " | \n" + " |  Customize game's appearance\n" + " | \n" + " | \n" + " | \n" + " |");
                                 }
                             };
                             Button leaderboards = new SFXButton("Leaderboards", sfx, this::displayLeaderboards) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " | \n" + " | \n" + " | \n" + " |  Show top times by difficulty\n" + " |");
+                                    text.setText(" | \n" + " | \n" + " | \n" + " | \n" + " |  Show top times by difficulty\n" + " | \n" + " |");
                                 }
                             };
                             Button done = new SFXButton("Done", sfx, true, win::close) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " | \n" + " | \n" + " | \n" + " | \n" + " |  Close this menu");
+                                    text.setText(" | \n" + " | \n" + " | \n" + " | \n" + " | \n" + " | \n" + " |  Close this menu");
                                 }
                             };
                             Button options = new SFXButton("Options", sfx, () -> {
@@ -569,10 +570,9 @@ public class TUIMines {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " | \n" + " | \n" + " |  Adjust game settings\n" + " | \n" + " |");
+                                    text.setText(" | \n" + " | \n" + " | \n" + " |  Adjust game settings\n" + " | \n" + " | \n" + " |");
                                 }
                             };
-
                             Button replays = new SFXButton("Replays", sfx, () -> {
                                 Window win2 = new SimpleWindow("Replays");
 
@@ -617,7 +617,43 @@ public class TUIMines {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " |  Browse and play replays \n" + " |  \n" + " | \n" + " | \n" + " |");
+                                    text.setText(" | \n" + " |  Browse and play replays \n" + " |  \n" + " | \n" + " | \n" + " | \n" + " |");
+                                }
+                            };
+                            Button about = new SFXButton("About", sfx, () -> {
+                                Window abt = new SimpleWindow("");
+
+                                abt.setComponent(Panels.vertical(
+                                        new Label("TUI - Mines\n" +
+                                                  "Terminal-based Minesweeper clone"),
+                                        new EmptySpace(),
+                                        new Label("Created for Java Jam 2023 hosted at\n" +
+                                                  "Java Community Discord"),
+                                        new EmptySpace(),
+                                        new Label("Author: Defective\n" +
+                                                  "Version: " + Main.VERSION + "\n" +
+                                                  "Github: https://github.com/Defective4/TUI-Mines"),
+                                        new EmptySpace(),
+                                        Panels.horizontal(
+                                                new SFXButton("Back", sfx, true, abt::close),
+                                                new SFXButton("Vote for the project!",
+                                                              sfx,
+                                                              () -> Main.openLink("https://discordjug.net", sfx, gui)),
+                                                new SFXButton("GitHub",
+                                                              sfx,
+                                                              () -> Main.openLink(
+                                                                      "https://github.com/Defective4/TUI-Mines",
+                                                                      sfx,
+                                                                      gui))
+
+                                        )
+                                ));
+                                gui.addWindowAndWait(abt);
+                            }) {
+                                @Override
+                                protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
+                                    super.afterEnterFocus(direction, previouslyInFocus);
+                                    text.setText(" | \n" + " |  \n" + " |  \n" + " | \n" + " | \n" + " |  Information about the game\n" + " |");
                                 }
                             };
 
@@ -627,6 +663,7 @@ public class TUIMines {
                                                                          theme,
                                                                          options,
                                                                          leaderboards,
+                                                                         about,
                                                                          done),
                                                          text));
                             this.gui.addWindowAndWait(win);

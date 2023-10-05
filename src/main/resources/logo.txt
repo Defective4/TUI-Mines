@@ -25,6 +25,6 @@
                         ==+*##%@=        %@@@#
                                           +=
 
-                      TUI - Sweeper
+                      TUI - Mines
     By Defective                   Made for Java Jam 09/2023
-    http://github.com/defective4     https://javadiscord.net
+    http://github.com/defective4      https://discordjug.net

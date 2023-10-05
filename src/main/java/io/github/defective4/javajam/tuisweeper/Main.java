@@ -16,15 +16,20 @@ import io.github.defective4.javajam.tuisweeper.core.TUIMines;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
+import io.github.defective4.javajam.tuisweeper.core.ui.Dialogs;
 import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -36,7 +41,27 @@ import static io.github.defective4.javajam.tuisweeper.core.ui.Dialogs.showErrorD
  * @author Defective
  */
 public final class Main {
+
+    public static final String VERSION = "1.0";
+
     private Main() {
+    }
+
+    public static void openLink(String url, SFXEngine sfx, WindowBasedTextGUI gui) {
+        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+        try {
+            if (desktop == null)
+                throw new IllegalStateException();
+            desktop.browse(new URI(url));
+        } catch (Exception ignored) {
+            try {
+                StringSelection content = new StringSelection(url);
+                Clipboard cp = Toolkit.getDefaultToolkit().getSystemClipboard();
+                cp.setContents(content, content);
+            } catch (Exception ex) {
+                Dialogs.showErrorDialog(gui, ex, sfx, "Couldn't copy link to the clipbaord...\n" + url);
+            }
+        }
     }
 
     public static void main(String[] args) {
