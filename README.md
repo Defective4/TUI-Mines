@@ -4,10 +4,12 @@
 
 # ![info](img/info.png) Description
 
-TUI Mines is a game created for the Java Jam hosted at [Java Community](https://discord.com/invite/X3NmMgzFKF) Discord
+TUI Mines is a game created for the **Java Jam** hosted at [Java Community](https://discord.com/invite/X3NmMgzFKF) Discord
 server.  
 It's a Minesweeper clone designed to run entirely in terminal.  
 The game also has its own terminal emulator that can be used as an alternative.
+
+[![vote](img/vote.png)](https://discordjug.net/)
 
 # ![features](img/features.png) Features
 - Playable without any GUI in a headless environment
