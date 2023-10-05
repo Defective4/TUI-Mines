@@ -414,16 +414,33 @@ public class TUIMines {
                                     File file = bd.buildAndShow(gui);
                                     if (file != null) {
                                         try (OutputStream os = Files.newOutputStream(file.toPath())) {
-                                            MessageDialogBuilder builder = new SFXMessageDialogBuilder(sfx);
-                                            builder.setTitle("Exporting theme");
-                                            builder.addButton(MessageDialogButton.OK);
                                             save.run();
                                             os.write(prefs.getTheme().toJSON().getBytes(StandardCharsets.UTF_8));
-                                            builder.setText("Theme exported to " + file + "!\n\n" +
-                                                            "Refer to\n" +
-                                                            "https://github.com/Defective4/TUI-Mines-Repo#how-to\n" +
-                                                            "if you want to submit your theme to the repository!");
-                                            builder.build().showDialog(gui);
+
+                                            Window saved = new SimpleWindow("Theme exported");
+
+                                            saved.setComponent(Panels.vertical(
+                                                    new Label("Theme exported to " + file + "!\n\n" +
+                                                              "Refer to\n" +
+                                                              "https://github.com/Defective4/TUI-Mines-Repo#how-to\n" +
+                                                              "if you want to submit your theme to the repository!"),
+                                                    new EmptySpace(),
+                                                    Panels.horizontal(
+                                                            new SFXButton("Close", sfx, true, saved::close),
+                                                            new SFXButton("Submit your theme",
+                                                                          sfx,
+                                                                          false,
+                                                                          () -> {
+                                                                              Main.openLink(
+                                                                                      "https://github.com/Defective4/TUI-Mines-Repo/issues/new?assignees=&labels=Theme&projects=&template=theme-submission.yml&title=%5BTheme%5D+",
+                                                                                      sfx,
+                                                                                      gui);
+                                                                              saved.close();
+                                                                          })
+                                                    )
+                                            ));
+
+                                            gui.addWindowAndWait(saved);
                                         } catch (Exception e) {
                                             showErrorDialog(gui,
                                                             e,
@@ -1037,14 +1054,34 @@ public class TUIMines {
                                                                          target.toPath(),
                                                                          StandardCopyOption.COPY_ATTRIBUTES,
                                                                          StandardCopyOption.REPLACE_EXISTING);
-                                                              new SFXMessageDialogBuilder(sfx)
-                                                                      .setTitle("Success")
-                                                                      .setText("Replay exported!\n\n" +
-                                                                               "Refer to\n" +
-                                                                               "https://github.com/Defective4/TUI-Mines-Repo#how-to\n" +
-                                                                               "if you want to submit your replay to the repository!")
-                                                                      .addButton(MessageDialogButton.OK)
-                                                                      .build().showDialog(gui);
+
+                                                              Window saved = new SimpleWindow("Success");
+
+                                                              saved.setComponent(Panels.vertical(
+                                                                      new Label("Replay exported!\n\n" +
+                                                                                "Refer to\n" +
+                                                                                "https://github.com/Defective4/TUI-Mines-Repo#how-to\n" +
+                                                                                "if you want to submit your replay to the repository!"),
+                                                                      new EmptySpace(),
+                                                                      Panels.horizontal(
+                                                                              new SFXButton("Close",
+                                                                                            sfx,
+                                                                                            true,
+                                                                                            saved::close),
+                                                                              new SFXButton("Submit your replay",
+                                                                                            sfx,
+                                                                                            false,
+                                                                                            () -> {
+                                                                                                Main.openLink(
+                                                                                                        "https://github.com/Defective4/TUI-Mines-Repo/issues/new?assignees=&labels=Replay&projects=&template=replay-submission.yml&title=%5BReplay%5D+",
+                                                                                                        sfx,
+                                                                                                        gui);
+                                                                                                saved.close();
+                                                                                            })
+                                                                      )
+                                                              ));
+
+                                                              gui.addWindowAndWait(saved);
                                                           } catch (Exception e) {
                                                               showErrorDialog(gui,
                                                                               e,
