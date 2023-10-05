@@ -546,6 +546,7 @@ public class TUIMines {
                                 boolean sndAvailable = sfx.isAvailable();
                                 boolean guiAvailable = term
                                         instanceof SwingTerminalFrame;
+                                boolean discordAvailable = DiscordIntegr.isAvailable();
 
                                 CheckBox shaking = new SFXCheckBox("Enable screen shaking",
                                                                    ops.isScreenShaking() && guiAvailable,
@@ -554,7 +555,7 @@ public class TUIMines {
                                                                   ops.areSoundsEnabled() && sndAvailable,
                                                                   sfx);
                                 CheckBox discord = new SFXCheckBox("Discord integration",
-                                                                   ops.isDiscordIntegrationEnabled(),
+                                                                   ops.isDiscordIntegrationEnabled() && discordAvailable,
                                                                    sfx);
 
                                 ComboBox<String> playStyle = new SFXComboBox<>(sfx, "Classic", "Flag only");
@@ -580,6 +581,7 @@ public class TUIMines {
 
                                 sounds.setEnabled(sndAvailable);
                                 shaking.setEnabled(guiAvailable);
+                                discord.setEnabled(discordAvailable);
 
                                 win2.setComponent(Panels.vertical(
                                         Panels.vertical(shaking,
@@ -594,11 +596,14 @@ public class TUIMines {
                                         Panels.horizontal(new SFXButton("Confirm",
                                                                         sfx,
                                                                         () -> {
-                                                                            ops.setScreenShaking(
-                                                                                    shaking.isChecked());
-                                                                            ops.setSounds(
-                                                                                    sounds.isChecked());
-                                                                            ops.setDiscordIntegration(discord.isChecked());
+                                                                            if (shaking.isEnabled())
+                                                                                ops.setScreenShaking(
+                                                                                        shaking.isChecked());
+                                                                            if (sounds.isEnabled())
+                                                                                ops.setSounds(
+                                                                                        sounds.isChecked());
+                                                                            if (discord.isEnabled())
+                                                                                ops.setDiscordIntegration(discord.isChecked());
                                                                             ops.setFlagOnly(playStyle.getSelectedIndex() == 1);
                                                                             sfx.setEnabled(ops.areSoundsEnabled());
                                                                             DiscordIntegr.setEnabled(discord.isChecked(),

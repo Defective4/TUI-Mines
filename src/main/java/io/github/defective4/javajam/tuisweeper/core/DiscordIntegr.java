@@ -21,19 +21,30 @@ public final class DiscordIntegr {
     private DiscordIntegr() {
     }
 
+    private static boolean INIT;
+
+    public static boolean isAvailable() {
+        return INIT;
+    }
+
     public static void init() {
-        DiscordRPC.discordInitialize("1158412076516114472", new DiscordEventHandlers(), true);
+        try {
+            DiscordRPC.discordInitialize("1158412076516114472", new DiscordEventHandlers(), true);
+            INIT = true;
+        } catch (Throwable ignored) {
+        }
     }
 
     public static boolean isEnabled() {
-        return enabled;
+        return enabled && INIT;
     }
 
     public static void setEnabled(boolean enabled, TUIMines game) {
         DiscordIntegr.enabled = enabled;
-        if (!enabled)
-            DiscordRPC.discordClearPresence();
-        else {
+        if (!isEnabled()) {
+            if (INIT)
+                DiscordRPC.discordClearPresence();
+        } else {
             if (game == null)
                 title();
             else
@@ -42,14 +53,14 @@ public final class DiscordIntegr {
     }
 
     public static void title() {
-        if (enabled)
+        if (isEnabled())
             DiscordRPC.discordUpdatePresence(new DiscordRichPresence.Builder("In title screen")
                                                      .setBigImage("sweeper-logo", "TUI Mines")
                                                      .build());
     }
 
     public static void update(TUIMines game) {
-        if (!enabled)
+        if (!isEnabled())
             return;
         if (System.currentTimeMillis() - LAST_UPDATE < 2000) {
             return;
