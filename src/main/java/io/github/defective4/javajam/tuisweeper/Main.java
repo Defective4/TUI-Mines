@@ -28,7 +28,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.Timer;
@@ -133,7 +132,10 @@ public final class Main {
                                 new Label("It looks like it's your first time playing TUI Mines!"),
                                 new EmptySpace(),
                                 Panels.horizontal(
-                                        new SFXButton("View controls", sfx, false, () -> TUIMines.showCtls(gui, sfx, prefs)),
+                                        new SFXButton("View controls",
+                                                      sfx,
+                                                      false,
+                                                      () -> TUIMines.showCtls(gui, sfx, prefs)),
                                         new SFXButton("Continue", sfx, true, twin::close)
                                 )
                         ));

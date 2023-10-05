@@ -31,8 +31,8 @@ Bomb format:
 ## Actions
 
 Actions are the most important data stored in a replay.  
-Each caret move, flag/unflag and field reveal is stored as a separate action.  
->Action coordinates are stored as `byte`s, meaning the board can have maximum width/height of `128` fields
+Each caret move, flag/unflag and field reveal is stored as a separate action.
+> Action coordinates are stored as `byte`s, meaning the board can have maximum width/height of `128` fields
 
 ### [Action format](https://github.com/Defective4/TUI-Mines/blob/a05ac9ed50d890535e76b2abaa9101d227960216/src/main/java/io/github/defective4/javajam/tuisweeper/core/replay/Replay.java#L23)
 

@@ -205,11 +205,6 @@ public class Preferences {
         }));
     }
 
-    public OneTimeDialogs getOneTimeDialogs() {
-        if (otd == null) otd = new OneTimeDialogs();
-        return otd;
-    }
-
     public static File getConfigDirectory() {
         String subdir = System.getProperty("os.name").toLowerCase().contains("windows") ?
                         "AppData/Roaming/TUIMines" :
@@ -239,6 +234,11 @@ public class Preferences {
         Preferences clean = new Preferences();
         clean.save();
         return clean;
+    }
+
+    public OneTimeDialogs getOneTimeDialogs() {
+        if (otd == null) otd = new OneTimeDialogs();
+        return otd;
     }
 
     public void save() throws IOException {
