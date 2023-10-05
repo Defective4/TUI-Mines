@@ -127,7 +127,7 @@ public final class Main {
                                                                 .addButton(MessageDialogButton.Yes)
                                                                 .addButton(MessageDialogButton.No)
                                                                 .build().showDialog(gui) == MessageDialogButton.Yes);
-
+                        sfx.setEnabled(prefs.getOptions().areSoundsEnabled());
                         Window twin = new SimpleWindow("First time");
                         twin.setComponent(Panels.vertical(
                                 new Label("It looks like it's your first time playing TUI Mines!"),

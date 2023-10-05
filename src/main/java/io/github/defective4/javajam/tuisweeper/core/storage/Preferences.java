@@ -145,7 +145,7 @@ public class Preferences {
             this.discordIntegration = discordIntegration;
         }
 
-        public boolean isSounds() {
+        public boolean areSoundsEnabled() {
             return sounds;
         }
 

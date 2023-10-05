@@ -86,7 +86,7 @@ public class TUIMines {
         this.sfx = sfx;
         this.prefs = prefs;
         this.recorder = new ReplayRecorder(board, this);
-        this.sfx.setEnabled(this.prefs.getOptions().isSounds());
+        this.sfx.setEnabled(this.prefs.getOptions().areSoundsEnabled());
         this.infoLabel = new Label("");
         this.player = new ReplayPlayer(this, boardBox, sfx);
         updateTheme(this.prefs.getTheme());
@@ -545,7 +545,7 @@ public class TUIMines {
                                 CheckBox shaking = new SFXCheckBox("Enable screen shaking",
                                                                    ops.isScreenShaking() && guiAvailable,
                                                                    sfx);
-                                CheckBox sounds = new SFXCheckBox("Enable sounds", ops.isSounds() && sndAvailable, sfx);
+                                CheckBox sounds = new SFXCheckBox("Enable sounds", ops.areSoundsEnabled() && sndAvailable, sfx);
                                 CheckBox discord = new SFXCheckBox("Discord integration",
                                                                    ops.isDiscordIntegrationEnabled(),
                                                                    sfx);
@@ -565,7 +565,7 @@ public class TUIMines {
                                                                             ops.setSounds(
                                                                                     sounds.isChecked());
                                                                             ops.setDiscordIntegration(discord.isChecked());
-                                                                            sfx.setEnabled(ops.isSounds());
+                                                                            sfx.setEnabled(ops.areSoundsEnabled());
                                                                             DiscordIntegr.setEnabled(discord.isChecked(),
                                                                                                      this);
                                                                             try {
