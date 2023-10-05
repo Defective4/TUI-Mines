@@ -1467,7 +1467,7 @@ public class TUIMines {
                     leaders.addEntry(diff, endTime - startTime);
                 }
                 Window win = new SimpleWindow(isReplay ? "Replay ended" : "Game won");
-                Panel ctl = Panels.horizontal(new Button("Close", win::close));
+                Panel ctl = Panels.horizontal();
                 if (diff != Difficulty.CUSTOM && !isReplay)
                     ctl.addComponent(new SFXButton("Leaderboards", sfx, this::displayLeaderboards));
 
@@ -1497,6 +1497,7 @@ public class TUIMines {
                             }
                         }
                     }));
+                ctl.addComponent(new Button("Close", win::close));
 
                 win.setComponent(Panels.vertical(new Label(isReplay ? "Replay ended" : "You won!\nYour time is " + getCurrentPlayingTime()),
                                                  new EmptySpace(),

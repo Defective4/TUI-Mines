@@ -127,8 +127,8 @@ public final class Main {
                                 new Label("It looks like it's your first time playing TUI Mines!"),
                                 new EmptySpace(),
                                 Panels.horizontal(
-                                        new SFXButton("Continue", sfx, true, twin::close),
-                                        new SFXButton("View controls", sfx, false, () -> TUIMines.showCtls(gui, sfx))
+                                        new SFXButton("View controls", sfx, false, () -> TUIMines.showCtls(gui, sfx)),
+                                        new SFXButton("Continue", sfx, true, twin::close)
                                 )
                         ));
                         gui.addWindowAndWait(twin);
