@@ -136,6 +136,15 @@ public class Preferences {
         private boolean screenShaking = true;
         private boolean sounds = true;
         private boolean discordIntegration = true;
+        private boolean isFlagOnly;
+
+        public boolean isFlagOnly() {
+            return isFlagOnly;
+        }
+
+        public void setFlagOnly(boolean flagOnly) {
+            isFlagOnly = flagOnly;
+        }
 
         public boolean isDiscordIntegrationEnabled() {
             return discordIntegration;
@@ -162,8 +171,23 @@ public class Preferences {
         }
     }
 
+    /**
+     * Keeps track on what dialogs were seen by the user
+     */
+    public static class OneTimeDialogs {
+        private boolean seenPlayStyleDialog;
+
+
+        public boolean seenPlayStyleDialog() {
+            boolean old = seenPlayStyleDialog;
+            seenPlayStyleDialog = true;
+            return old;
+        }
+    }
+
     private UserTheme theme = ThemePreset.PITCH_BLACK.toTheme();
     private Options options = new Options();
+    private OneTimeDialogs otd = new OneTimeDialogs();
 
     private boolean firstBoot = true;
     private Difficulty difficulty = Difficulty.EASY;
@@ -179,6 +203,11 @@ public class Preferences {
                 e.printStackTrace();
             }
         }));
+    }
+
+    public OneTimeDialogs getOneTimeDialogs() {
+        if (otd == null) otd = new OneTimeDialogs();
+        return otd;
     }
 
     public static File getConfigDirectory() {
@@ -200,7 +229,7 @@ public class Preferences {
         return new File(getConfigDirectory(), "replays");
     }
 
-    public static Preferences load() throws IOException {
+    public static Preferences load() throws Exception {
         File in = getConfigFile();
         if (in.isFile()) try (InputStreamReader reader = new FileReader(in)) {
             Preferences prefs = new Gson().fromJson(reader, Preferences.class);

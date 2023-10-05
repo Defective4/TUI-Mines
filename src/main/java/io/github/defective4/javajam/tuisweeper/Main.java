@@ -133,7 +133,7 @@ public final class Main {
                                 new Label("It looks like it's your first time playing TUI Mines!"),
                                 new EmptySpace(),
                                 Panels.horizontal(
-                                        new SFXButton("View controls", sfx, false, () -> TUIMines.showCtls(gui, sfx)),
+                                        new SFXButton("View controls", sfx, false, () -> TUIMines.showCtls(gui, sfx, prefs)),
                                         new SFXButton("Continue", sfx, true, twin::close)
                                 )
                         ));
@@ -193,7 +193,7 @@ public final class Main {
                 }
             }, 1000);
             gui.addWindowAndWait(win);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

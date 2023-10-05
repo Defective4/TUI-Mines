@@ -124,9 +124,14 @@ public class TUIMines {
                                 break;
                             }
                             case ' ': {
-                                int cnt = reveal(absX, absY);
-                                updateBoard();
-                                if (cnt > 0 && gameOver == 0) sfx.play(cnt > 10 ? "mass_reveal" : "reveal");
+                                byte current = board.getFieldAt(absX, absY);
+                                if (prefs.getOptions().isFlagOnly() && placed && (current <= 0 || current >= 10)) {
+                                    flag(absX, absY);
+                                } else {
+                                    int cnt = reveal(absX, absY);
+                                    updateBoard();
+                                    if (cnt > 0 && gameOver == 0) sfx.play(cnt > 10 ? "mass_reveal" : "reveal");
+                                }
                                 break;
                             }
                             default:
@@ -435,7 +440,7 @@ public class TUIMines {
                                                                                           "https://github.com/Defective4/TUI-Mines-Repo/issues/new?assignees=&labels=Theme&projects=&template=theme-submission.yml&title=%5BTheme%5D+",
                                                                                           sfx,
                                                                                           gui)
-                                           
+
                                                             )
                                                     )
                                             ));
@@ -545,16 +550,45 @@ public class TUIMines {
                                 CheckBox shaking = new SFXCheckBox("Enable screen shaking",
                                                                    ops.isScreenShaking() && guiAvailable,
                                                                    sfx);
-                                CheckBox sounds = new SFXCheckBox("Enable sounds", ops.areSoundsEnabled() && sndAvailable, sfx);
+                                CheckBox sounds = new SFXCheckBox("Enable sounds",
+                                                                  ops.areSoundsEnabled() && sndAvailable,
+                                                                  sfx);
                                 CheckBox discord = new SFXCheckBox("Discord integration",
                                                                    ops.isDiscordIntegrationEnabled(),
                                                                    sfx);
+
+                                ComboBox<String> playStyle = new SFXComboBox<>(sfx, "Classic", "Flag only");
+                                playStyle.addListener((i, i1, b) -> {
+                                    if (i == 1 && !prefs.getOneTimeDialogs().seenPlayStyleDialog()) {
+                                        new SFXMessageDialogBuilder(sfx)
+                                                .setTitle("Play style notice")
+                                                .setText("Welcome to Flag only mode!\n" +
+                                                         "While Flag only play style is active\n" +
+                                                         "<space> key action is replaced with Flag,\n" +
+                                                         "meaning you have to use chording to work your way\n" +
+                                                         "through the board!\n" +
+                                                         "This option is recommended for players who use chording\n" +
+                                                         "as their main technique, as it can be quicker and it helps avoid\n" +
+                                                         "mistakes!\n" +
+                                                         "\n" +
+                                                         "Also make sure to check game controls help after this change!")
+                                                .addButton(MessageDialogButton.OK)
+                                                .build().showDialog(gui);
+                                    }
+                                });
+                                playStyle.setSelectedIndex(ops.isFlagOnly() ? 1 : 0);
+
                                 sounds.setEnabled(sndAvailable);
                                 shaking.setEnabled(guiAvailable);
 
                                 win2.setComponent(Panels.vertical(
                                         Panels.vertical(shaking,
-                                                        sounds, discord).withBorder(Borders.singleLine())
+                                                        sounds,
+                                                        discord,
+                                                        new EmptySpace(),
+                                                        new Label("Play style"),
+                                                        playStyle)
+                                              .withBorder(Borders.singleLine())
                                         ,
                                         new EmptySpace(),
                                         Panels.horizontal(new SFXButton("Confirm",
@@ -565,6 +599,7 @@ public class TUIMines {
                                                                             ops.setSounds(
                                                                                     sounds.isChecked());
                                                                             ops.setDiscordIntegration(discord.isChecked());
+                                                                            ops.setFlagOnly(playStyle.getSelectedIndex() == 1);
                                                                             sfx.setEnabled(ops.areSoundsEnabled());
                                                                             DiscordIntegr.setEnabled(discord.isChecked(),
                                                                                                      this);
@@ -698,7 +733,7 @@ public class TUIMines {
                             break;
                         }
                         case 'h': {
-                            showCtls(gui, sfx);
+                            showCtls(gui, sfx, prefs);
                             break;
                         }
                         default:
@@ -758,13 +793,18 @@ public class TUIMines {
         return String.join(" ", split);
     }
 
-    public static void showCtls(WindowBasedTextGUI gui, SFXEngine sfx) {
+    public static void showCtls(WindowBasedTextGUI gui, SFXEngine sfx, Preferences prefs) {
         Window win = new SimpleWindow("Game controls");
 
+        boolean onlyFlags = prefs.getOptions().isFlagOnly();
+
         win.setComponent(Panels.vertical(
-                new Label("Arrow keys - Navigate on the board\n" +
-                          "<Space> - Reveal a field\n" +
-                          "F - Place/Remove a flag").withBorder(Borders.singleLine()),
+                new Label("Controls for " + (onlyFlags ? "Flag only" : "Classic") + " mode"),
+                new EmptySpace(),
+                new Label(onlyFlags ? "Arrow keys - Navigate on the board\n" +
+                                      "<Space> - Flag/Chord" : "Arrow keys - Navigate on the board\n" +
+                                                               "<Space> - Reveal a field\n" +
+                                                               "F - Place/Remove a flag").withBorder(Borders.singleLine()),
                 new EmptySpace(),
                 new Label("If a revealed field has equal number of\n" +
                           "surrounding flags and bombs, you can\n" +
