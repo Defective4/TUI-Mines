@@ -1,8 +1,7 @@
 <img alt="logo" height="128" src="img/logo.png" width="128"/>  
 
 ![](https://img.shields.io/github/last-commit/defective4/TUI-Mines/master?style=flat-square)   ![](https://img.shields.io/github/actions/workflow/status/defective4/tui-mines/maven.yml?style=flat-square)   ![](https://img.shields.io/github/license/defective4/tui-mines?style=flat-square)  ![](https://img.shields.io/github/v/release/defective4/tui-mines?style=flat-square)     
-[Releases](https://github.com/Defective4/TUI-Mines/releases) | [**Installation
-**](#-installation) | [Share your theme/replay](#-share-your-theme-or-replay)
+[Releases](https://github.com/Defective4/TUI-Mines/releases) | [**Installation**](#-installation) | [Share your theme/replay](#-share-your-theme-or-replay)
 
 # ![info](img/info.png) Description
 
@@ -54,7 +53,9 @@ To do so:
 1. Add the repository to your system
 
 ```shell
-
+sudo curl https://debian.racuszki.pl/api/packages/Defective/debian/repository.key -o /etc/apt/trusted.gpg.d/github-Defective.asc
+echo "deb https://debian.racuszki.pl/api/packages/Defective/debian stable main" | sudo tee -a /etc/apt/sources.list.d/github-defective.list
+sudo apt update
 ```
 
 2. Install TUI Mines using APT
