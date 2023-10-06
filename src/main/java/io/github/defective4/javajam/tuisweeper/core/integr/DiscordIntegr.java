@@ -14,6 +14,7 @@ public final class DiscordIntegr {
     private static long LAST_UPDATE = System.currentTimeMillis();
     private static long START_DATE = System.currentTimeMillis();
     private static boolean enabled;
+    private static boolean INIT;
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::discordShutdown));
@@ -21,8 +22,6 @@ public final class DiscordIntegr {
 
     private DiscordIntegr() {
     }
-
-    private static boolean INIT;
 
     public static boolean isAvailable() {
         return INIT;

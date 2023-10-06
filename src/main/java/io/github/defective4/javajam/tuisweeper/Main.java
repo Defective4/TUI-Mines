@@ -215,7 +215,8 @@ public final class Main {
                             ));
                             gui.addWindow(up);
                         }
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }).start();
             }
 
