@@ -11,7 +11,7 @@ server.
 It's a Minesweeper clone designed to run entirely in terminal.  
 The game also has its own terminal emulator that can be used as an alternative.
 
-[![vote](img/vote.png)](https://discordjug.net/)
+[![vote](img/vote.png)]([https://discordjug.net/](https://discord.gg/java-community-help-code-learn-648956210850299986))
 
 # ![features](img/features.png) Features
 
