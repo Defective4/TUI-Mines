@@ -43,7 +43,7 @@ import static io.github.defective4.javajam.tuisweeper.core.ui.Dialogs.showErrorD
  */
 public final class Main {
 
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "1.0.1";
 
     private Main() {
     }
