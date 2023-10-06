@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=TUI Mines
+Icon=/usr/share/icons/tui-mines.png
+Exec=tui-mines -gui
+Categories=Game

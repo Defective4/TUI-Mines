@@ -1,0 +1,15 @@
+Package: tui-mines
+Version: 1.0
+Maintainer: Defective <def3ctive4@gmail.com>
+Description: A terminal based Minesweeper clone
+ TUI Mines is a clone of the classis Minesweeper game
+ that can be played directly in your terminal!
+ The game also contains its own terminal emulator
+ in case you want to play the game in your favourite
+ window manager.
+Section: games
+Priority: optional
+Installed-Size: 0
+Architecture: all
+Homepage: https://github.com/Defective4/TUI-Mines
+Recommends: openjdk-17-jre
