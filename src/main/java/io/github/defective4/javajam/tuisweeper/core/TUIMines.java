@@ -14,6 +14,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import io.github.defective4.javajam.tuisweeper.Main;
+import io.github.defective4.javajam.tuisweeper.core.integr.DiscordIntegr;
 import io.github.defective4.javajam.tuisweeper.core.network.RemoteReplay;
 import io.github.defective4.javajam.tuisweeper.core.network.RemoteTheme;
 import io.github.defective4.javajam.tuisweeper.core.network.Repository;
@@ -557,6 +558,7 @@ public class TUIMines {
                                 CheckBox discord = new SFXCheckBox("Discord integration",
                                                                    ops.isDiscordIntegrationEnabled() && discordAvailable,
                                                                    sfx);
+                                CheckBox updates = new SFXCheckBox("Update checker", ops.areUpdatesEnabled(), sfx);
 
                                 ComboBox<String> playStyle = new SFXComboBox<>(sfx, "Classic", "Flag only");
                                 playStyle.addListener((i, i1, b) -> {
@@ -587,6 +589,7 @@ public class TUIMines {
                                         Panels.vertical(shaking,
                                                         sounds,
                                                         discord,
+                                                        updates,
                                                         new EmptySpace(),
                                                         new Label("Play style"),
                                                         playStyle)
@@ -604,6 +607,7 @@ public class TUIMines {
                                                                                         sounds.isChecked());
                                                                             if (discord.isEnabled())
                                                                                 ops.setDiscordIntegration(discord.isChecked());
+                                                                            ops.setUpdatesEnabled(updates.isChecked());
                                                                             ops.setFlagOnly(playStyle.getSelectedIndex() == 1);
                                                                             sfx.setEnabled(ops.areSoundsEnabled());
                                                                             DiscordIntegr.setEnabled(discord.isChecked(),

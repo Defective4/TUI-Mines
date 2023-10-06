@@ -11,8 +11,9 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
-import io.github.defective4.javajam.tuisweeper.core.DiscordIntegr;
 import io.github.defective4.javajam.tuisweeper.core.TUIMines;
+import io.github.defective4.javajam.tuisweeper.core.integr.DiscordIntegr;
+import io.github.defective4.javajam.tuisweeper.core.integr.GithubIntegr;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
 import io.github.defective4.javajam.tuisweeper.core.sfx.SFXMessageDialogBuilder;
@@ -92,6 +93,7 @@ public final class Main {
 
             WindowBasedTextGUI gui = new MultiWindowTextGUI(screen);
             gui.setTheme(prefs.getTheme().toTUITheme());
+
             Window win = new SimpleWindow(Window.Hint.FULL_SCREEN, Window.Hint.NO_DECORATIONS);
 
             StringBuilder brandBuilder = new StringBuilder();
@@ -194,8 +196,32 @@ public final class Main {
                     }
                 }
             }, 1000);
+
+
+            if (prefs.getOptions().areUpdatesEnabled()) {
+                new Thread(() -> {
+                    try {
+                        String update = GithubIntegr.checkUpdates();
+                        if (update != null) {
+                            Window up = new SimpleWindow("Update available");
+
+                            up.setComponent(Panels.vertical(
+                                    new Label("A new update is available!\n" +
+                                              "\n" +
+                                              "New version: " + update + "\n" +
+                                              "Your version: v" + VERSION),
+                                    new EmptySpace(),
+                                    new SFXButton("Ok", sfx, up::close)
+                            ));
+                            gui.addWindow(up);
+                        }
+                    } catch (Exception ignored) {}
+                }).start();
+            }
+
             gui.addWindowAndWait(win);
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             e.printStackTrace();
         }
     }

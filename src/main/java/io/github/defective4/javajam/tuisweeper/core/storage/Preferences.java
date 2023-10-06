@@ -136,7 +136,16 @@ public class Preferences {
         private boolean screenShaking = true;
         private boolean sounds = true;
         private boolean discordIntegration = true;
+        private boolean updatesEnabled = true;
         private boolean isFlagOnly;
+
+        public boolean areUpdatesEnabled() {
+            return updatesEnabled;
+        }
+
+        public void setUpdatesEnabled(boolean updatesEnabled) {
+            this.updatesEnabled = updatesEnabled;
+        }
 
         public boolean isFlagOnly() {
             return isFlagOnly;

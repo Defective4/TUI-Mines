@@ -1,5 +1,6 @@
-package io.github.defective4.javajam.tuisweeper.core;
+package io.github.defective4.javajam.tuisweeper.core.integr;
 
+import io.github.defective4.javajam.tuisweeper.core.TUIMines;
 import net.arikia.dev.drpc.DiscordEventHandlers;
 import net.arikia.dev.drpc.DiscordRPC;
 import net.arikia.dev.drpc.DiscordRichPresence;
