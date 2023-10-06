@@ -74,6 +74,13 @@ public class Leaderboards {
         }
     }
 
+    public void clear() {
+        try (Statement stmt = mkStatement()) {
+            stmt.execute("delete from times");
+        } catch (Exception ignored) {
+        }
+    }
+
     public void addEntry(Difficulty diff, long time) {
         try (Statement stmt = mkStatement()) {
             stmt.execute(String.format("insert into times (difficulty, time, date) values (%s, %s, %s)",

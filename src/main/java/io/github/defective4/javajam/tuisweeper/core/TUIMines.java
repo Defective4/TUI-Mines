@@ -1453,7 +1453,27 @@ public class TUIMines {
                                          new EmptySpace(),
                                          table.withBorder(Borders.singleLine()),
                                          new EmptySpace(),
-                                         new SFXButton("Close", sfx, true, win::close)));
+                                         Panels.horizontal(
+                                                 new SFXButton("Close", sfx, true, win::close),
+                                                 new SFXButton("Clear", sfx, () -> {
+                                                     if (new SFXMessageDialogBuilder(sfx)
+                                                                 .setTitle("Are you sure?")
+                                                                 .setText(
+                                                                         "Are you sure you want to clear ALL leaderboard entries?\n" +
+                                                                         "This cannot be undone!")
+                                                                 .addButton(MessageDialogButton.No).
+                                                                 addButton(MessageDialogButton.Yes)
+                                                                 .build()
+                                                                 .showDialog(gui) == MessageDialogButton.Yes) {
+                                                         leaders.clear();
+                                                         new SFXMessageDialogBuilder(sfx)
+                                                                 .setText("Leaderboards cleared")
+                                                                 .addButton(MessageDialogButton.OK)
+                                                                 .build().showDialog(gui);
+                                                         win.close();
+                                                     }
+                                                 })
+                                         )));
         gui.addWindow(win);
     }
 
