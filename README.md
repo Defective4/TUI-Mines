@@ -40,7 +40,7 @@ The game was tested on all JRE versions from `1.8` to `17` inclusive.
 
 ## Windows
 
-To play TUI Mines on Windows it is recommended to download the executable file (.exe) from the [Releases page]().  
+To play TUI Mines on Windows it is recommended to download the executable file (.exe) from the [Releases page](https://github.com/Defective4/TUI-Mines/releases).  
 Alternatively you can download the universal JAR file.
 
 ## Linux
@@ -67,7 +67,7 @@ sudo apt-get install tui-mines
 ### Manual installation
 
 To install TUI Mines without adding any repositories you can download the Debian package (or universal JAR if you don't
-want to install/don't have root privileges) from the [Releases page]().
+want to install/don't have root privileges) from the [Releases page](https://github.com/Defective4/TUI-Mines/releases).
 
 ## Other
 
