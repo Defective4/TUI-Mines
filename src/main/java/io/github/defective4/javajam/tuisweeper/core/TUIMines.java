@@ -1486,6 +1486,7 @@ public class TUIMines {
             currentReplay = null;
             isReplay = false;
             player.stop();
+            recorder.stop();
             recorder.setEnabled(true);
             board.initialize(prefs.getWidth(), prefs.getHeight(), prefs.getBombs());
             resetVariables();
@@ -1501,6 +1502,7 @@ public class TUIMines {
         try {
             isReplay = true;
             player.stop();
+            recorder.stop();
             recorder.setEnabled(false);
             board.initializeReplay(replay.getWidth(), replay.getHeight(), replay.getBombs().size(), replay.getSeed());
             for (Replay.CoordPair bomb : replay.getBombs())
