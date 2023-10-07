@@ -118,7 +118,6 @@ public class DiscordPresenceData extends OrderedStructure {
         }
     }
 
-    public final int instance = 1;
     public String state;   /* max 128 bytes */
     public String details; /* max 128 bytes */
     public long startTimestamp;
@@ -134,6 +133,7 @@ public class DiscordPresenceData extends OrderedStructure {
     public String matchSecret;    /* max 128 bytes */
     public String joinSecret;     /* max 128 bytes */
     public String spectateSecret; /* max 128 bytes */
+    public int instance = 1;
 
     public DiscordPresenceData(String state, String details, long startTimestamp, long endTimestamp, String largeImageKey, String largeImageText, String smallImageKey, String smallImageText, String partyId, int partySize, int partyMax, int partyPrivacy, String matchSecret, String joinSecret, String spectateSecret) {
         this.state = state;
