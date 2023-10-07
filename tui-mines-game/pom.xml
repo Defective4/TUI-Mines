@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.defective4.javajam.tuimines</groupId>
         <artifactId>tui-mines</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
     </parent>
 
     <artifactId>tui-mines-game</artifactId>
@@ -58,9 +58,9 @@
                         </goals>
                         <configuration>
                             <headerType>gui</headerType>
-                            <jar>target/tui-mines-game-1.0.1-jar-with-dependencies.jar
+                            <jar>target/tui-mines-game-1.0.2-jar-with-dependencies.jar
                             </jar>
-                            <outfile>target/TUI-Mines-1.0.1.exe</outfile>
+                            <outfile>target/TUI-Mines-1.0.2.exe</outfile>
                             <chdir>.</chdir>
                             <priority>normal</priority>
                             <stayAlive>false</stayAlive>
@@ -73,12 +73,12 @@
                                 <minVersion>1.8</minVersion>
                             </jre>
                             <versionInfo>
-                                <fileVersion>1.0.1.0</fileVersion>
-                                <txtFileVersion>1.0.1</txtFileVersion>
+                                <fileVersion>1.0.2.0</fileVersion>
+                                <txtFileVersion>1.0.2</txtFileVersion>
                                 <fileDescription>The TUI Mines game</fileDescription>
                                 <copyright>Defective</copyright>
-                                <productVersion>1.0.1.0</productVersion>
-                                <txtProductVersion>1.0.1</txtProductVersion>
+                                <productVersion>1.0.2.0</productVersion>
+                                <txtProductVersion>1.0.2</txtProductVersion>
                                 <productName>TUI-Mines</productName>
                                 <internalName>TUI-Mines</internalName>
                                 <originalFilename>TUI-Mines.exe</originalFilename>
@@ -105,7 +105,7 @@
         <dependency>
             <groupId>io.github.defective4.javajam.tuimines</groupId>
             <artifactId>discord-presence-min</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.xerial</groupId>

@@ -1,0 +1,2 @@
+#!/bin/sh
+java -jar /usr/share/java/tui-mines/tui-mines-game-1.0.2-jar-with-dependencies.jar $@
