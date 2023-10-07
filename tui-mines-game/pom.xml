@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.defective4.javajam.tuimines</groupId>
+        <artifactId>tui-mines</artifactId>
+        <version>1.0.1</version>
+    </parent>
+
+    <artifactId>tui-mines-game</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+
+    <repositories>
+        <repository>
+            <id>scijava</id>
+            <url>https://maven.scijava.org/content/repositories/public/</url>
+        </repository>
+    </repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>io.github.defective4.javajam.tuisweeper.Main</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>assembly</id>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <phase>
+                            package
+                        </phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>2.4.1</version>
+                <executions>
+                    <execution>
+                        <id>exe</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <jar>target/tui-mines-game-1.0.1-jar-with-dependencies.jar
+                            </jar>
+                            <outfile>target/TUI-Mines-1.0.1.exe</outfile>
+                            <chdir>.</chdir>
+                            <priority>normal</priority>
+                            <stayAlive>false</stayAlive>
+                            <restartOnCrash>false</restartOnCrash>
+                            <icon>../img/logo.ico</icon>
+                            <jre>
+                                <path>%JAVA_HOME%;%PATH%</path>
+                                <requiresJdk>false</requiresJdk>
+                                <requires64Bit>false</requires64Bit>
+                                <minVersion>1.8</minVersion>
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>1.0.1.0</fileVersion>
+                                <txtFileVersion>1.0.1</txtFileVersion>
+                                <fileDescription>The TUI Mines game</fileDescription>
+                                <copyright>Defective</copyright>
+                                <productVersion>1.0.1.0</productVersion>
+                                <txtProductVersion>1.0.1</txtProductVersion>
+                                <productName>TUI-Mines</productName>
+                                <internalName>TUI-Mines</internalName>
+                                <originalFilename>TUI-Mines.exe</originalFilename>
+                                <language>ENGLISH_US</language>
+                            </versionInfo>
+                            <messages>
+                                <startupErr>An error occurred while starting the application.</startupErr>
+                                <jreNotFoundErr>TUI Mines requires Java Runtime Environment 1.8</jreNotFoundErr>
+                                <jreVersionErr>TUI Mines requires Java Runtime Environment 1.8</jreVersionErr>
+                                <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation
+                                    or the runtime is corrupted.
+                                </launcherErr>
+                                <instanceAlreadyExistsMsg>An application instance is already running.
+                                </instanceAlreadyExistsMsg>
+                            </messages>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.Vatuu</groupId>
+            <artifactId>discord-rpc</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.43.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.lanterna</groupId>
+            <artifactId>lanterna</artifactId>
+            <version>3.1.1</version>
+        </dependency>
+    </dependencies>
+
+
+</project>

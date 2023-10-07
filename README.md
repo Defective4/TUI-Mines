@@ -3,7 +3,7 @@
 ![](https://img.shields.io/github/last-commit/defective4/TUI-Mines/master?style=flat-square)   [![](https://img.shields.io/github/actions/workflow/status/defective4/tui-mines/maven.yml?style=flat-square)](https://github.com/Defective4/TUI-Mines/actions)   ![](https://img.shields.io/github/license/defective4/TUI-Mines?style=flat-square)  [![](https://img.shields.io/github/v/release/defective4/tui-mines?style=flat-square)](https://github.com/Defective4/TUI-Mines/releases)     
 [Releases](https://github.com/Defective4/TUI-Mines/releases) | [**Installation**](#-installation) | [Share your theme/replay](#-share-your-theme-or-replay)
 
-# ![info](img/info.png) Description
+# ![info](tui-mines-game/img/info.png) Description
 
 TUI Mines is a game created for the **Java Jam** hosted at [Java Community](https://discord.com/invite/X3NmMgzFKF)
 Discord
@@ -11,9 +11,9 @@ server.
 It's a Minesweeper clone designed to run entirely in terminal.  
 The game also has its own terminal emulator that can be used as an alternative.
 
-[![vote](img/vote.png)](https://discord.com/invite/X3NmMgzFKF)
+[![vote](tui-mines-game/img/vote.png)](https://discord.com/invite/X3NmMgzFKF)
 
-# ![features](img/features.png) Features
+# ![features](tui-mines-game/img/features.png) Features
 
 - Playable without any GUI in a headless environment
 - All classic mechanics from Minesweeper, including chording
@@ -23,7 +23,7 @@ The game also has its own terminal emulator that can be used as an alternative.
 - [User driven themes and replays repository](https://github.com/Defective4/TUI-Mines-Repo)
 - Discord integration (Rich presence)
 
-# ![installation](img/install.png) Installation
+# ![installation](tui-mines-game/img/install.png) Installation
 
 |           Contents            |
 |:-----------------------------:|
@@ -74,7 +74,7 @@ want to install/don't have root privileges) from the [Releases page](https://git
 TUI Mines should be able to run on any platform that can run Java applications.  
 It was confirmed to run in Termux on Android.
 
-# ![build](img/build.png) Building from source
+# ![build](tui-mines-game/img/build.png) Building from source
 
 ## Requirements
 
@@ -95,10 +95,10 @@ Also [Git](https://git-scm.com/downloads) is recommended to clone the repository
     mvn clean package
     ``` 
 3. After successful build you will find built exe  
-   and `jar-with-dependencies` in the `target`
+   and `jar-with-dependencies` in the `tui-mines-game/target`
    directory
 
-# ![share](img/share.png) Share your theme or replay
+# ![share](tui-mines-game/img/share.png) Share your theme or replay
 
 ### [User assets repository](https://github.com/Defective4/TUI-Mines-Repo)
 
@@ -106,7 +106,7 @@ You can share your themes and replays in a separate repository (see link above).
 Instructions on how to share are also included.  
 All shared assets are available for viewing and downloading using **in-game browser**.
 
-# ![cogs](img/cogs.png) Technical information
+# ![cogs](tui-mines-game/img/cogs.png) Technical information
 
 ## Libraries used
 
