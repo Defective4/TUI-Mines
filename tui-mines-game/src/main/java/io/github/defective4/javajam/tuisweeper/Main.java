@@ -160,7 +160,7 @@ public final class Main {
                 SwingTerminalFrame frame = (SwingTerminalFrame) term;
                 Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setSize((int) (dim.getWidth() - 4), (int) dim.getHeight());
+                frame.setSize(Math.min((int) (dim.getWidth() - 4), 732), Math.min((int) dim.getHeight(), 612));
                 frame.setLocation(2, 0);
                 frame.setTitle("TUI-Mines");
                 try {
