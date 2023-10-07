@@ -33,12 +33,6 @@ build/
 ### Mac OS ###
 .DS_Store
 /tui-mines-game/src/main/resources/META-INF/MANIFEST.MF
-/.idea/misc.xml
-/.idea/discord.xml
-/.idea/compiler.xml
-/.idea/workspace.xml
-/.idea/jarRepositories.xml
-/.idea/encodings.xml
-/.idea/vcs.xml
+/.idea/*.xml
 /.idea/inspectionProfiles/
 /.idea/codeStyles

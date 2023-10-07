@@ -1,9 +1,13 @@
 package io.github.defective4.javajam.tuisweeper.core.integr;
 
 import io.github.defective4.javajam.tuisweeper.core.TUIMines;
-import net.arikia.dev.drpc.DiscordEventHandlers;
-import net.arikia.dev.drpc.DiscordRPC;
-import net.arikia.dev.drpc.DiscordRichPresence;
+import io.github.defective4.javajam.tuisweeper.discord.DiscordEventHandlers;
+import io.github.defective4.javajam.tuisweeper.discord.DiscordPresenceData;
+import io.github.defective4.javajam.tuisweeper.discord.DiscordUser;
+import io.github.defective4.javajam.tuisweeper.discord.DiscordWrapper;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Provides methods to easily init and update Discord Rich Presence
@@ -11,39 +15,48 @@ import net.arikia.dev.drpc.DiscordRichPresence;
  * @author Defective
  */
 public final class DiscordIntegr {
+    private static final Timer cTimer = new Timer(true);
     private static long LAST_UPDATE = System.currentTimeMillis();
     private static long START_DATE = System.currentTimeMillis();
     private static boolean enabled;
-    private static boolean INIT;
+    private static DiscordUser user;
+    private static boolean cTimerStarted;
 
     static {
-        Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::discordShutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(DiscordWrapper::shutdown));
     }
 
     private DiscordIntegr() {
     }
 
-    public static boolean isAvailable() {
-        return INIT;
+    public static DiscordUser getUser() {
+        return user;
     }
 
     public static void init() {
-        try {
-            DiscordRPC.discordInitialize("1158412076516114472", new DiscordEventHandlers(), true);
-            INIT = true;
-        } catch (Throwable ignored) {
+        DiscordWrapper.initialize("1158412076516114472",
+                                  new DiscordEventHandlers(
+                                          u -> user = u
+                                  ));
+        if (!cTimerStarted) {
+            cTimerStarted = true;
+            cTimer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    DiscordWrapper.runCallbacks();
+                }
+            }, 2500, 15000);
         }
     }
 
     public static boolean isEnabled() {
-        return enabled && INIT;
+        return enabled;
     }
 
     public static void setEnabled(boolean enabled, TUIMines game) {
         DiscordIntegr.enabled = enabled;
         if (!isEnabled()) {
-            if (INIT)
-                DiscordRPC.discordClearPresence();
+            DiscordWrapper.clearPresence();
         } else {
             if (game == null)
                 title();
@@ -54,9 +67,11 @@ public final class DiscordIntegr {
 
     public static void title() {
         if (isEnabled())
-            DiscordRPC.discordUpdatePresence(new DiscordRichPresence.Builder("In title screen")
-                                                     .setBigImage("sweeper-logo", "TUI Mines")
-                                                     .build());
+            DiscordWrapper.updatePresence(new DiscordPresenceData.Builder()
+                                                  .setState("In title screen")
+                                                  .setLargeImageKey("sweeper-logo")
+                                                  .setLargeImageText("TUI Mines")
+                                                  .createDiscordPresenceData());
     }
 
     public static void update(TUIMines game) {
@@ -67,20 +82,22 @@ public final class DiscordIntegr {
         }
         LAST_UPDATE = System.currentTimeMillis();
         String state = game.isReplay() ? "Watching a replay" : game.getGameOver() == 2 ? "Game won! (in " + game.getCurrentPlayingTime() + ")" : game.getGameOver() == 1 ? "Game Over" : "Playing";
-        DiscordRPC.discordUpdatePresence(new DiscordRichPresence.Builder(TUIMines.capitalize(game.getLocalDifficulty()) + " (" + game.getPercentDone() + "%)")
-                                                 .setBigImage("sweeper-logo", "TUI Mines")
-                                                 .setSmallImage(game.isReplay() ? "replay" : game.getLocalDifficulty()
+        DiscordWrapper.updatePresence(new DiscordPresenceData.Builder()
+                                              .setState(TUIMines.capitalize(game.getLocalDifficulty()) + " (" + game.getPercentDone() + "%)")
+                                              .setLargeImageKey("sweeper-logo")
+                                              .setLargeImageText("TUI Mines")
+                                              .setSmallImageKey(game.isReplay() ? "replay" : game.getLocalDifficulty()
                                                                                                  .name()
-                                                                                                 .toLowerCase(),
-                                                                String.format("%s (%sx%s - %s bombs)" + (game.isReplay() ? "(Replay)" : ""),
-                                                                              TUIMines.capitalize(
-                                                                                      game.getLocalDifficulty()),
-                                                                              game.getWidth(),
-                                                                              game.getHeight(),
-                                                                              game.getBombs()))
-                                                 .setDetails(state)
-                                                 .setStartTimestamps(START_DATE)
-                                                 .build());
+                                                                                                 .toLowerCase())
+                                              .setSmallImageText(String.format("%s (%sx%s - %s bombs)" + (game.isReplay() ? "(Replay)" : ""),
+                                                                               TUIMines.capitalize(
+                                                                                       game.getLocalDifficulty()),
+                                                                               game.getWidth(),
+                                                                               game.getHeight(),
+                                                                               game.getBombs()))
+                                              .setDetails(state)
+                                              .setStartTimestamp(START_DATE)
+                                              .createDiscordPresenceData());
     }
 
     public static void updateStartDate() {

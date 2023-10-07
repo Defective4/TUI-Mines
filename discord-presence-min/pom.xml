@@ -3,25 +3,28 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.defective4.javajam.tuimines</groupId>
+        <artifactId>tui-mines</artifactId>
+        <version>1.0.1</version>
+    </parent>
 
-    <groupId>io.github.defective4.javajam.tuimines</groupId>
-    <artifactId>tui-mines</artifactId>
-    <version>1.0.1</version>
-    <packaging>pom</packaging>
-    <description>Terminal based Minesweeper game</description>
-    <inceptionYear>2023</inceptionYear>
+    <description>A minimal Discord Presence wrapper</description>
 
-    <organization>
-        <name>Defective</name>
-    </organization>
-    <modules>
-        <module>tui-mines-game</module>
-        <module>discord-presence-min</module>
-    </modules>
+    <artifactId>discord-presence-min</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna-platform</artifactId>
+            <version>5.13.0</version>
+        </dependency>
+    </dependencies>
+
 </project>

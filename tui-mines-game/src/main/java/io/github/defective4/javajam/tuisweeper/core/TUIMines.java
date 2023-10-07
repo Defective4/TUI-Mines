@@ -26,6 +26,8 @@ import io.github.defective4.javajam.tuisweeper.core.sfx.*;
 import io.github.defective4.javajam.tuisweeper.core.storage.Leaderboards;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.*;
+import io.github.defective4.javajam.tuisweeper.discord.DiscordUser;
+import io.github.defective4.javajam.tuisweeper.discord.DiscordWrapper;
 
 import java.awt.Point;
 import java.io.File;
@@ -547,7 +549,7 @@ public class TUIMines {
                                 boolean sndAvailable = sfx.isAvailable();
                                 boolean guiAvailable = term
                                         instanceof SwingTerminalFrame;
-                                boolean discordAvailable = DiscordIntegr.isAvailable();
+                                boolean discordAvailable = DiscordWrapper.isAvailable();
 
                                 CheckBox shaking = new SFXCheckBox("Enable screen shaking",
                                                                    ops.isScreenShaking() && guiAvailable,
@@ -718,15 +720,21 @@ public class TUIMines {
                                 }
                             };
 
-                            win.setComponent(Panels.grid(2,
-                                                         Panels.vertical(game,
-                                                                         replays,
-                                                                         theme,
-                                                                         options,
-                                                                         leaderboards,
-                                                                         about,
-                                                                         done),
-                                                         text));
+                            DiscordUser user = DiscordIntegr.getUser();
+                            Label discord = new Label(
+                                    !DiscordIntegr.isEnabled() || user == null ? "Not connected to Discord" : "Logged to Discord as:\n" +
+                                                                                                              user.username
+                            );
+
+                            win.setComponent(Panels.vertical(discord, new EmptySpace(), Panels.grid(2,
+                                                                                                    Panels.vertical(game,
+                                                                                                                    replays,
+                                                                                                                    theme,
+                                                                                                                    options,
+                                                                                                                    leaderboards,
+                                                                                                                    about,
+                                                                                                                    done),
+                                                                                                    text)));
                             this.gui.addWindowAndWait(win);
                             break;
                         }
