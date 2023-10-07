@@ -1,5 +1,10 @@
 package io.github.defective4.javajam.tuisweeper.discord;
 
+/**
+ * Contains information about a Discord user
+ *
+ * @author Defective
+ */
 public class DiscordUser extends OrderedStructure {
     public String userId;
     public String username;

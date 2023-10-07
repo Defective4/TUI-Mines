@@ -1,5 +1,10 @@
 package io.github.defective4.javajam.tuisweeper.discord;
 
+/**
+ * Presence data that can be presented to Discord API
+ *
+ * @author Defective
+ */
 public class DiscordPresenceData extends OrderedStructure {
     public static class Builder {
 
@@ -112,6 +117,7 @@ public class DiscordPresenceData extends OrderedStructure {
                                            spectateSecret);
         }
     }
+
     public final int instance = 1;
     public String state;   /* max 128 bytes */
     public String details; /* max 128 bytes */

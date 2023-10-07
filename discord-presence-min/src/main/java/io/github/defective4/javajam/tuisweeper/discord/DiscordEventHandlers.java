@@ -1,5 +1,8 @@
 package io.github.defective4.javajam.tuisweeper.discord;
 
+/**
+ * @author Defective
+ */
 public class DiscordEventHandlers extends OrderedStructure {
     public DiscordReadyCallback ready;
 

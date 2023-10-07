@@ -3,6 +3,12 @@ package io.github.defective4.javajam.tuisweeper.discord;
 
 import com.sun.jna.Native;
 
+/**
+ * Wraps {@link DiscordLibrary}.
+ * It takes care of library loading so it's safer to use this wrapper than the library itself.
+ *
+ * @author Defective
+ */
 public final class DiscordWrapper {
 
     private static final String[] LIBS = {
