@@ -23,6 +23,10 @@ The game also has its own terminal emulator that can be used as an alternative.
 - [User driven themes and replays repository](https://github.com/Defective4/TUI-Mines-Repo)
 - Discord integration (Rich presence)
 
+# ![planned](img/star.png) Planned
+- [ ] Live multiplayer
+- [ ] More game styles/modes
+
 # ![installation](img/install.png) Installation
 
 |           Contents            |
