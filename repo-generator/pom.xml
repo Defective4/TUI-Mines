@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.defective4.javajam.tuimines</groupId>
         <artifactId>tui-mines</artifactId>
-        <version>1.0.2.1</version>
+        <version>1.0.2.2</version>
     </parent>
 
     <artifactId>repo-generator</artifactId>
@@ -52,7 +52,7 @@
         <dependency>
             <groupId>io.github.defective4.javajam.tuimines</groupId>
             <artifactId>game-components</artifactId>
-            <version>1.0.2.1</version>
+            <version>1.0.2.2</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
