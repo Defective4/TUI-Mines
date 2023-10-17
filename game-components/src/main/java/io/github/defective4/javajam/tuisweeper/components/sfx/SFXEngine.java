@@ -1,4 +1,4 @@
-package io.github.defective4.javajam.tuisweeper.core.sfx;
+package io.github.defective4.javajam.tuisweeper.components.sfx;
 
 import javax.sound.sampled.*;
 import java.io.*;

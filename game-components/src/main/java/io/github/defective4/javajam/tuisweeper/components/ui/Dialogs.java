@@ -1,11 +1,12 @@
-package io.github.defective4.javajam.tuisweeper.core.ui;
+package io.github.defective4.javajam.tuisweeper.components.ui;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXMessageDialogBuilder;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SFXButton;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SFXEngine;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SFXMessageDialogBuilder;
+import io.github.defective4.javajam.tuisweeper.components.ui.SimpleWindow;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;

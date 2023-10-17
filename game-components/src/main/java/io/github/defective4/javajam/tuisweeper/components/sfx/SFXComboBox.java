@@ -1,7 +1,7 @@
-package io.github.defective4.javajam.tuisweeper.core.sfx;
+package io.github.defective4.javajam.tuisweeper.components.sfx;
 
+import com.googlecode.lanterna.gui2.ComboBox;
 import com.googlecode.lanterna.gui2.Interactable;
-import com.googlecode.lanterna.gui2.RadioBoxList;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 
@@ -9,11 +9,20 @@ import com.googlecode.lanterna.input.KeyType;
  * @param <T>
  * @author Defective
  */
-public class SFXRadioBoxList<T> extends RadioBoxList<T> {
+public class SFXComboBox<T> extends ComboBox<T> {
+
     private final SFXEngine sfx;
 
-    public SFXRadioBoxList(SFXEngine sfx) {
+    @SafeVarargs
+    public SFXComboBox(SFXEngine sfx, T... items) {
+        super(items);
         this.sfx = sfx;
+    }
+
+    @Override
+    protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
+        super.afterEnterFocus(direction, previouslyInFocus);
+        sfx.play("focus");
     }
 
     @Override
@@ -23,11 +32,5 @@ public class SFXRadioBoxList<T> extends RadioBoxList<T> {
         else if (keyStroke.getKeyType() == KeyType.Enter || keyStroke.getKeyType() == KeyType.Character && keyStroke.getCharacter() == ' ')
             sfx.play("confirm");
         return res;
-    }
-
-    @Override
-    protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
-        super.afterEnterFocus(direction, previouslyInFocus);
-        sfx.play("focus");
     }
 }

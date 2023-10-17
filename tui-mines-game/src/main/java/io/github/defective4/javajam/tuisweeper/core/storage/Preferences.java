@@ -16,8 +16,8 @@ import java.nio.file.Files;
 
 import static com.googlecode.lanterna.TextColor.ANSI;
 import static com.googlecode.lanterna.TextColor.RGB;
-import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.optimize;
-import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.toRGB;
+import static io.github.defective4.javajam.tuisweeper.components.ui.util.ColorConverter.optimize;
+import static io.github.defective4.javajam.tuisweeper.components.ui.util.ColorConverter.toRGB;
 
 /**
  * Stores user's game preferences, theme and options

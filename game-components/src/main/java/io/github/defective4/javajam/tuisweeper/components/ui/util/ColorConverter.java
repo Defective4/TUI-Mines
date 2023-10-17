@@ -1,4 +1,4 @@
-package io.github.defective4.javajam.tuisweeper.core.util;
+package io.github.defective4.javajam.tuisweeper.components.ui.util;
 
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.TextColor.ANSI;

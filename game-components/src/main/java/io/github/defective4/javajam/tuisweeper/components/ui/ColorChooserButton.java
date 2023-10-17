@@ -1,12 +1,12 @@
-package io.github.defective4.javajam.tuisweeper.core.ui;
+package io.github.defective4.javajam.tuisweeper.components.ui;
 
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.gui2.*;
-import io.github.defective4.javajam.tuisweeper.core.TUIMines;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
-import io.github.defective4.javajam.tuisweeper.core.util.ColorConverter;
+import io.github.defective4.javajam.tuisweeper.components.Strings;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SFXButton;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SFXEngine;
+import io.github.defective4.javajam.tuisweeper.components.ui.util.ColorConverter;
 
 import static com.googlecode.lanterna.TextColor.ANSI;
 
@@ -28,7 +28,7 @@ public final class ColorChooserButton extends SFXButton {
             Panel colorPanel = new Panel(new GridLayout(5));
 
             for (ANSI c : ANSI.values()) {
-                Button btn = new SFXButton(TUIMines.capitalize(c), sfx, false, () -> {
+                Button btn = new SFXButton(Strings.capitalize(c), sfx, false, () -> {
                     win.close();
                     setColor(c);
                 });
@@ -91,7 +91,7 @@ public final class ColorChooserButton extends SFXButton {
     public void setColor(TextColor color) {
         this.color = color;
         ANSI ansi = color instanceof ANSI ? (ANSI) color : null;
-        setLabel(ansi == null ? "Custom" : TUIMines.capitalize(ansi));
+        setLabel(ansi == null ? "Custom" : Strings.capitalize(ansi));
         setTheme(new SimpleTheme(ColorConverter.isDark(color) ? ANSI.WHITE_BRIGHT : ANSI.BLACK, color));
     }
 }

@@ -14,12 +14,12 @@ import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import io.github.defective4.javajam.tuisweeper.core.TUIMines;
 import io.github.defective4.javajam.tuisweeper.core.integr.DiscordIntegr;
 import io.github.defective4.javajam.tuisweeper.core.integr.GithubIntegr;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXButton;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXMessageDialogBuilder;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SFXButton;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SFXEngine;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SFXMessageDialogBuilder;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
-import io.github.defective4.javajam.tuisweeper.core.ui.Dialogs;
-import io.github.defective4.javajam.tuisweeper.core.ui.SimpleWindow;
+import io.github.defective4.javajam.tuisweeper.components.ui.Dialogs;
+import io.github.defective4.javajam.tuisweeper.components.ui.SimpleWindow;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -34,7 +34,7 @@ import java.net.URI;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static io.github.defective4.javajam.tuisweeper.core.ui.Dialogs.showErrorDialog;
+import static io.github.defective4.javajam.tuisweeper.components.ui.Dialogs.showErrorDialog;
 
 /**
  * Main entry point of the game

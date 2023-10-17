@@ -1,8 +1,8 @@
-package io.github.defective4.javajam.tuisweeper.core.ui;
+package io.github.defective4.javajam.tuisweeper.components.ui;
 
 import com.googlecode.lanterna.gui2.Interactable;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXTextBox;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SFXEngine;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SFXTextBox;
 
 import java.util.regex.Pattern;
 

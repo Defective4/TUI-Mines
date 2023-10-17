@@ -1,4 +1,4 @@
-package io.github.defective4.javajam.tuisweeper.core.ui;
+package io.github.defective4.javajam.tuisweeper.components.ui;
 
 import com.googlecode.lanterna.gui2.BasicWindow;
 

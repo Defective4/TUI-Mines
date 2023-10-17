@@ -118,9 +118,9 @@
             <version>2.10.1</version>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.lanterna</groupId>
-            <artifactId>lanterna</artifactId>
-            <version>3.1.1</version>
+            <groupId>io.github.defective4.javajam.tuimines</groupId>
+            <artifactId>game-components</artifactId>
+            <version>1.0.2.1</version>
         </dependency>
     </dependencies>
 
