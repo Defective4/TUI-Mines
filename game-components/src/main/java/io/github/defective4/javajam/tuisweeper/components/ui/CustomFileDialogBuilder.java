@@ -6,7 +6,7 @@ import com.googlecode.lanterna.gui2.dialogs.FileDialog;
 import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
-import io.github.defective4.javajam.tuisweeper.components.sfx.SFXEngine;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SoundEngine;
 import io.github.defective4.javajam.tuisweeper.components.sfx.SFXMessageDialogBuilder;
 
 import java.io.File;
@@ -22,17 +22,17 @@ import java.util.List;
 public class CustomFileDialogBuilder extends FileDialogBuilder {
 
     private final boolean save;
-    private final SFXEngine sfx;
+    private final SoundEngine sfx;
 
     private String forcedExtension;
 
-    public CustomFileDialogBuilder(boolean save, SFXEngine sfx) {
+    public CustomFileDialogBuilder(boolean save, SoundEngine sfx) {
         this.save = save;
         this.sfx = sfx;
     }
 
 
-    public CustomFileDialogBuilder(SFXEngine sfx) {
+    public CustomFileDialogBuilder(SoundEngine sfx) {
         this(false, sfx);
     }
 

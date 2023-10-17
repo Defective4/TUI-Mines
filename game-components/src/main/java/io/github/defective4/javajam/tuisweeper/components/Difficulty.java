@@ -1,4 +1,4 @@
-package io.github.defective4.javajam.tuisweeper.core;
+package io.github.defective4.javajam.tuisweeper.components;
 
 /**
  * An enum containing all difficulties the player can choose
@@ -44,6 +44,6 @@ public enum Difficulty {
 
     @Override
     public String toString() {
-        return TUIMines.capitalize(this);
+        return Strings.capitalize(this);
     }
 }

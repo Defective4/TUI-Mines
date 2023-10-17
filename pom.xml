@@ -18,6 +18,7 @@
         <module>tui-mines-game</module>
         <module>discord-presence-min</module>
         <module>game-components</module>
+        <module>repo-generator</module>
     </modules>
 
     <properties>

@@ -1,6 +1,6 @@
-package io.github.defective4.javajam.tuisweeper.core.replay;
+package io.github.defective4.javajam.tuisweeper.components.replay;
 
-import io.github.defective4.javajam.tuisweeper.core.Difficulty;
+import io.github.defective4.javajam.tuisweeper.components.Difficulty;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -10,10 +10,9 @@ import java.util.Locale;
 
 /**
  * Stores all data required to replay a full game.
- * Can be played in {@link ReplayPlayer}
+ * Can be played in ReplayPlayer
  *
  * @author Defective
- * @see ReplayRecorder
  * @see ReplayIO
  */
 public class Replay {
@@ -213,7 +212,7 @@ public class Replay {
         return width;
     }
 
-    protected void setWidth(int width) {
+    public void setWidth(int width) {
         this.width = width;
     }
 
@@ -221,7 +220,7 @@ public class Replay {
         return height;
     }
 
-    protected void setHeight(int height) {
+    public void setHeight(int height) {
         this.height = height;
     }
 

@@ -15,9 +15,9 @@ import java.util.List;
  * @author Defective
  */
 public class SFXMessageDialogBuilder extends MessageDialogBuilder {
-    private final SFXEngine sfx;
+    private final SoundEngine sfx;
 
-    public SFXMessageDialogBuilder(SFXEngine sfx) {
+    public SFXMessageDialogBuilder(SoundEngine sfx) {
         this.sfx = sfx;
         setExtraWindowHints(Arrays.asList(Window.Hint.NO_POST_RENDERING, Window.Hint.CENTERED));
     }

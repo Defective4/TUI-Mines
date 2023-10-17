@@ -9,9 +9,9 @@ import com.googlecode.lanterna.input.KeyType;
  */
 public class SFXTextBox extends TextBox {
 
-    private final SFXEngine sfx;
+    private final SoundEngine sfx;
 
-    public SFXTextBox(String initialContent, SFXEngine sfx) {
+    public SFXTextBox(String initialContent, SoundEngine sfx) {
         super(initialContent);
         this.sfx = sfx;
         setInputFilter((interactable, keyStroke) -> {

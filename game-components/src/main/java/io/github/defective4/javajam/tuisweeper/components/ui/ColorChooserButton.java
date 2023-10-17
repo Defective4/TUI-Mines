@@ -5,7 +5,7 @@ import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.gui2.*;
 import io.github.defective4.javajam.tuisweeper.components.Strings;
 import io.github.defective4.javajam.tuisweeper.components.sfx.SFXButton;
-import io.github.defective4.javajam.tuisweeper.components.sfx.SFXEngine;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SoundEngine;
 import io.github.defective4.javajam.tuisweeper.components.ui.util.ColorConverter;
 
 import static com.googlecode.lanterna.TextColor.ANSI;
@@ -21,7 +21,7 @@ public final class ColorChooserButton extends SFXButton {
 
     private TextColor color;
 
-    public ColorChooserButton(WindowBasedTextGUI gui, TextColor color, SFXEngine sfx) {
+    public ColorChooserButton(WindowBasedTextGUI gui, TextColor color, SoundEngine sfx) {
         super("", sfx, false, () -> {});
         addListener(button -> {
             Window win = new SimpleWindow("Color chooser");

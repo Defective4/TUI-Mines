@@ -8,15 +8,15 @@ import com.googlecode.lanterna.gui2.Interactable;
  */
 public class SFXButton extends Button {
 
-    private final SFXEngine sfx;
+    private final SoundEngine sfx;
 
-    public SFXButton(String label, SFXEngine sfx, boolean back, Runnable action) {
+    public SFXButton(String label, SoundEngine sfx, boolean back, Runnable action) {
         super(label, () -> sfx.play(back ? "back" : "click"));
         this.sfx = sfx;
         addListener(b -> action.run());
     }
 
-    public SFXButton(String label, SFXEngine sfx, Runnable action) {
+    public SFXButton(String label, SoundEngine sfx, Runnable action) {
         this(label, sfx, false, action);
     }
 

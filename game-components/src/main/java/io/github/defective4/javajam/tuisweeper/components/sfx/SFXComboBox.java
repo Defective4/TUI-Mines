@@ -11,10 +11,10 @@ import com.googlecode.lanterna.input.KeyType;
  */
 public class SFXComboBox<T> extends ComboBox<T> {
 
-    private final SFXEngine sfx;
+    private final SoundEngine sfx;
 
     @SafeVarargs
-    public SFXComboBox(SFXEngine sfx, T... items) {
+    public SFXComboBox(SoundEngine sfx, T... items) {
         super(items);
         this.sfx = sfx;
     }

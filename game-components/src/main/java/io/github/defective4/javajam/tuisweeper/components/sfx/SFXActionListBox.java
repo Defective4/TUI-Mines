@@ -8,9 +8,9 @@ import com.googlecode.lanterna.input.KeyStroke;
  * @author Defective
  */
 public class SFXActionListBox extends ActionListBox {
-    private final SFXEngine sfx;
+    private final SoundEngine sfx;
 
-    public SFXActionListBox(SFXEngine sfx) {
+    public SFXActionListBox(SoundEngine sfx) {
         this.sfx = sfx;
     }
 

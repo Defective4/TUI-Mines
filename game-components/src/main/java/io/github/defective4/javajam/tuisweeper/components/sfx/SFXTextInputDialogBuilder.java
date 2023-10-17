@@ -14,9 +14,9 @@ import java.util.List;
  */
 public class SFXTextInputDialogBuilder extends TextInputDialogBuilder {
 
-    private final SFXEngine sfx;
+    private final SoundEngine sfx;
 
-    public SFXTextInputDialogBuilder(SFXEngine sfx) {
+    public SFXTextInputDialogBuilder(SoundEngine sfx) {
         this.sfx = sfx;
     }
 

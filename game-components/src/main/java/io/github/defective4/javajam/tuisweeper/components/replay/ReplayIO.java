@@ -1,6 +1,7 @@
-package io.github.defective4.javajam.tuisweeper.core.replay;
+package io.github.defective4.javajam.tuisweeper.components.replay;
 
-import io.github.defective4.javajam.tuisweeper.core.Difficulty;
+
+import io.github.defective4.javajam.tuisweeper.components.Difficulty;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

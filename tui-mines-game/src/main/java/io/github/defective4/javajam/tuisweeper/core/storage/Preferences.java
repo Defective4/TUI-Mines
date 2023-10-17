@@ -7,7 +7,7 @@ import com.google.gson.JsonPrimitive;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.graphics.Theme;
-import io.github.defective4.javajam.tuisweeper.core.Difficulty;
+import io.github.defective4.javajam.tuisweeper.components.Difficulty;
 import io.github.defective4.javajam.tuisweeper.core.ui.ThemePreset;
 
 import java.io.*;

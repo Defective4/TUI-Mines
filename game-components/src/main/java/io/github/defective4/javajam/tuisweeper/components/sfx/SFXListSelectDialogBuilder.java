@@ -14,9 +14,9 @@ import java.util.List;
  */
 public class SFXListSelectDialogBuilder<T> extends ListSelectDialogBuilder<T> {
 
-    private final SFXEngine sfx;
+    private final SoundEngine sfx;
 
-    public SFXListSelectDialogBuilder(SFXEngine sfx) {
+    public SFXListSelectDialogBuilder(SoundEngine sfx) {
         this.sfx = sfx;
     }
 

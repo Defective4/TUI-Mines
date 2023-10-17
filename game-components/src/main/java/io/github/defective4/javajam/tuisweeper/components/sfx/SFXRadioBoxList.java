@@ -10,9 +10,9 @@ import com.googlecode.lanterna.input.KeyType;
  * @author Defective
  */
 public class SFXRadioBoxList<T> extends RadioBoxList<T> {
-    private final SFXEngine sfx;
+    private final SoundEngine sfx;
 
-    public SFXRadioBoxList(SFXEngine sfx) {
+    public SFXRadioBoxList(SoundEngine sfx) {
         this.sfx = sfx;
     }
 

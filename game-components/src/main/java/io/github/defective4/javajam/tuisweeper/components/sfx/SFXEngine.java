@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Defective
  */
-public final class SFXEngine {
+public final class SFXEngine implements SoundEngine {
     private final AudioFormat FORMAT = new AudioFormat(44100, 16, 1, true, false);
 
     private final ScheduledExecutorService service = Executors.newScheduledThreadPool(10);
@@ -58,6 +58,7 @@ public final class SFXEngine {
         this.enabled = enabled;
     }
 
+    @Override
     public void play(String sound) {
         if (!isAvailable() || !enabled) return;
         synchronized (queue) {
@@ -65,6 +66,7 @@ public final class SFXEngine {
         }
     }
 
+    @Override
     public boolean isAvailable() {
         return available;
     }

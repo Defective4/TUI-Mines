@@ -1,7 +1,7 @@
 package io.github.defective4.javajam.tuisweeper.components.ui;
 
 import com.googlecode.lanterna.gui2.Interactable;
-import io.github.defective4.javajam.tuisweeper.components.sfx.SFXEngine;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SoundEngine;
 import io.github.defective4.javajam.tuisweeper.components.sfx.SFXTextBox;
 
 import java.util.regex.Pattern;
@@ -16,7 +16,7 @@ public class NumberBox extends SFXTextBox {
     private int min = 1;
     private int max = Integer.MAX_VALUE;
 
-    public NumberBox(int initial, SFXEngine sfx) {
+    public NumberBox(int initial, SoundEngine sfx) {
         super(Integer.toString(initial), sfx);
         setValidationPattern(Pattern.compile("[0-9]+"));
     }

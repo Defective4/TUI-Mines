@@ -9,9 +9,9 @@ import com.googlecode.lanterna.gui2.Interactable;
  */
 public class SFXCheckBox extends CheckBox {
 
-    private final SFXEngine sfx;
+    private final SoundEngine sfx;
 
-    public SFXCheckBox(String label, boolean checked, SFXEngine sfx) {
+    public SFXCheckBox(String label, boolean checked, SoundEngine sfx) {
         super(label);
         this.sfx = sfx;
         setChecked(checked);
