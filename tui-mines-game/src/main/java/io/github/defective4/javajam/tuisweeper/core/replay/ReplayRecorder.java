@@ -1,5 +1,6 @@
 package io.github.defective4.javajam.tuisweeper.core.replay;
 
+import io.github.defective4.javajam.tuisweeper.components.replay.Replay;
 import io.github.defective4.javajam.tuisweeper.core.MineBoard;
 import io.github.defective4.javajam.tuisweeper.core.TUIMines;
 

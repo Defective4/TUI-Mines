@@ -6,7 +6,7 @@
 
     <groupId>io.github.defective4.javajam.tuimines</groupId>
     <artifactId>tui-mines</artifactId>
-    <version>1.0.2.1</version>
+    <version>1.0.2.2</version>
     <packaging>pom</packaging>
     <description>Terminal based Minesweeper game</description>
     <inceptionYear>2023</inceptionYear>
@@ -17,6 +17,8 @@
     <modules>
         <module>tui-mines-game</module>
         <module>discord-presence-min</module>
+        <module>game-components</module>
+        <module>repo-generator</module>
     </modules>
 
     <properties>

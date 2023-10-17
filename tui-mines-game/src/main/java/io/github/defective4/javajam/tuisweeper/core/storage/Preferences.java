@@ -7,7 +7,7 @@ import com.google.gson.JsonPrimitive;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.graphics.Theme;
-import io.github.defective4.javajam.tuisweeper.core.Difficulty;
+import io.github.defective4.javajam.tuisweeper.components.Difficulty;
 import io.github.defective4.javajam.tuisweeper.core.ui.ThemePreset;
 
 import java.io.*;
@@ -16,8 +16,8 @@ import java.nio.file.Files;
 
 import static com.googlecode.lanterna.TextColor.ANSI;
 import static com.googlecode.lanterna.TextColor.RGB;
-import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.optimize;
-import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.toRGB;
+import static io.github.defective4.javajam.tuisweeper.components.ui.util.ColorConverter.optimize;
+import static io.github.defective4.javajam.tuisweeper.components.ui.util.ColorConverter.toRGB;
 
 /**
  * Stores user's game preferences, theme and options

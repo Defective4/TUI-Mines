@@ -1,8 +1,8 @@
 package io.github.defective4.javajam.tuisweeper.core.network;
 
-import io.github.defective4.javajam.tuisweeper.core.Difficulty;
-import io.github.defective4.javajam.tuisweeper.core.replay.Replay;
-import io.github.defective4.javajam.tuisweeper.core.replay.ReplayIO;
+import io.github.defective4.javajam.tuisweeper.components.Difficulty;
+import io.github.defective4.javajam.tuisweeper.components.replay.Replay;
+import io.github.defective4.javajam.tuisweeper.components.replay.ReplayIO;
 
 import java.io.InputStream;
 import java.net.URL;

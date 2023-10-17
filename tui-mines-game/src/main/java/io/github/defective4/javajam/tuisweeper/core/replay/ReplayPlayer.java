@@ -1,8 +1,9 @@
 package io.github.defective4.javajam.tuisweeper.core.replay;
 
 import com.googlecode.lanterna.gui2.TextBox;
+import io.github.defective4.javajam.tuisweeper.components.replay.Replay;
 import io.github.defective4.javajam.tuisweeper.core.TUIMines;
-import io.github.defective4.javajam.tuisweeper.core.sfx.SFXEngine;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SFXEngine;
 
 import java.util.ArrayList;
 import java.util.List;

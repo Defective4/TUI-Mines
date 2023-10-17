@@ -3,8 +3,8 @@ package io.github.defective4.javajam.tuisweeper.core.network;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import io.github.defective4.javajam.tuisweeper.core.Difficulty;
-import io.github.defective4.javajam.tuisweeper.core.replay.Replay;
+import io.github.defective4.javajam.tuisweeper.components.Difficulty;
+import io.github.defective4.javajam.tuisweeper.components.replay.Replay;
 
 import java.io.InputStreamReader;
 import java.net.URL;

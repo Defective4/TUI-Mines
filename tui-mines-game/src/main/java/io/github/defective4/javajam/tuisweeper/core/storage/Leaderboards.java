@@ -1,6 +1,6 @@
 package io.github.defective4.javajam.tuisweeper.core.storage;
 
-import io.github.defective4.javajam.tuisweeper.core.Difficulty;
+import io.github.defective4.javajam.tuisweeper.components.Difficulty;
 
 import java.io.File;
 import java.sql.*;

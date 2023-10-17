@@ -14,18 +14,25 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import io.github.defective4.javajam.tuisweeper.Main;
+import io.github.defective4.javajam.tuisweeper.components.Difficulty;
+import io.github.defective4.javajam.tuisweeper.components.Strings;
+import io.github.defective4.javajam.tuisweeper.components.sfx.*;
+import io.github.defective4.javajam.tuisweeper.components.ui.CustomFileDialogBuilder;
+import io.github.defective4.javajam.tuisweeper.components.ui.Dialogs;
+import io.github.defective4.javajam.tuisweeper.components.ui.SimpleWindow;
 import io.github.defective4.javajam.tuisweeper.core.integr.DiscordIntegr;
 import io.github.defective4.javajam.tuisweeper.core.network.RemoteReplay;
 import io.github.defective4.javajam.tuisweeper.core.network.RemoteTheme;
 import io.github.defective4.javajam.tuisweeper.core.network.Repository;
-import io.github.defective4.javajam.tuisweeper.core.replay.Replay;
-import io.github.defective4.javajam.tuisweeper.core.replay.ReplayIO;
+import io.github.defective4.javajam.tuisweeper.components.replay.Replay;
+import io.github.defective4.javajam.tuisweeper.components.replay.ReplayIO;
 import io.github.defective4.javajam.tuisweeper.core.replay.ReplayPlayer;
 import io.github.defective4.javajam.tuisweeper.core.replay.ReplayRecorder;
-import io.github.defective4.javajam.tuisweeper.core.sfx.*;
 import io.github.defective4.javajam.tuisweeper.core.storage.Leaderboards;
 import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
-import io.github.defective4.javajam.tuisweeper.core.ui.*;
+import io.github.defective4.javajam.tuisweeper.components.ui.ColorChooserButton;
+import io.github.defective4.javajam.tuisweeper.components.ui.NumberBox;
+import io.github.defective4.javajam.tuisweeper.core.ui.ThemePreset;
 import io.github.defective4.javajam.tuisweeper.discord.DiscordUser;
 import io.github.defective4.javajam.tuisweeper.discord.DiscordWrapper;
 
@@ -43,10 +50,10 @@ import java.util.*;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static io.github.defective4.javajam.tuisweeper.core.replay.Replay.*;
-import static io.github.defective4.javajam.tuisweeper.core.ui.Dialogs.showDownloadingWindow;
-import static io.github.defective4.javajam.tuisweeper.core.ui.Dialogs.showErrorDialog;
-import static io.github.defective4.javajam.tuisweeper.core.util.ColorConverter.applyBackground;
+import static io.github.defective4.javajam.tuisweeper.components.ui.Dialogs.showDownloadingWindow;
+import static io.github.defective4.javajam.tuisweeper.components.ui.Dialogs.showErrorDialog;
+import static io.github.defective4.javajam.tuisweeper.components.ui.util.ColorConverter.applyBackground;
+import static io.github.defective4.javajam.tuisweeper.components.replay.Replay.*;
 
 /**
  * The main game class.
@@ -804,10 +811,7 @@ public class TUIMines {
     }
 
     public static String capitalize(Enum<?> en) {
-        String[] split = en.name().split("_");
-        for (int x = 0; x < split.length; x++)
-            split[x] = split[x].substring(0, 1).toUpperCase() + split[x].substring(1).toLowerCase();
-        return String.join(" ", split);
+        return Strings.capitalize(en);
     }
 
     public static void showCtls(WindowBasedTextGUI gui, SFXEngine sfx, Preferences prefs) {
