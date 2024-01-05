@@ -10,9 +10,7 @@ import com.googlecode.lanterna.graphics.Theme;
 import io.github.defective4.javajam.tuisweeper.components.Difficulty;
 import io.github.defective4.javajam.tuisweeper.core.ui.ThemePreset;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.io.Reader;
 
 import static com.googlecode.lanterna.TextColor.ANSI;
 import static com.googlecode.lanterna.TextColor.RGB;
@@ -133,7 +131,7 @@ public class Preferences {
      * Stores user's options
      */
     public static class Options {
-        private boolean screenShaking = true;
+        private boolean screenShaking;
         private boolean sounds = true;
         private boolean discordIntegration = true;
         private boolean updatesEnabled = true;
@@ -204,58 +202,13 @@ public class Preferences {
     private int height = difficulty.getHeight();
     private int bombs = difficulty.getBombs();
 
-    public Preferences() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                save();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }));
-    }
-
-    public static File getConfigDirectory() {
-        String subdir = System.getProperty("os.name").toLowerCase().contains("windows") ?
-                        "AppData/Roaming/TUIMines" :
-                        ".config/tuimines";
-        return new File(System.getProperty("user.home") + "/" + subdir);
-    }
-
-    public static File getConfigFile() {
-        return new File(getConfigDirectory(), "config.json");
-    }
-
-    public static File getDatabaseFile() {
-        return new File(getConfigDirectory(), "storage.db");
-    }
-
-    public static File getReplaysDir() {
-        return new File(getConfigDirectory(), "replays");
-    }
-
-    public static Preferences load() throws Exception {
-        File in = getConfigFile();
-        if (in.isFile()) try (InputStreamReader reader = new FileReader(in)) {
-            Preferences prefs = new Gson().fromJson(reader, Preferences.class);
-            if (!prefs.getTheme().isValid()) prefs.getTheme().fromTheme(ThemePreset.PITCH_BLACK.toTheme());
-            return prefs;
-        }
-        Preferences clean = new Preferences();
-        clean.save();
-        return clean;
+    public static Preferences load() {
+        return new Preferences();
     }
 
     public OneTimeDialogs getOneTimeDialogs() {
         if (otd == null) otd = new OneTimeDialogs();
         return otd;
-    }
-
-    public void save() throws IOException {
-        File out = getConfigFile();
-        out.getParentFile().mkdirs();
-        try (OutputStream os = Files.newOutputStream(out.toPath())) {
-            os.write(new Gson().toJson(this).getBytes(StandardCharsets.UTF_8));
-        }
     }
 
     public boolean isFirstBoot() {

@@ -1,6 +1,9 @@
 package io.github.defective4.javajam.tuisweeper.components;
 
-public class Strings {
+public final class Strings {
+    private Strings() {
+    }
+
     public static String capitalize(Enum<?> en) {
         String[] split = en.name().split("_");
         for (int x = 0; x < split.length; x++)

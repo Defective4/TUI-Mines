@@ -61,7 +61,7 @@ echo "deb https://debian.racuszki.pl/api/packages/Defective/debian stable main" 
 sudo apt update
 ```
 
-2. Install TUI Mines using APT
+1. Install TUI Mines using APT
 
 ```shell
 sudo apt-get install tui-mines

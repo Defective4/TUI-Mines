@@ -12,8 +12,6 @@ import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import io.github.defective4.javajam.tuisweeper.core.TUIMines;
-import io.github.defective4.javajam.tuisweeper.core.integr.DiscordIntegr;
-import io.github.defective4.javajam.tuisweeper.core.integr.GithubIntegr;
 import io.github.defective4.javajam.tuisweeper.components.sfx.SFXButton;
 import io.github.defective4.javajam.tuisweeper.components.sfx.SFXEngine;
 import io.github.defective4.javajam.tuisweeper.components.sfx.SFXMessageDialogBuilder;
@@ -43,7 +41,7 @@ import static io.github.defective4.javajam.tuisweeper.components.ui.Dialogs.show
  */
 public final class Main {
 
-    public static final String VERSION = "1.0.2.2";
+    public static final String VERSION = "1.0.2.2 - Portable";
 
     private Main() {
     }
@@ -75,9 +73,6 @@ public final class Main {
             DefaultTerminalFactory factory = new DefaultTerminalFactory();
             Timer timer = new Timer(true);
             Preferences prefs = Preferences.load();
-            DiscordIntegr.init();
-            DiscordIntegr.setEnabled(prefs.getOptions().isDiscordIntegrationEnabled(), null);
-            DiscordIntegr.title();
             SFXEngine sfx = new SFXEngine();
             TextBox box = new TextBox();
             box.setReadOnly(true);
@@ -120,15 +115,6 @@ public final class Main {
             box.setInputFilter((interactable, keyStroke) -> {
                 if (keyStroke.getKeyType() == KeyType.Character || keyStroke.getKeyType() == KeyType.Enter) {
                     if (prefs.isFirstBoot()) {
-                        prefs
-                                .getOptions().setSounds(new MessageDialogBuilder()
-                                                                .setText(
-                                                                        "Do you want to enable sounds?\nYou can always change this setting in\ngame menu!")
-                                                                .setTitle("Enable sounds?")
-                                                                .addButton(MessageDialogButton.Yes)
-                                                                .addButton(MessageDialogButton.No)
-                                                                .build().showDialog(gui) == MessageDialogButton.Yes);
-                        sfx.setEnabled(prefs.getOptions().areSoundsEnabled());
                         Window twin = new SimpleWindow("First time");
                         twin.setComponent(Panels.vertical(
                                 new Label("It looks like it's your first time playing TUI Mines!"),
@@ -196,29 +182,6 @@ public final class Main {
                     }
                 }
             }, 1000);
-
-
-            if (prefs.getOptions().areUpdatesEnabled()) {
-                new Thread(() -> {
-                    try {
-                        String update = GithubIntegr.checkUpdates();
-                        if (update != null) {
-                            Window up = new SimpleWindow("Update available");
-
-                            up.setComponent(Panels.vertical(
-                                    new Label("A new update is available!\n" +
-                                              "\n" +
-                                              "New version: " + update + "\n" +
-                                              "Your version: v" + VERSION),
-                                    new EmptySpace(),
-                                    new SFXButton("Ok", sfx, up::close)
-                            ));
-                            gui.addWindow(up);
-                        }
-                    } catch (Exception ignored) {
-                    }
-                }).start();
-            }
 
             gui.addWindowAndWait(win);
         } catch (

@@ -6,7 +6,6 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import io.github.defective4.javajam.tuisweeper.components.sfx.SFXButton;
 import io.github.defective4.javajam.tuisweeper.components.sfx.SoundEngine;
 import io.github.defective4.javajam.tuisweeper.components.sfx.SFXMessageDialogBuilder;
-import io.github.defective4.javajam.tuisweeper.components.ui.SimpleWindow;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -129,7 +128,6 @@ public final class Dialogs {
                         })
                 )
         ));
-        sfx.play("error");
         gui.addWindowAndWait(win);
     }
 }

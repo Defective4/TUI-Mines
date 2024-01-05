@@ -9,7 +9,6 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.gui2.table.TableModel;
-import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
@@ -17,43 +16,25 @@ import io.github.defective4.javajam.tuisweeper.Main;
 import io.github.defective4.javajam.tuisweeper.components.Difficulty;
 import io.github.defective4.javajam.tuisweeper.components.Strings;
 import io.github.defective4.javajam.tuisweeper.components.sfx.*;
-import io.github.defective4.javajam.tuisweeper.components.ui.CustomFileDialogBuilder;
-import io.github.defective4.javajam.tuisweeper.components.ui.Dialogs;
-import io.github.defective4.javajam.tuisweeper.components.ui.SimpleWindow;
-import io.github.defective4.javajam.tuisweeper.core.integr.DiscordIntegr;
-import io.github.defective4.javajam.tuisweeper.core.network.RemoteReplay;
-import io.github.defective4.javajam.tuisweeper.core.network.RemoteTheme;
-import io.github.defective4.javajam.tuisweeper.core.network.Repository;
-import io.github.defective4.javajam.tuisweeper.components.replay.Replay;
-import io.github.defective4.javajam.tuisweeper.components.replay.ReplayIO;
-import io.github.defective4.javajam.tuisweeper.core.replay.ReplayPlayer;
-import io.github.defective4.javajam.tuisweeper.core.replay.ReplayRecorder;
-import io.github.defective4.javajam.tuisweeper.core.storage.Leaderboards;
-import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.components.ui.ColorChooserButton;
 import io.github.defective4.javajam.tuisweeper.components.ui.NumberBox;
+import io.github.defective4.javajam.tuisweeper.components.ui.SimpleWindow;
+import io.github.defective4.javajam.tuisweeper.core.network.RemoteTheme;
+import io.github.defective4.javajam.tuisweeper.core.network.Repository;
+import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.core.ui.ThemePreset;
-import io.github.defective4.javajam.tuisweeper.discord.DiscordUser;
-import io.github.defective4.javajam.tuisweeper.discord.DiscordWrapper;
 
-import java.awt.Point;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 import static io.github.defective4.javajam.tuisweeper.components.ui.Dialogs.showDownloadingWindow;
 import static io.github.defective4.javajam.tuisweeper.components.ui.Dialogs.showErrorDialog;
 import static io.github.defective4.javajam.tuisweeper.components.ui.util.ColorConverter.applyBackground;
-import static io.github.defective4.javajam.tuisweeper.components.replay.Replay.*;
 
 /**
  * The main game class.
@@ -76,9 +57,6 @@ public class TUIMines {
 
     private final Timer boardUpdater = new Timer(true);
     private final Preferences prefs;
-    private final ReplayRecorder recorder;
-    private final ReplayPlayer player;
-    private final Leaderboards leaders = new Leaderboards();
     private final Repository remoteRepo = new Repository();
     private final Label infoLabel;
     private long startTime = -1;
@@ -86,8 +64,9 @@ public class TUIMines {
     private boolean placed;
     private byte gameOver;
     private Difficulty localDifficulty = Difficulty.EASY;
-    private boolean isReplay;
-    private Replay currentReplay;
+
+
+    private final Runnable notAvailable;
 
     public TUIMines(Screen screen, WindowBasedTextGUI gui, Terminal term, SFXEngine sfx, Preferences prefs) {
         this.screen = screen;
@@ -95,24 +74,24 @@ public class TUIMines {
         this.term = term;
         this.sfx = sfx;
         this.prefs = prefs;
-        this.recorder = new ReplayRecorder(board, this);
-        this.sfx.setEnabled(this.prefs.getOptions().areSoundsEnabled());
         this.infoLabel = new Label("");
-        this.player = new ReplayPlayer(this, boardBox, sfx);
         updateTheme(this.prefs.getTheme());
+
+        notAvailable = () -> new MessageDialogBuilder()
+                .setTitle("Error")
+                .setText("This feature is not available in\n" +
+                         "this version of TUI-Mines\n" +
+                         "\n " +
+                         "Please download the full version at\n" +
+                         "https://github.com/Defective4/TUI-Mines")
+                .addButton(MessageDialogButton.OK)
+                .build().showDialog(gui);
 
         boardBox.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill,
                                                              LinearLayout.GrowPolicy.CanGrow));
         mainWindow.setComponent(Panels.vertical(infoLabel, boardBox));
 
         boardBox.setInputFilter((interactable, keyStroke) -> {
-            if (isReplay) {
-                if (keyStroke.getKeyType() == KeyType.Character && keyStroke.getCharacter() == 'n') {
-                    start();
-                }
-                if (gameOver == 0)
-                    return false;
-            }
             boolean allowed = false;
             TerminalPosition pos = boardBox.getCaretPosition();
 
@@ -140,7 +119,6 @@ public class TUIMines {
                                 } else {
                                     int cnt = reveal(absX, absY);
                                     updateBoard();
-                                    if (cnt > 0 && gameOver == 0) sfx.play(cnt > 10 ? "mass_reveal" : "reveal");
                                 }
                                 break;
                             }
@@ -158,7 +136,6 @@ public class TUIMines {
                                     byte type = matrix[x][y];
                                     if (type == 0 || type == 11) {
                                         boardBox.setCaretPosition(y + oy, x + ox);
-                                        recorder.action(Replay.ActionType.CARET, y + oy, x + ox);
                                         break;
                                     }
                                 }
@@ -240,11 +217,6 @@ public class TUIMines {
                                     TUIMines.this.prefs.setWidth(wBox.getValue());
                                     TUIMines.this.prefs.setHeight(hBox.getValue());
                                     TUIMines.this.prefs.setBombs(bBox.getValue());
-                                    try {
-                                        prefs.save();
-                                    } catch (IOException e) {
-                                        Dialogs.showErrorDialog(gui, e, sfx, "Couldn't save preferences!");
-                                    }
 
                                     win.close();
                                     win2.close();
@@ -418,90 +390,10 @@ public class TUIMines {
                                     }
                                 });
 
-                                Button share = new SFXButton("Share theme", sfx, false, () -> {
-                                    CustomFileDialogBuilder bd = (CustomFileDialogBuilder) new CustomFileDialogBuilder(
-                                            true,
-                                            sfx).setActionLabel("Save")
-                                                .setDescription("Choose location to save your theme")
-                                                .setTitle("Exporting theme")
-                                                .setSelectedFile(new File("theme.json"));
-                                    bd.setForcedExtension("json");
-                                    File file = bd.buildAndShow(gui);
-                                    if (file != null) {
-                                        try (OutputStream os = Files.newOutputStream(file.toPath())) {
-                                            save.run();
-                                            os.write(prefs.getTheme().toJSON().getBytes(StandardCharsets.UTF_8));
+                                Button share = new SFXButton("Share theme", sfx, false, notAvailable);
 
-                                            Window saved = new SimpleWindow("Theme exported");
+                                Button imp = new SFXButton("Import theme", sfx, false, notAvailable);
 
-                                            saved.setComponent(Panels.vertical(
-                                                    new Label("Theme exported to " + file + "!\n\n" +
-                                                              "Refer to\n" +
-                                                              "https://github.com/Defective4/TUI-Mines-Repo#how-to\n" +
-                                                              "if you want to submit your theme to the repository!"),
-                                                    new EmptySpace(),
-                                                    Panels.horizontal(
-                                                            new SFXButton("Close", sfx, true, saved::close),
-                                                            new SFXButton("Submit your theme",
-                                                                          sfx,
-                                                                          false,
-                                                                          () ->
-                                                                                  Main.openLink(
-                                                                                          "https://github.com/Defective4/TUI-Mines-Repo/issues/new?assignees=&labels=Theme&projects=&template=theme-submission.yml&title=%5BTheme%5D+",
-                                                                                          sfx,
-                                                                                          gui)
-
-                                                            )
-                                                    )
-                                            ));
-
-                                            gui.addWindowAndWait(saved);
-                                        } catch (Exception e) {
-                                            showErrorDialog(gui,
-                                                            e,
-                                                            sfx,
-                                                            "An exception was catched",
-                                                            "when trying to save your theme!");
-                                        }
-                                    }
-                                });
-
-                                Button imp = new SFXButton("Import theme", sfx, false, () -> {
-                                    CustomFileDialogBuilder builder = (CustomFileDialogBuilder) new CustomFileDialogBuilder(
-                                            sfx).setSelectedFile(new File("theme.json"))
-                                                .setTitle("Importing a theme")
-                                                .setDescription("Select a theme file to import")
-                                                .setActionLabel("Import");
-                                    builder.setForcedExtension("json");
-
-                                    File file = builder.buildAndShow(gui);
-                                    if (file != null) {
-                                        MessageDialogBuilder md = new SFXMessageDialogBuilder(sfx);
-                                        md.addButton(MessageDialogButton.OK);
-                                        md.setText("Importing theme");
-                                        if (file.isFile()) {
-                                            try (FileReader rdr = new FileReader(file)) {
-                                                Preferences.UserTheme imported = Preferences.UserTheme.fromJSON(rdr);
-                                                if (imported == null || !imported.isValid())
-                                                    throw new IOException("Invalid theme");
-                                                updateTheme(imported);
-                                                prefs.getTheme().fromTheme(imported);
-                                                md.setText("Theme imported!");
-                                                win2.close();
-                                            } catch (IOException e) {
-                                                showErrorDialog(gui,
-                                                                e,
-                                                                sfx,
-                                                                "An exception was catched",
-                                                                "when trying to import your theme!");
-                                                return;
-                                            }
-                                        } else {
-                                            md.setText("This file does not exist!");
-                                        }
-                                        md.build().showDialog(gui);
-                                    }
-                                });
 
                                 win2.setComponent(Panels.grid(2,
                                                               Panels.vertical(new Label("Choose a preset"),
@@ -536,11 +428,11 @@ public class TUIMines {
                                     text.setText(" | \n" + " | \n" + " |  Customize game's appearance\n" + " | \n" + " | \n" + " | \n" + " |");
                                 }
                             };
-                            Button leaderboards = new SFXButton("Leaderboards", sfx, this::displayLeaderboards) {
+                            Button leaderboards = new SFXButton("Leaderboards", sfx, notAvailable) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " | \n" + " | \n" + " | \n" + " |  Show top times by difficulty\n" + " | \n" + " |");
+                                    text.setText(" | \n" + " | \n" + " | \n" + " | \n" + " |  Not available\n" + " | \n" + " |");
                                 }
                             };
                             Button done = new SFXButton("Done", sfx, true, win::close) {
@@ -556,18 +448,17 @@ public class TUIMines {
                                 boolean sndAvailable = sfx.isAvailable();
                                 boolean guiAvailable = term
                                         instanceof SwingTerminalFrame;
-                                boolean discordAvailable = DiscordWrapper.isAvailable();
 
                                 CheckBox shaking = new SFXCheckBox("Enable screen shaking",
-                                                                   ops.isScreenShaking() && guiAvailable,
+                                                                   false,
                                                                    sfx);
                                 CheckBox sounds = new SFXCheckBox("Enable sounds",
-                                                                  ops.areSoundsEnabled() && sndAvailable,
+                                                                  false,
                                                                   sfx);
                                 CheckBox discord = new SFXCheckBox("Discord integration",
-                                                                   ops.isDiscordIntegrationEnabled() && discordAvailable,
+                                                                   false,
                                                                    sfx);
-                                CheckBox updates = new SFXCheckBox("Update checker", ops.areUpdatesEnabled(), sfx);
+                                CheckBox updates = new SFXCheckBox("Update checker", false, sfx);
 
                                 ComboBox<String> playStyle = new SFXComboBox<>(sfx, "Classic", "Flag only");
                                 playStyle.addListener((i, i1, b) -> {
@@ -590,9 +481,10 @@ public class TUIMines {
                                 });
                                 playStyle.setSelectedIndex(ops.isFlagOnly() ? 1 : 0);
 
-                                sounds.setEnabled(sndAvailable);
-                                shaking.setEnabled(guiAvailable);
-                                discord.setEnabled(discordAvailable);
+                                sounds.setEnabled(false);
+                                shaking.setEnabled(false);
+                                discord.setEnabled(false);
+                                updates.setEnabled(false);
 
                                 win2.setComponent(Panels.vertical(
                                         Panels.vertical(shaking,
@@ -618,17 +510,6 @@ public class TUIMines {
                                                                                 ops.setDiscordIntegration(discord.isChecked());
                                                                             ops.setUpdatesEnabled(updates.isChecked());
                                                                             ops.setFlagOnly(playStyle.getSelectedIndex() == 1);
-                                                                            sfx.setEnabled(ops.areSoundsEnabled());
-                                                                            DiscordIntegr.setEnabled(discord.isChecked(),
-                                                                                                     this);
-                                                                            try {
-                                                                                prefs.save();
-                                                                            } catch (IOException e) {
-                                                                                Dialogs.showErrorDialog(gui,
-                                                                                                        e,
-                                                                                                        sfx,
-                                                                                                        "Couldn't save preferences!");
-                                                                            }
                                                                             win2.close();
                                                                         }),
                                                           new SFXButton("Cancel",
@@ -643,51 +524,11 @@ public class TUIMines {
                                     text.setText(" | \n" + " | \n" + " | \n" + " |  Adjust game settings\n" + " | \n" + " | \n" + " |");
                                 }
                             };
-                            Button replays = new SFXButton("Replays", sfx, () -> {
-                                Window win2 = new SimpleWindow("Replays");
-
-                                Label text2 = new Label("");
-                                text2.setPreferredSize(new TerminalSize(38, 3));
-
-                                Button local = new SFXButton("Local", sfx, () -> {
-                                    win2.close();
-                                    win.close();
-                                    openLocalReplayBrowser();
-                                }) {
-                                    @Override
-                                    protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
-                                        super.afterEnterFocus(direction, previouslyInFocus);
-                                        text2.setText(" |  Browse replays saved locally\n |\n |");
-                                    }
-                                };
-
-                                Button online = new SFXButton("Online", sfx, () -> {
-                                    win2.close();
-                                    win.close();
-                                    openRemoteReplayBrowser();
-                                }) {
-                                    @Override
-                                    protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
-                                        super.afterEnterFocus(direction, previouslyInFocus);
-                                        text2.setText(" | \n |  Browse replays shared by others\n |");
-                                    }
-                                };
-                                Button back = new SFXButton("Back", sfx, true, win2::close) {
-                                    @Override
-                                    protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
-                                        super.afterEnterFocus(direction, previouslyInFocus);
-                                        text2.setText(" | \n |\n |  Go back");
-                                    }
-                                };
-
-
-                                win2.setComponent(Panels.grid(2, Panels.vertical(local, online, back), text2));
-                                gui.addWindowAndWait(win2);
-                            }) {
+                            Button replays = new SFXButton("Replays", sfx, notAvailable) {
                                 @Override
                                 protected void afterEnterFocus(FocusChangeDirection direction, Interactable previouslyInFocus) {
                                     super.afterEnterFocus(direction, previouslyInFocus);
-                                    text.setText(" | \n" + " |  Browse and play replays \n" + " |  \n" + " | \n" + " | \n" + " | \n" + " |");
+                                    text.setText(" | \n" + " |  Not available \n" + " |  \n" + " | \n" + " | \n" + " | \n" + " |");
                                 }
                             };
                             Button about = new SFXButton("About", sfx, () -> {
@@ -706,9 +547,6 @@ public class TUIMines {
                                         new EmptySpace(),
                                         Panels.horizontal(
                                                 new SFXButton("Back", sfx, true, abt::close),
-                                                new SFXButton("Vote for the project!",
-                                                              sfx,
-                                                              () -> Main.openLink("https://discordjug.net", sfx, gui)),
                                                 new SFXButton("GitHub",
                                                               sfx,
                                                               () -> Main.openLink(
@@ -727,10 +565,7 @@ public class TUIMines {
                                 }
                             };
 
-                            DiscordUser user = DiscordIntegr.getUser();
-                            Label discord = new Label(
-                                    !DiscordIntegr.isEnabled() || user == null ? "Not connected to Discord" : "Logged to Discord as:\n" +
-                                                                                                              user.username
+                            Label discord = new Label("Discord integration disabled"
                             );
 
                             win.setComponent(Panels.vertical(discord, new EmptySpace(), Panels.grid(2,
@@ -769,33 +604,25 @@ public class TUIMines {
                 case ArrowLeft: {
                     cx--;
                     allowed = true;
-                    arrow = true;
                     break;
                 }
                 case ArrowRight: {
                     cx++;
                     allowed = true;
-                    arrow = true;
                     break;
                 }
                 case ArrowUp: {
                     cy--;
                     allowed = true;
-                    arrow = true;
                     break;
                 }
                 case ArrowDown: {
                     cy++;
                     allowed = true;
-                    arrow = true;
                     break;
                 }
                 default:
                     break;
-            }
-
-            if (arrow) {
-                recorder.action(Replay.ActionType.CARET, cx, cy);
             }
 
             if (allowed) updateBoard(cx, cy);
@@ -833,367 +660,6 @@ public class TUIMines {
                 new EmptySpace(),
                 new SFXButton("OK", sfx, true, win::close)
         ));
-        gui.addWindowAndWait(win);
-    }
-
-    private void openRemoteReplayBrowser() {
-        Window downloading = showDownloadingWindow(gui);
-        Future<?> future = remoteRepo.fetch(ex -> {
-            downloading.close();
-            if (ex != null) {
-                showErrorDialog(gui, ex, sfx, "Couldn't download from remote repository!");
-                return;
-            }
-            Window win = new SimpleWindow("Replay browser");
-            List<RemoteReplay> replays = new ArrayList<>();
-            Collections.addAll(replays, remoteRepo.getReplays());
-
-
-            List<String> dl = new ArrayList<>();
-            dl.add("All");
-            dl.addAll(Arrays.stream(Difficulty.values()).map(TUIMines::capitalize).collect(Collectors.toList()));
-            ComboBox<String> diffs = new SFXComboBox<>(sfx, dl.toArray(new String[0]));
-            ComboBox<RemoteReplay.Sorting> sort = new SFXComboBox<>(sfx, RemoteReplay.Sorting.values());
-
-            Table<Object> table = new Table<>("#", "ID", "Author", "Time", "Difficulty");
-            table.setPreferredSize(new TerminalSize(50, 10));
-
-            table.setSelectAction(() -> {
-                Object selected = table.getTableModel().getRow(table.getSelectedRow()).get(0);
-                if (selected instanceof Integer) {
-                    int index = (int) selected - 1;
-                    if (index < replays.size()) {
-                        RemoteReplay replay = replays.get(index);
-                        Window win2 = new SimpleWindow("Replay info");
-
-                        String id = replay.getIdentifier();
-
-                        win2.setComponent(Panels.vertical(
-                                Panels.vertical(new Label("Identifier: " + (id.isEmpty() ? "<None>" : id)),
-                                                new Label("Author: " + replay.getAuthor()),
-                                                new Label("Play time: " + TIME_FORMAT.format(new Date(replay.getPlayTime()))))
-                                      .withBorder(Borders.singleLine("Info")),
-                                Panels.vertical(new Label("Difficulty: " + capitalize(replay.getDifficulty())),
-                                                new Label(String.format("Size: %sx%s (%s bombs)",
-                                                                        replay.getWidth(),
-                                                                        replay.getHeight(),
-                                                                        replay.getBombs())))
-                                      .withBorder(Borders.singleLine("Difficulty")),
-                                Panels.vertical(new Label("Added: " + DATE_FORMAT.format(new Date(replay.getAddedTime()))),
-                                                new Label("Created: " + DATE_FORMAT.format(new Date(replay.getCreatedTime()))))
-                                      .withBorder(Borders.singleLine("Times")),
-                                new EmptySpace(),
-                                Panels.horizontal(new SFXButton("Back", sfx, true, win2::close),
-                                                  new SFXButton("Play", sfx, false, () -> {
-                                                      Replay rpl = replay.fetch();
-                                                      if (rpl == null) {
-                                                          new SFXMessageDialogBuilder(sfx).setText(
-                                                                                                  "Couldn't download this replay!")
-                                                                                          .setTitle("Error")
-                                                                                          .addButton(MessageDialogButton.OK)
-                                                                                          .build().showDialog(gui);
-                                                      } else if (new SFXMessageDialogBuilder(sfx)
-                                                                         .addButton(MessageDialogButton.No)
-                                                                         .addButton(MessageDialogButton.Yes)
-                                                                         .setText(
-                                                                                 "Playing a replay will discard your current game.\n" +
-                                                                                 "Do you want to continue?")
-                                                                         .setTitle("Warning")
-                                                                         .build()
-                                                                         .showDialog(gui) == MessageDialogButton.Yes) {
-                                                          win2.close();
-                                                          win.close();
-                                                          startReplay(rpl);
-                                                      }
-                                                  }),
-                                                  new SFXButton("Download", sfx, false, () -> {
-                                                      Replay rpl = replay.fetch();
-                                                      if (rpl == null) {
-                                                          new SFXMessageDialogBuilder(sfx).setText(
-                                                                                                  "Couldn't download this replay!")
-                                                                                          .setTitle("Error")
-                                                                                          .addButton(MessageDialogButton.OK)
-                                                                                          .build().showDialog(gui);
-                                                      } else {
-                                                          try {
-                                                              File dir = Preferences.getReplaysDir();
-                                                              dir.mkdirs();
-                                                              File out = new File(dir,
-                                                                                  FILE_FORMAT.format(new Date()) + ".jbcfrt");
-                                                              ReplayIO.write(rpl, out);
-
-                                                              new SFXMessageDialogBuilder(sfx).setText(
-                                                                                                      "Replay saved!\n" +
-                                                                                                      "You can now access it in your local replays.")
-                                                                                              .setTitle("Success")
-                                                                                              .addButton(
-                                                                                                      MessageDialogButton.OK)
-                                                                                              .build().showDialog(gui);
-                                                              win2.close();
-                                                          } catch (Exception e) {
-                                                              showErrorDialog(gui, e, sfx, "Couldn't save the replay!");
-                                                          }
-                                                      }
-                                                  }))
-                        ));
-                        gui.addWindowAndWait(win2);
-                    }
-                }
-            });
-
-            diffs.addListener((i, i1, b) -> {
-                table.getTableModel().clear();
-                String dif = diffs.getItem(i);
-                int index = 0;
-                int added = 0;
-                for (RemoteReplay replay : replays) {
-                    if ("all".equalsIgnoreCase(dif) || replay.getDifficulty().name().equalsIgnoreCase(dif)) {
-                        table.getTableModel().addRow(index + 1, replay.getIdentifier(),
-                                                     replay.getAuthor(),
-                                                     TIME_FORMAT.format(new Date(replay.getPlayTime())),
-                                                     capitalize(replay.getDifficulty()));
-                        added++;
-                    }
-                    index++;
-                }
-                if (added == 0) {
-                    table.getTableModel().addRow("", "<No replays>", "", "", "");
-                }
-            });
-
-            sort.addListener((i, i1, b) -> {
-                RemoteReplay.Sorting s = sort.getItem(i);
-                if (s != null) {
-                    Comparator<RemoteReplay> comparator;
-                    switch (s) {
-                        default:
-                        case DATE: {
-                            comparator = (o1, o2) -> (int) (o1.getAddedTime() / 1000 - o2.getAddedTime() / 1000);
-                            break;
-                        }
-                        case TIME: {
-                            comparator = (o1, o2) -> (int) (o1.getPlayTime() - o2.getPlayTime());
-                            break;
-                        }
-                        case CREATED: {
-                            comparator = (o1, o2) -> (int) (o1.getCreatedTime() / 1000 - o2.getCreatedTime() / 1000);
-                            break;
-                        }
-                    }
-                    replays.sort(comparator);
-                }
-                diffs.setSelectedIndex(diffs.getSelectedIndex());
-            });
-
-            sort.setSelectedIndex(0);
-
-
-            win.setComponent(Panels.vertical(
-                    Panels.grid(2, new Label("Filter by    "),
-                                new Label("Sort by"),
-                                diffs,
-                                sort),
-                    new EmptySpace(),
-                    table.withBorder(Borders.singleLine()),
-                    new SFXButton("Close", sfx, true, win::close)
-            ));
-            table.takeFocus();
-            gui.addWindowAndWait(win);
-        });
-
-        Button cancel = new SFXButton("Cancel", sfx, true, () -> {
-            downloading.close();
-            remoteRepo.cancel(future);
-        });
-        ((Panel) downloading.getComponent()).addComponent(cancel);
-        cancel.takeFocus();
-    }
-
-    private void openLocalReplayBrowser() {
-        Window win = new SimpleWindow("Replay viewer");
-        List<File> replayFiles = new ArrayList<>();
-        List<Replay> replays = new ArrayList<>();
-        if (Preferences.getReplaysDir().isDirectory())
-            try {
-                File[] list = Preferences.getReplaysDir().listFiles();
-
-                for (File f : list)
-                    if (f.getName().endsWith(".jbcfrt"))
-                        replayFiles.add(f);
-                replayFiles.sort((o1, o2) -> {
-                    int l1 = (int) (o1.lastModified() / 1000);
-                    int l2 = (int) (o2.lastModified() / 1000);
-                    return l2 - l1;
-                });
-
-                for (File f : replayFiles) {
-                    try {
-                        replays.add(ReplayIO.read(f));
-                    } catch (Exception e) {
-                        showErrorDialog(gui, e, sfx, "Corrupted replay:", f.getAbsolutePath());
-                    }
-                }
-            } catch (Exception e) {
-                showErrorDialog(gui, e, sfx, "Couldn't list files in replay dir");
-            }
-
-        List<String> difList = new ArrayList<>();
-        difList.add("All");
-        difList.addAll(Arrays.stream(Difficulty.values())
-                             .map(TUIMines::capitalize)
-                             .collect(Collectors.toList()));
-        ComboBox<String> difs = new SFXComboBox<>(sfx, difList.toArray(new String[0]));
-
-
-        Table<Object> table = new Table<>("#", "ID", "Created", "Time", "Difficulty");
-        table.setSelectAction(() -> {
-            Object index = table.getTableModel().getRow(table.getSelectedRow()).get(0);
-            if (index instanceof Integer) {
-                int sel = (int) index - 1;
-                if (sel < replays.size()) {
-                    Replay repl = replays.get(sel);
-                    Window win2 = new SimpleWindow("Replay");
-
-                    win2.setComponent(Panels.vertical(
-                            new Label("Identifier: " + repl.getMetadata().getIdentifier()),
-                            new Label("Date created: " + DATE_FORMAT.format(new Date(repl.getMetadata()
-                                                                                         .getCreatedDate()))),
-                            new EmptySpace(),
-                            new Label("Time: " + TIME_FORMAT.format(new Date(repl.getTime()))),
-                            new Label("Difficulty: " + repl.getMetadata().getDifficulty()),
-                            new Label(String.format("Size: %sx%s (%s bombs)",
-                                                    repl.getWidth(),
-                                                    repl.getHeight(),
-                                                    repl.getBombs().size())),
-                            new EmptySpace(),
-                            Panels.horizontal(new SFXButton("Back", sfx, true, win2::close),
-                                              new SFXButton("Play", sfx, () -> {
-                                                  if (new SFXMessageDialogBuilder(sfx)
-                                                              .addButton(MessageDialogButton.No)
-                                                              .addButton(MessageDialogButton.Yes)
-                                                              .setText(
-                                                                      "Playing a replay will discard your current game.\n" +
-                                                                      "Do you want to continue?")
-                                                              .setTitle("Warning")
-                                                              .build()
-                                                              .showDialog(gui) == MessageDialogButton.Yes) {
-                                                      win2.close();
-                                                      win.close();
-                                                      startReplay(repl);
-                                                  }
-                                              }),
-                                              new SFXButton("Delete", sfx, () -> {
-                                                  if (new SFXMessageDialogBuilder(sfx)
-                                                              .setTitle("Deleting a replay")
-                                                              .setText("Are you sure you want to delete\n" +
-                                                                       "this replay?\n" +
-                                                                       "This action is permanent")
-                                                              .addButton(MessageDialogButton.No)
-                                                              .addButton(MessageDialogButton.Yes)
-                                                              .build()
-                                                              .showDialog(gui) == MessageDialogButton.Yes) {
-                                                      repl.getMetadata().getOrigin().delete();
-                                                      win2.close();
-                                                      replays.remove(repl);
-                                                      difs.setSelectedIndex(difs.getSelectedIndex());
-                                                  }
-                                              }),
-                                              new SFXButton("Share", sfx, () -> {
-                                                  CustomFileDialogBuilder builder = (CustomFileDialogBuilder)
-                                                          new CustomFileDialogBuilder(true, sfx)
-                                                                  .setForcedExtension("jbcfrt")
-                                                                  .setTitle("Exporting a replay")
-                                                                  .setActionLabel("Save")
-                                                                  .setSelectedFile(new File("replay.jbcfrt"))
-                                                                  .setDescription("Choose where to save the replay");
-                                                  File target = builder.buildAndShow(gui);
-                                                  if (target != null) {
-                                                      File orig = repl.getMetadata().getOrigin();
-                                                      if (orig.isFile()) {
-                                                          try {
-                                                              Files.copy(orig.toPath(),
-                                                                         target.toPath(),
-                                                                         StandardCopyOption.COPY_ATTRIBUTES,
-                                                                         StandardCopyOption.REPLACE_EXISTING);
-
-                                                              Window saved = new SimpleWindow("Success");
-
-                                                              saved.setComponent(Panels.vertical(
-                                                                      new Label("Replay exported!\n\n" +
-                                                                                "Refer to\n" +
-                                                                                "https://github.com/Defective4/TUI-Mines-Repo#how-to\n" +
-                                                                                "if you want to submit your replay to the repository!"),
-                                                                      new EmptySpace(),
-                                                                      Panels.horizontal(
-                                                                              new SFXButton("Close",
-                                                                                            sfx,
-                                                                                            true,
-                                                                                            saved::close),
-                                                                              new SFXButton("Submit your replay",
-                                                                                            sfx,
-                                                                                            false,
-                                                                                            () ->
-                                                                                                    Main.openLink(
-                                                                                                            "https://github.com/Defective4/TUI-Mines-Repo/issues/new?assignees=&labels=Replay&projects=&template=replay-submission.yml&title=%5BReplay%5D+",
-                                                                                                            sfx,
-                                                                                                            gui)
-                                                                              )
-                                                                      )
-                                                              ));
-
-                                                              gui.addWindowAndWait(saved);
-                                                          } catch (Exception e) {
-                                                              showErrorDialog(gui,
-                                                                              e,
-                                                                              sfx,
-                                                                              "Couldn't export your replay!");
-                                                          }
-                                                      }
-                                                  }
-                                              }))
-                    ));
-                    gui.addWindowAndWait(win2);
-                }
-            }
-        });
-        table.setPreferredSize(new TerminalSize(50, 10));
-
-
-        difs.addListener((i, i1, b) -> {
-            table.getTableModel().clear();
-
-            String dif = difs.getItem(i);
-            int index = 0;
-            Difficulty difE = dif.equalsIgnoreCase("all") ? null : Difficulty.valueOf(dif.toUpperCase());
-            int addedN = 0;
-            for (Replay rpl : replays) {
-                if (difE == null || rpl.getMetadata().getDifficulty() == difE) {
-                    table.getTableModel().addRow(index + 1,
-                                                 rpl.getMetadata().getIdentifier(),
-                                                 DATE_FORMAT.format(new Date(rpl.getMetadata().getCreatedDate())),
-                                                 TIME_FORMAT.format(new Date(rpl.getTime())),
-                                                 capitalize(rpl.getMetadata().getDifficulty())
-                    );
-                    addedN++;
-                }
-                index++;
-            }
-            if (addedN == 0) {
-                table.getTableModel().addRow("", "<No replays>", "", "", "");
-            }
-        });
-
-        difs.setSelectedIndex(0);
-
-
-        win.setComponent(Panels.vertical(
-                new Label("Filter by difficulty"),
-                difs,
-                new EmptySpace(),
-                table.withBorder(Borders.singleLine()),
-                new SFXButton("Back", sfx, true, win::close)
-        ));
-        table.takeFocus();
         gui.addWindowAndWait(win);
     }
 
@@ -1253,43 +719,13 @@ public class TUIMines {
         gui.addWindowAndWait(win);
     }
 
-    public boolean isReplay() {
-        return isReplay;
-    }
-
     public byte getGameOver() {
         return gameOver;
     }
 
     private void updateTheme(Preferences.UserTheme theme) {
         gui.setTheme(theme.toTUITheme());
-        try {
-            prefs.save();
-        } catch (IOException e) {
-            Dialogs.showErrorDialog(gui, e, sfx, "Couldn't save preferences!");
-        }
         infoLabel.setTheme(new SimpleTheme(TextColor.ANSI.BLACK, TextColor.ANSI.WHITE_BRIGHT));
-    }
-
-    public void shake() {
-        if (!prefs.getOptions().isScreenShaking()) return;
-        if (term instanceof SwingTerminalFrame) {
-            SwingTerminalFrame frame = (SwingTerminalFrame) term;
-            Point original = frame.getLocation();
-            boardUpdater.scheduleAtFixedRate(new TimerTask() {
-                int x = 50;
-
-                @Override
-                public void run() {
-                    frame.setLocation((int) (original.getX() + (x % 2 == 0 ? 2 : -2)), (int) original.getY());
-                    x--;
-                    if (x <= 0) {
-                        cancel();
-                        frame.setLocation(original);
-                    }
-                }
-            }, 10, 10);
-        }
     }
 
     public Difficulty getLocalDifficulty() {
@@ -1322,23 +758,19 @@ public class TUIMines {
         switch (current) {
             case 0: {
                 if (fields[0] - fields[1] <= 0) break;
-                sfx.play("flag");
                 c = 12;
                 break;
             }
             case 11: {
                 if (fields[0] - fields[1] <= 0) break;
-                sfx.play("flag");
                 c = 13;
                 break;
             }
             case 12: {
-                sfx.play("unflag");
                 c = 0;
                 break;
             }
             case 13: {
-                sfx.play("unflag");
                 c = 11;
                 break;
             }
@@ -1348,8 +780,6 @@ public class TUIMines {
         }
         if (c > -1) {
             startTimer();
-            recorder.start();
-            recorder.action(Replay.ActionType.FLAG, x, y);
             board.setFieldAt(x, y, c);
         }
     }
@@ -1362,7 +792,6 @@ public class TUIMines {
         if (gameOver > 0)
             return 0;
         startTimer();
-        recorder.start();
         int count = 0;
         byte current = board.getFieldAt(x, y);
         if (!placed) {
@@ -1408,8 +837,6 @@ public class TUIMines {
             } else {
                 board.setFieldAt(x, y, bombs);
             }
-            if (user)
-                recorder.action(Replay.ActionType.REVEAL, x, y);
             count++;
         } else if (current > 0 && current < 10) {
             int flags = board.countFlags(x, y);
@@ -1422,15 +849,10 @@ public class TUIMines {
                         }
                     }
             }
-            if (user)
-                recorder.action(Replay.ActionType.REVEAL, x, y);
         } else if (current == 11) {
             board.revealMines();
             gameOver = 1;
-            recorder.stop();
             endTime = System.currentTimeMillis();
-            sfx.play("bomb");
-            shake();
         }
         return count;
     }
@@ -1439,94 +861,14 @@ public class TUIMines {
         gui.addWindow(mainWindow);
     }
 
-    public void displayLeaderboards() {
-        Window win = new SimpleWindow("Leaderboards");
-
-        Table<String> table = new Table<>("#", "Time", "Date (yy-mm-dd hh:mm)");
-        table.setPreferredSize(new TerminalSize(35, 11));
-
-        ComboBox<Difficulty> diff = new SFXComboBox<>(sfx, Difficulty.EASY, Difficulty.NORMAL, Difficulty.HARD);
-        Difficulty current = prefs.getDifficulty();
-        diff.addListener((i, i1, b) -> {
-            Difficulty sel = diff.getItem(i);
-            int index = 0;
-            table.getTableModel().clear();
-            Leaderboards.Entry[] entries = leaders.getEntries(sel, 10);
-            if (entries.length == 0) {
-                table.getTableModel().addRow("", "No entries", "");
-            } else for (Leaderboards.Entry et : entries) {
-                index++;
-                table.getTableModel()
-                     .addRow(Integer.toString(index),
-                             new SimpleDateFormat("mm:ss").format(new Date(et.getTime())),
-                             new SimpleDateFormat("(yy-MM-dd kk:mm)").format(new Date(et.getDate())));
-            }
-        });
-        diff.setSelectedItem(current == Difficulty.CUSTOM ? Difficulty.EASY : current);
-
-        win.setComponent(Panels.vertical(new Label("Difficulty"),
-                                         diff,
-                                         new EmptySpace(),
-                                         table.withBorder(Borders.singleLine()),
-                                         new EmptySpace(),
-                                         Panels.horizontal(
-                                                 new SFXButton("Close", sfx, true, win::close),
-                                                 new SFXButton("Clear", sfx, () -> {
-                                                     if (new SFXMessageDialogBuilder(sfx)
-                                                                 .setTitle("Are you sure?")
-                                                                 .setText(
-                                                                         "Are you sure you want to clear ALL leaderboard entries?\n" +
-                                                                         "This cannot be undone!")
-                                                                 .addButton(MessageDialogButton.No).
-                                                                 addButton(MessageDialogButton.Yes)
-                                                                 .build()
-                                                                 .showDialog(gui) == MessageDialogButton.Yes) {
-                                                         leaders.clear();
-                                                         new SFXMessageDialogBuilder(sfx)
-                                                                 .setText("Leaderboards cleared")
-                                                                 .addButton(MessageDialogButton.OK)
-                                                                 .build().showDialog(gui);
-                                                         win.close();
-                                                     }
-                                                 })
-                                         )));
-        gui.addWindow(win);
-    }
-
     public void start() {
         try {
-            currentReplay = null;
-            isReplay = false;
-            player.stop();
-            recorder.stop();
-            recorder.setEnabled(true);
             board.initialize(prefs.getWidth(), prefs.getHeight(), prefs.getBombs());
             resetVariables();
             updateBoard();
             boardBox.setCaretPosition(MineBoard.Y_OFFSET, board.getXOffset());
-            DiscordIntegr.updateStartDate();
         } catch (Exception e) {
             showErrorDialog(gui, e, sfx, "Error initializing the field!");
-        }
-    }
-
-    public void startReplay(Replay replay) {
-        try {
-            isReplay = true;
-            player.stop();
-            recorder.stop();
-            recorder.setEnabled(false);
-            board.initializeReplay(replay.getWidth(), replay.getHeight(), replay.getBombs().size(), replay.getSeed());
-            for (Replay.CoordPair bomb : replay.getBombs())
-                board.setFieldAt(bomb.getX(), bomb.getY(), 11);
-            resetVariables();
-            updateBoard();
-            boardBox.setCaretPosition(0, 0);
-            player.play(replay);
-            currentReplay = replay;
-            DiscordIntegr.updateStartDate();
-        } catch (Exception e) {
-            showErrorDialog(gui, e, sfx, "Error initializing replay field!", "The replay might be corrupted.");
         }
     }
 
@@ -1577,48 +919,14 @@ public class TUIMines {
             int[] fields = board.countAllFields(11, 12, 0, 13);
             if (fields[0] == 0 && fields[1] == 0 && fields[2] == 0) {
                 gameOver = 2;
-                Replay replay = recorder.getReplay();
-                recorder.stop();
-                sfx.play("win");
                 endTime = System.currentTimeMillis();
                 Difficulty diff = prefs.getDifficulty();
-                if (diff != Difficulty.CUSTOM && !isReplay) {
-                    leaders.addEntry(diff, endTime - startTime);
-                }
-                Window win = new SimpleWindow(isReplay ? "Replay ended" : "Game won");
+                Window win = new SimpleWindow("Game won");
                 Panel ctl = Panels.horizontal();
-                if (diff != Difficulty.CUSTOM && !isReplay)
-                    ctl.addComponent(new SFXButton("Leaderboards", sfx, this::displayLeaderboards));
 
-                if (!isReplay)
-                    ctl.addComponent(new SFXButton("Save replay", sfx, () -> {
-                        String name = new SFXTextInputDialogBuilder(sfx)
-                                .setValidator(s -> s.length() <= 10 ? null : "The name must be less than 10 characters long!")
-                                .setTextBoxSize(new TerminalSize(10, 1))
-                                .setTitle("Enter replay name")
-                                .setDescription("Enter replay name in the field below.\n" +
-                                                "You can leave the field empty.")
-                                .build().showDialog(gui);
-                        if (name != null) {
-                            replay.getMetadata().setIdentifier(name);
-                            File dir = Preferences.getReplaysDir();
-                            dir.mkdirs();
-                            String rpn = FILE_FORMAT.format(new Date()) + ".jbcfrt";
-                            try {
-                                ReplayIO.write(replay, new File(dir, rpn));
-                                new SFXMessageDialogBuilder(sfx).addButton(MessageDialogButton.OK)
-                                                                .setText("Replay saved!")
-                                                                .setTitle("Success")
-                                                                .build()
-                                                                .showDialog(gui);
-                            } catch (Exception e) {
-                                showErrorDialog(gui, e, sfx, "An error occured while saving", "the replay!");
-                            }
-                        }
-                    }));
                 ctl.addComponent(new SFXButton("Close", sfx, true, win::close));
 
-                win.setComponent(Panels.vertical(new Label(isReplay ? "Replay ended" : "You won!\nYour time is " + getCurrentPlayingTime()),
+                win.setComponent(Panels.vertical(new Label("You won!\nYour time is " + getCurrentPlayingTime()),
                                                  new EmptySpace(),
                                                  ctl
 
@@ -1686,23 +994,13 @@ public class TUIMines {
 
             builder.append("\n");
         }
-
-        if (isReplay && gameOver == 0) {
-            builder.append("\n")
-                   .append("\n")
-                   .append("    ")
-                   .append("\n")
-                   .append("    n - End replay");
-        } else {
-            builder.append("\n    ")
-                   .append(gameOver == 0 ? "" : gameOver == 2 ? "You won!" : "GAME OVER")
-                   .append("\n")
-                   .append("    ")
-                   .append("\n")
-                   .append("    n - New Game     g - Go to field...\n")
-                   .append("    m - Game Menu    u - Find next empty field\n")
-                   .append("    q - Quit         h - Show controls");
-        }
+        builder.append("\n    ")
+               .append(gameOver == 0 ? "" : gameOver == 2 ? "You won!" : "GAME OVER")
+               .append("\n")
+               .append("    ")
+               .append("\n")
+               .append("    n - New Game     g - Go to field...\n")
+               .append("    m - Game Menu    u - Find next empty field\n");
 
         boardBox.setText(builder.toString());
 
@@ -1712,12 +1010,10 @@ public class TUIMines {
         labelText.append("  ")
                  .append(emote)
                  .append("   TUI-Mines    Difficulty: ")
-                 .append(currentReplay != null && isReplay ? currentReplay.getMetadata()
-                                                                          .getDifficulty() : localDifficulty);
+                 .append(localDifficulty);
         int wh = screen.getTerminalSize().getColumns();
         for (int x = labelText.length(); x < wh; x++)
             labelText.append(" ");
         infoLabel.setText(labelText.toString());
-        DiscordIntegr.update(this);
     }
 }
