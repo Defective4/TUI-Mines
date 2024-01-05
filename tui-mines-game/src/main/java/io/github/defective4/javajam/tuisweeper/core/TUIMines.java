@@ -544,13 +544,7 @@ public class TUIMines {
                                                   "Github: https://github.com/Defective4/TUI-Mines"),
                                         new EmptySpace(),
                                         Panels.horizontal(
-                                                new SFXButton("Back", sfx, true, abt::close),
-                                                new SFXButton("GitHub",
-                                                              sfx,
-                                                              () -> Main.openLink(
-                                                                      "https://github.com/Defective4/TUI-Mines",
-                                                                      sfx,
-                                                                      gui))
+                                                new SFXButton("Back", sfx, true, abt::close)
 
                                         )
                                 ));
