@@ -59,14 +59,12 @@ public class TUIMines {
     private final Preferences prefs;
     private final Repository remoteRepo = new Repository();
     private final Label infoLabel;
+    private final Runnable notAvailable;
     private long startTime = -1;
     private long endTime = -1;
     private boolean placed;
     private byte gameOver;
     private Difficulty localDifficulty = Difficulty.EASY;
-
-
-    private final Runnable notAvailable;
 
     public TUIMines(Screen screen, WindowBasedTextGUI gui, Terminal term, SFXEngine sfx, Preferences prefs) {
         this.screen = screen;

@@ -1,7 +1,8 @@
 <img alt="logo" height="128" src="img/logo.png" width="128"/>  
 
 ![](https://img.shields.io/github/last-commit/defective4/TUI-Mines/master?style=flat-square)   [![](https://img.shields.io/github/actions/workflow/status/defective4/tui-mines/maven.yml?style=flat-square)](https://github.com/Defective4/TUI-Mines/actions)   ![](https://img.shields.io/github/license/defective4/TUI-Mines?style=flat-square)  [![](https://img.shields.io/github/v/release/defective4/tui-mines?style=flat-square)](https://github.com/Defective4/TUI-Mines/releases)     
-[Releases](https://github.com/Defective4/TUI-Mines/releases) | [**Installation**](#-installation) | [Share your theme/replay](#-share-your-theme-or-replay)
+[Releases](https://github.com/Defective4/TUI-Mines/releases) | [**Installation
+**](#-installation) | [Share your theme/replay](#-share-your-theme-or-replay)
 
 # ![info](img/info.png) Description
 
@@ -22,6 +23,7 @@ The game also has its own terminal emulator that can be used as an alternative.
 - Discord integration (Rich presence)
 
 # ![planned](img/star.png) Planned
+
 - [ ] Live multiplayer
 - [ ] More game styles/modes
 

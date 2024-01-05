@@ -6,8 +6,8 @@ import com.googlecode.lanterna.gui2.dialogs.FileDialog;
 import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
-import io.github.defective4.javajam.tuisweeper.components.sfx.SoundEngine;
 import io.github.defective4.javajam.tuisweeper.components.sfx.SFXMessageDialogBuilder;
+import io.github.defective4.javajam.tuisweeper.components.sfx.SoundEngine;
 
 import java.io.File;
 import java.lang.reflect.Field;

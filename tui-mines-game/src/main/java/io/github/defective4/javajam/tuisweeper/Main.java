@@ -11,13 +11,13 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
-import io.github.defective4.javajam.tuisweeper.core.TUIMines;
 import io.github.defective4.javajam.tuisweeper.components.sfx.SFXButton;
 import io.github.defective4.javajam.tuisweeper.components.sfx.SFXEngine;
 import io.github.defective4.javajam.tuisweeper.components.sfx.SFXMessageDialogBuilder;
-import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 import io.github.defective4.javajam.tuisweeper.components.ui.Dialogs;
 import io.github.defective4.javajam.tuisweeper.components.ui.SimpleWindow;
+import io.github.defective4.javajam.tuisweeper.core.TUIMines;
+import io.github.defective4.javajam.tuisweeper.core.storage.Preferences;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
